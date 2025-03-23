@@ -16,6 +16,10 @@ echo "Created logs directory"
 mkdir -p "Lego Parts Search.app/Contents/MacOS"
 mkdir -p "Lego Parts Search.app/Contents/Resources"
 
+# Copy the icon file to the Resources directory
+cp icon.icns "Lego Parts Search.app/Contents/Resources/"
+echo "Copied icon file to Resources"
+
 # Create Info.plist
 cat > "Lego Parts Search.app/Contents/Info.plist" << EOL
 <?xml version="1.0" encoding="UTF-8"?>
@@ -44,6 +48,8 @@ cat > "Lego Parts Search.app/Contents/Info.plist" << EOL
     <string>10.9.0</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
+    <key>CFBundleIconFile</key>
+    <string>3001.icns</string>
 </dict>
 </plist>
 EOL

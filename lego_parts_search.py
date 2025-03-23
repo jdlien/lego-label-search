@@ -512,7 +512,6 @@ class LegoPartsSearch(tk.Tk):
         # Bind events
         self.tree.bind('<ButtonRelease-1>', self.on_treeview_click)
         self.tree.bind('<Motion>', self.on_treeview_motion)
-        self.tree.bind('<Expose>', self.on_treeview_expose)
 
         # If we have cached results, refill the treeview
         if hasattr(self, 'cached_results') and self.cached_results:
@@ -549,23 +548,6 @@ class LegoPartsSearch(tk.Tk):
             logging.error(f"Motion handling error: {e}", exc_info=True)
             self.tree.configure(cursor="")
 
-    def on_treeview_expose(self, event):
-        """Handle treeview expose events to reapply styling after scrolling"""
-        if not 'label_file' in self.visible_columns:
-            return
-
-        # Get the blue color for macOS UI
-        blue_color = '#0A84FF' if self.is_dark_mode() else '#0066CC'
-
-        # Reapply colors to all visible cells
-        label_idx = self.visible_columns.index('label_file')
-        for item in self.tree.get_children():
-            values = self.tree.item(item, 'values')
-            if label_idx < len(values) and values[label_idx]:
-                # Schedule with a small delay to ensure rendering is complete
-                self.after(10, lambda item=item, idx=label_idx:
-                         self.highlight_label_cell(item, idx, blue_color))
-
     def fill_treeview_with_results(self, results):
         """Fill the treeview with search results"""
         # Clear existing items
@@ -575,9 +557,6 @@ class LegoPartsSearch(tk.Tk):
         if not results:
             self.status_var.set("No results found")
             return
-
-        # Get the blue color for macOS UI
-        blue_color = '#0A84FF' if self.is_dark_mode() else '#0066CC'
 
         # Insert items
         for result in results:
@@ -590,61 +569,12 @@ class LegoPartsSearch(tk.Tk):
                     values.append('')
 
             # Insert the row
-            item = self.tree.insert('', 'end', values=values)
-
-            # Apply color to the label file column if it exists
-            if 'label_file' in self.visible_columns:
-                label_idx = self.visible_columns.index('label_file')
-                if label_idx < len(values) and values[label_idx]:
-                    # Schedule a call to highlight the cell after it's drawn
-                    self.after(10, lambda item=item, idx=label_idx:
-                             self.highlight_label_cell(item, idx, blue_color))
+            self.tree.insert('', 'end', values=values)
 
         # Log the number of results
         num_results = len(results)
         logging.debug(f"Filled treeview with {num_results} results")
         self.status_var.set(f"Found {num_results} {'result' if num_results == 1 else 'results'}")
-
-    def is_dark_mode(self):
-        """Check if system is using dark mode"""
-        try:
-            if sys.platform == 'darwin':
-                # Check macOS appearance
-                is_dark = self.tk.call('tk', 'windowingsystem') == 'aqua' and \
-                          'dark' in self.tk.call('::tk::mac::isDark')
-                return is_dark
-            # For other platforms, default to False
-            return False
-        except:
-            return False
-
-    def highlight_label_cell(self, item, col_idx, color):
-        """Apply a highlight color to just the label cell using widget access"""
-        try:
-            # Directly access the canvas and modify the text color
-            # This works because ttk.Treeview uses a tk.Canvas to draw its items
-            canvas = None
-
-            # Find the canvas within the treeview widget
-            for child in self.tree.winfo_children():
-                if isinstance(child, tk.Canvas):
-                    canvas = child
-                    break
-
-            if not canvas:
-                return
-
-            # Find the text item for our particular cell
-            for item_id in canvas.find_all():
-                tags = canvas.gettags(item_id)
-                # The tag format is "text#" where # is the column number (1-based)
-                if f"text{col_idx+1}" in tags and f"item{item}" in tags:
-                    # This is the text for our cell - set its color
-                    canvas.itemconfigure(item_id, fill=color)
-                    break
-
-        except Exception as e:
-            logging.error(f"Error highlighting cell: {e}", exc_info=True)
 
     def on_treeview_click(self, event):
         """Handle clicks on the treeview, opening label files when clicking on label file column"""

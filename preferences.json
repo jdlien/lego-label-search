@@ -1,7 +1,7 @@
 {
   "search_term": "brick",
   "category": "All Categories",
-  "has_labels": false,
+  "has_labels": true,
   "show_category": false,
   "show_material": false,
   "show_label_file": true,

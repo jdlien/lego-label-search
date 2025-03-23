@@ -7,7 +7,7 @@ Importing macOS-specific modules
 Starting Lego Parts Search application
 Initializing LegoPartsSearch application
 Tkinter root window initialized
-Loaded preferences: {'search_term': 'brick', 'category': 'All Categories', 'has_labels': False, 'show_category': False, 'show_material': False, 'show_label_file': True, 'label_files_root': '/Users/jdlien/Library/Mobile Documents/com~apple~CloudDocs/Lego/LEGO_BRICK_LABELS-v40/Labels'}
+Loaded preferences: {'search_term': 'brick', 'category': 'All Categories', 'has_labels': True, 'show_category': False, 'show_material': False, 'show_label_file': True, 'label_files_root': '/Users/jdlien/Library/Mobile Documents/com~apple~CloudDocs/Lego/LEGO_BRICK_LABELS-v40/Labels'}
 Debug mode disabled, no debug label shown
 Added macOS-specific window commands
 UI Update: Window configured
@@ -29,12 +29,12 @@ Initial treeview created
 Status bar created
 UI widgets created successfully
 UI Update: UI created successfully
-Searching for: 'brick' in category ID: 0, has_labels: False
-Filled treeview with 1000 results
-Found 1000 results for 'brick'
-Searching for: 'brick' in category ID: 0, has_labels: False
-Filled treeview with 1000 results
-Found 1000 results for 'brick'
+Searching for: 'brick' in category ID: 0, has_labels: True
+Filled treeview with 224 results
+Found 224 results for 'brick'
+Searching for: 'brick' in category ID: 0, has_labels: True
+Filled treeview with 224 results
+Found 224 results for 'brick'
 Applied preferences to UI
 Layout manager configured
 Initial focus set
@@ -44,9 +44,10 @@ Raising window and calling lift()
 Attempting macOS window activation
 macOS activation script executed
 Entering Tkinter mainloop
-2025-03-22 20:18:21.981 Python[40721:27803186] +[IMKClient subclass]: chose IMKClient_Modern
-2025-03-22 20:18:21.981 Python[40721:27803186] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+2025-03-22 21:42:10.687 Python[96239:28218088] +[IMKClient subclass]: chose IMKClient_Modern
+2025-03-22 21:42:10.687 Python[96239:28218088] +[IMKInputSession subclass]: chose IMKInputSession_Modern
 Application closing, cleaning up resources
-Preferences saved: {'search_term': 'brick', 'category': 'All Categories', 'has_labels': False, 'show_category': False, 'show_material': False, 'show_label_file': True, 'label_files_root': '/Users/jdlien/Library/Mobile Documents/com~apple~CloudDocs/Lego/LEGO_BRICK_LABELS-v40/Labels'}
+Preferences saved: {'search_term': 'brick', 'category': 'All Categories', 'has_labels': True, 'show_category': False, 'show_material': False, 'show_label_file': True, 'label_files_root': '/Users/jdlien/Library/Mobile Documents/com~apple~CloudDocs/Lego/LEGO_BRICK_LABELS-v40/Labels'}
 Database connection closed
 Exited mainloop
+/Users/jdlien/code/lego-label-search/activate_app.scpt:309:334: execution error: Finder got an error: Can’t get application "Python". (-1728)
