@@ -1,9 +1,11 @@
 {
-  "search_term": "brick",
+  "search_term": "1 x 1",
   "category": "All Categories",
   "has_labels": true,
-  "show_category": false,
+  "show_category": true,
   "show_material": false,
   "show_label_file": true,
-  "label_files_root": "/Users/jdlien/Library/Mobile Documents/com~apple~CloudDocs/Lego/LEGO_BRICK_LABELS-v40/Labels"
+  "show_image": true,
+  "label_files_root": "/Users/jdlien/Library/Mobile Documents/com~apple~CloudDocs/Lego/LEGO_BRICK_LABELS-v40/Labels",
+  "window_geometry": "1802x918+-2111+255"
 }

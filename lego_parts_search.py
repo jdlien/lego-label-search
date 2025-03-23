@@ -11,6 +11,7 @@ import subprocess
 import tkinter as tk
 from tkinter import ttk, filedialog
 from pathlib import Path
+from PIL import Image, ImageTk
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Lego Parts Search Application')
@@ -78,12 +79,27 @@ class LegoPartsSearch(tk.Tk):
 
             # Configure window
             self.title("Lego Parts Search")
-            self.geometry("800x600")
+
+            # Set initial geometry or load from preferences
+            default_geometry = "800x600"
+            if "window_geometry" in self.preferences:
+                # Use saved geometry but ensure window is on screen
+                try:
+                    self.geometry(self.preferences["window_geometry"])
+                    logging.info(f"Loaded window geometry: {self.preferences['window_geometry']}")
+                    # After setting geometry, check if the window is fully visible
+                    self.after(100, self.ensure_on_screen)
+                except Exception as e:
+                    logging.error(f"Error setting window geometry: {e}", exc_info=True)
+                    self.geometry(default_geometry)
+            else:
+                self.geometry(default_geometry)
+
             self.minsize(600, 400)
 
             # macOS specific settings to ensure window appears
             if sys.platform == 'darwin':
-                self.createcommand('::tk::mac::ReopenApplication', self.deiconify)
+                self.createcommand('::tk::mac::ReopenApplication', self.handle_reopen)
                 self.createcommand('::tk::mac::Quit', self.on_closing)
                 logging.info("Added macOS-specific window commands")
 
@@ -222,7 +238,7 @@ class LegoPartsSearch(tk.Tk):
 
             # Search entry
             self.search_var = tk.StringVar()
-            self.search_entry = ttk.Entry(search_frame, textvariable=self.search_var, width=30)
+            self.search_entry = ttk.Entry(search_frame, textvariable=self.search_var, width=10)
             self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
             logging.debug("Search entry created")
 
@@ -239,7 +255,7 @@ class LegoPartsSearch(tk.Tk):
             category_names = [category["name"] for category in self.categories]
 
             self.category_dropdown = ttk.Combobox(search_frame, textvariable=self.category_var,
-                                               values=category_names, width=20, state="readonly")
+                                               values=category_names, width=15, state="readonly")
             self.category_dropdown.pack(side=tk.LEFT, padx=(0, 5))
             self.category_dropdown.bind("<<ComboboxSelected>>", self.on_category_change)
             logging.debug("Category dropdown created")
@@ -254,7 +270,7 @@ class LegoPartsSearch(tk.Tk):
 
             self.has_labels_checkbutton = ttk.Checkbutton(
                 checkbox_frame,
-                text="With Labels",
+                text="Only Labels",
                 variable=self.has_labels_var,
                 command=self.on_has_labels_change
             )
@@ -270,13 +286,14 @@ class LegoPartsSearch(tk.Tk):
             column_controls_frame.pack(fill=tk.X, padx=10, pady=(0, 5))
 
             # Label for column visibility
-            visibility_label = ttk.Label(column_controls_frame, text="Columns:")
+            visibility_label = ttk.Label(column_controls_frame, text="Show:")
             visibility_label.pack(side=tk.LEFT, padx=(0, 10))
 
             # Checkboxes for column visibility
             self.show_category_var = tk.BooleanVar(value=True)
             self.show_material_var = tk.BooleanVar(value=True)
             self.show_label_file_var = tk.BooleanVar(value=True)
+            self.show_image_var = tk.BooleanVar(value=True)
 
             self.category_toggle = ttk.Checkbutton(
                 column_controls_frame,
@@ -300,7 +317,15 @@ class LegoPartsSearch(tk.Tk):
                 variable=self.show_label_file_var,
                 command=lambda: self.toggle_column_visibility("label_file")
             )
-            self.label_file_toggle.pack(side=tk.LEFT)
+            self.label_file_toggle.pack(side=tk.LEFT, padx=(0, 10))
+
+            self.image_toggle = ttk.Checkbutton(
+                column_controls_frame,
+                text="Images",
+                variable=self.show_image_var,
+                command=self.toggle_image_panel
+            )
+            self.image_toggle.pack(side=tk.LEFT)
 
             # Add separator
             separator = ttk.Separator(column_controls_frame, orient='vertical')
@@ -322,13 +347,27 @@ class LegoPartsSearch(tk.Tk):
 
             logging.debug("Column visibility controls created")
 
-            # Results area
-            results_frame = ttk.Frame(main_container)
-            results_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
-            logging.debug("Results frame created")
+            # Results container with treeview and image panel
+            results_container = ttk.Frame(main_container)
+            results_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-            # Store this frame for later reference when rebuilding treeview
-            self.results_frame = results_frame
+            # Create a PanedWindow for treeview and image panel
+            self.paned = ttk.PanedWindow(results_container, orient=tk.HORIZONTAL)
+            self.paned.pack(fill=tk.BOTH, expand=True)
+
+            # Create frames for treeview and image panel
+            self.results_frame = ttk.Frame(self.paned)
+            self.image_panel = ttk.Frame(self.paned, width=100)
+
+            # Add the frames to the paned window
+            self.paned.add(self.results_frame, weight=4)
+
+            # Only add image panel if show_image is true
+            if self.show_image_var.get():
+                self.paned.add(self.image_panel, weight=1)
+                self.setup_image_panel()
+
+            logging.debug("Results frame created")
 
             # Define all possible columns and their properties
             self.all_columns = {
@@ -336,11 +375,19 @@ class LegoPartsSearch(tk.Tk):
                 "name": {"text": "Name", "width": 250, "always_visible": True},
                 "category": {"text": "Category", "width": 120, "always_visible": False},
                 "part_material": {"text": "Material", "width": 100, "always_visible": False},
-                "label_file": {"text": "Label File", "width": 150, "always_visible": False}
+                "label_file": {"text": "Label File", "width": 150, "always_visible": False},
             }
 
-            # Store visible columns (initially all)
-            self.visible_columns = list(self.all_columns.keys())
+            # Store visible columns (initially all but without the image column)
+            self.visible_columns = [col for col in self.all_columns.keys()]
+
+            # Store image instances to prevent garbage collection
+            self.image_cache = {}
+
+            # Set images root path - it's in the same folder as the database file
+            db_path = os.path.expanduser("~/bin/lego-data")
+            self.images_root = os.path.join(db_path, "images")
+            logging.info(f"Images folder set to: {self.images_root}")
 
             # Create initial treeview
             self.create_treeview()
@@ -353,14 +400,129 @@ class LegoPartsSearch(tk.Tk):
             status_bar.pack(side=tk.BOTTOM, fill=tk.X)
             logging.debug("Status bar created")
 
-            # Bind treeview click event for label files
+            # Bind treeview click event for label files and selection
             self.tree.bind('<ButtonRelease-1>', self.on_treeview_click)
+            self.tree.bind('<<TreeviewSelect>>', self.on_treeview_select)
+            self.tree.bind('<Motion>', self.on_treeview_motion)
 
             logging.info("UI widgets created successfully")
         except Exception as e:
             logging.error(f"Error creating widgets: {e}", exc_info=True)
             self.update_debug(f"Widget creation ERROR: {e}")
             raise
+
+    def setup_image_panel(self):
+        """Set up the image panel to display images"""
+        # Clear any existing widgets
+        for widget in self.image_panel.winfo_children():
+            widget.destroy()
+
+        # Create a main container for the image panel with padding
+        main_container = ttk.Frame(self.image_panel, padding=10)
+        main_container.pack(fill=tk.BOTH, expand=True)
+
+        # Add a title for the image panel
+        title_label = ttk.Label(main_container, text="Part Image", font=('TkDefaultFont', 12, 'bold'))
+        title_label.pack(side=tk.TOP, pady=(0, 10))
+
+        # Create a centered, flexible container for the image - no border
+        img_container = ttk.Frame(main_container)
+        img_container.pack(fill=tk.BOTH, expand=True)
+
+        # Create a label to display the image with a white background
+        self.image_label = ttk.Label(img_container, anchor='center', background='white')
+        self.image_label.pack(fill=tk.BOTH, expand=True)
+
+        # Create a label for part number and name display
+        self.part_num_label = ttk.Label(main_container, text="", anchor='center',
+                                      font=('TkDefaultFont', 11), wraplength=230)
+        self.part_num_label.pack(side=tk.BOTTOM, fill=tk.X, pady=(10, 0))
+
+        # Start with "Select a part" message
+        self.image_label.config(text="Select a part to view image")
+        self.part_num_label.config(text="")
+
+    def toggle_image_panel(self):
+        """Toggle the image panel visibility"""
+        if self.show_image_var.get():
+            # Image panel should be visible
+            if not self.image_panel.winfo_ismapped():
+                # Set a good minimum width for the image panel
+                self.image_panel.config(width=250)
+                self.setup_image_panel()
+                try:
+                    self.paned.add(self.image_panel, weight=1)
+                except Exception as e:
+                    logging.debug(f"Could not add image panel, may already be added: {e}")
+                # Update the selected item to display its image
+                self.update_image_panel()
+
+                # Bind configure event to update image when panel is resized
+                self.image_panel.bind("<Configure>", self.on_panel_resize)
+        else:
+            # Image panel should be hidden
+            if self.image_panel.winfo_ismapped():
+                # Unbind configure event when hiding the panel
+                self.image_panel.unbind("<Configure>")
+                try:
+                    self.paned.forget(self.image_panel)
+                except Exception as e:
+                    logging.debug(f"Could not forget image panel: {e}")
+
+    def on_panel_resize(self, event):
+        """Handle panel resize events to update the image scale"""
+        # Only respond to actual size changes, not all configure events
+        if event.width > 10 and hasattr(self, 'image_label'):
+            # Update the image if there's a selection
+            self.update_image_panel()
+
+    def update_image_panel(self):
+        """Update the image panel with the selected item"""
+        if not self.show_image_var.get() or not hasattr(self, 'image_label'):
+            return
+
+        selection = self.tree.selection()
+        if not selection:
+            self.image_label.config(image='')
+            self.part_num_label.config(text="No part selected")
+            return
+
+        # Get part number of selected item
+        item = selection[0]
+        values = self.tree.item(item, 'values')
+
+        if not values:
+            self.image_label.config(image='')
+            self.part_num_label.config(text="No part data")
+            return
+
+        part_num = values[0]  # First column is always part_num
+        part_name = values[1] if len(values) > 1 else ""  # Second column is name
+
+        # Load and display the image
+        img = self.load_part_image(part_num)
+        if img:
+            self.image_label.config(image=img, text="")
+            # Display both part number and name
+            self.part_num_label.config(text=f"{part_num}\n{part_name}")
+        else:
+            # Check if the image is actually being loaded but not displayed
+            # by looking for it on disk
+            for ext in ['webp', 'png']:
+                image_path = os.path.join(self.images_root, f"{part_num}.{ext}")
+                if os.path.exists(image_path):
+                    self.image_label.config(image='')
+                    self.part_num_label.config(text=f"{part_num}\n{part_name}\n(Image loading error)")
+                    logging.warning(f"Image file exists but failed to display: {image_path}")
+                    return
+
+            # No image file exists
+            self.image_label.config(image='', text="No Image")
+            self.part_num_label.config(text=f"{part_num}\n{part_name}")
+
+    def on_treeview_select(self, event):
+        """Handle selection in the treeview"""
+        self.update_image_panel()
 
     def on_search_change(self, *args):
         """Handle search input changes"""
@@ -483,16 +645,18 @@ class LegoPartsSearch(tk.Tk):
         for widget in self.results_frame.winfo_children():
             widget.destroy()
 
-        # Create the treeview
+        # Create the treeview with columns but without image column
         self.tree = ttk.Treeview(self.results_frame, columns=self.visible_columns, show='headings')
 
         # Configure columns
         for col in self.visible_columns:
             # Add a special indicator for the label file column
             if col == 'label_file':
-                self.tree.heading(col, text=f"{col.replace('_', ' ').title()} (clickable)")
+                self.tree.heading(col, text=f"{col.replace('_', ' ').title()} (click to open)")
             else:
                 self.tree.heading(col, text=col.replace('_', ' ').title())
+
+            # Set column width based on predefined widths
             self.tree.column(col, width=self.all_columns[col]["width"], minwidth=50)
 
         # Add scrollbars
@@ -511,6 +675,7 @@ class LegoPartsSearch(tk.Tk):
 
         # Bind events
         self.tree.bind('<ButtonRelease-1>', self.on_treeview_click)
+        self.tree.bind('<<TreeviewSelect>>', self.on_treeview_select)
         self.tree.bind('<Motion>', self.on_treeview_motion)
 
         # If we have cached results, refill the treeview
@@ -542,6 +707,9 @@ class LegoPartsSearch(tk.Tk):
             # Only show hand cursor for label file column with content
             if col_name == 'label_file' and col_idx < len(values) and values[col_idx]:
                 self.tree.configure(cursor="hand2")
+            # Don't change cursor for image column
+            elif col_name == 'image':
+                self.tree.configure(cursor="")
             else:
                 self.tree.configure(cursor="")
         except Exception as e:
@@ -553,6 +721,9 @@ class LegoPartsSearch(tk.Tk):
         # Clear existing items
         for item in self.tree.get_children():
             self.tree.delete(item)
+
+        # Clear image cache when loading new results
+        self.image_cache.clear()
 
         if not results:
             self.status_var.set("No results found")
@@ -575,6 +746,13 @@ class LegoPartsSearch(tk.Tk):
         num_results = len(results)
         logging.debug(f"Filled treeview with {num_results} results")
         self.status_var.set(f"Found {num_results} {'result' if num_results == 1 else 'results'}")
+
+        # Select the first item if there are results and update image panel
+        if results and self.tree.get_children():
+            first_item = self.tree.get_children()[0]
+            self.tree.selection_set(first_item)
+            self.tree.focus(first_item)
+            self.update_image_panel()
 
     def on_treeview_click(self, event):
         """Handle clicks on the treeview, opening label files when clicking on label file column"""
@@ -638,6 +816,10 @@ class LegoPartsSearch(tk.Tk):
                 show = self.show_material_var.get()
             elif column_name == "label_file":
                 show = self.show_label_file_var.get()
+            elif column_name == "image":
+                # Handle image toggle separately
+                self.toggle_image_panel()
+                return
             else:
                 return
 
@@ -682,6 +864,9 @@ class LegoPartsSearch(tk.Tk):
     def save_preferences(self):
         """Save current user preferences to file"""
         try:
+            # Get current window position and size
+            geometry = self.geometry()
+
             preferences = {
                 "search_term": self.search_var.get() if hasattr(self, 'search_var') else "",
                 "category": self.category_var.get() if hasattr(self, 'category_var') else "All Categories",
@@ -689,7 +874,9 @@ class LegoPartsSearch(tk.Tk):
                 "show_category": self.show_category_var.get() if hasattr(self, 'show_category_var') else True,
                 "show_material": self.show_material_var.get() if hasattr(self, 'show_material_var') else True,
                 "show_label_file": self.show_label_file_var.get() if hasattr(self, 'show_label_file_var') else True,
-                "label_files_root": self.label_files_root if hasattr(self, 'label_files_root') else ""
+                "show_image": self.show_image_var.get() if hasattr(self, 'show_image_var') else True,
+                "label_files_root": self.label_files_root if hasattr(self, 'label_files_root') else "",
+                "window_geometry": geometry
             }
 
             with open(self.preferences_file, 'w') as f:
@@ -712,6 +899,10 @@ class LegoPartsSearch(tk.Tk):
             if "show_label_file" in self.preferences:
                 self.show_label_file_var.set(self.preferences["show_label_file"])
 
+            if "show_image" in self.preferences:
+                self.show_image_var.set(self.preferences["show_image"])
+                # No need to call toggle_image_panel here as it will be handled after creating the treeview
+
             if "has_labels" in self.preferences:
                 self.has_labels_var.set(self.preferences["has_labels"])
 
@@ -726,6 +917,10 @@ class LegoPartsSearch(tk.Tk):
 
             # Recreate treeview with correct columns
             self.create_treeview()
+
+            # Now handle the image panel toggle after treeview is created
+            if hasattr(self, 'image_panel'):
+                self.toggle_image_panel()
 
             # Set category dropdown
             if "category" in self.preferences:
@@ -790,6 +985,94 @@ class LegoPartsSearch(tk.Tk):
             logging.info(f"Label files root set to: {folder_path}")
             self.status_var.set(f"Labels folder set to: {folder_path}")
 
+    def ensure_on_screen(self):
+        """Ensure the window is visible on screen"""
+        try:
+            # Get window geometry
+            x = self.winfo_x()
+            y = self.winfo_y()
+            width = self.winfo_width()
+            height = self.winfo_height()
+
+            # Get screen size
+            screen_width = self.winfo_screenwidth()
+            screen_height = self.winfo_screenheight()
+
+            logging.debug(f"Window: {width}x{height}+{x}+{y}, Screen: {screen_width}x{screen_height}")
+
+            # Check if window is off screen
+            new_x, new_y = x, y
+            if x < 0:
+                new_x = 0
+            elif x + width > screen_width:
+                new_x = max(0, screen_width - width)
+
+            if y < 0:
+                new_y = 0
+            elif y + height > screen_height:
+                new_y = max(0, screen_height - height)
+
+            # If position changed, update window position
+            if new_x != x or new_y != y:
+                logging.info(f"Moving window from {x},{y} to {new_x},{new_y}")
+                self.geometry(f"+{new_x}+{new_y}")
+        except Exception as e:
+            logging.error(f"Error ensuring window on screen: {e}", exc_info=True)
+
+    def handle_reopen(self):
+        """Handle macOS app reopen event (when clicking dock icon)"""
+        logging.info("Handling app reopen")
+        self.deiconify()
+        self.lift()
+        self.focus_force()
+        self.ensure_on_screen()
+
+    def load_part_image(self, part_num):
+        """Attempt to load an image for a part number"""
+        if not self.show_image_var.get() or not part_num:
+            return None
+
+        # Try webp first, then png
+        for ext in ['webp', 'png']:
+            image_path = os.path.join(self.images_root, f"{part_num}.{ext}")
+            if os.path.exists(image_path):
+                try:
+                    # Open the image
+                    img = Image.open(image_path)
+
+                    # Get the current panel width to scale the image accordingly
+                    panel_width = self.image_panel.winfo_width() - 20  # Account for padding
+                    if panel_width < 10:  # If panel not yet measured, use default
+                        panel_width = 220
+
+                    # Limit maximum width to 300
+                    max_width = 300
+                    if panel_width > max_width:
+                        panel_width = max_width
+
+                    # Calculate height to maintain aspect ratio
+                    aspect_ratio = img.height / img.width
+                    target_height = int(panel_width * aspect_ratio)
+
+                    # Resize image to fit panel width
+                    img = img.resize((panel_width, target_height), Image.Resampling.LANCZOS)
+
+                    # Convert to PhotoImage for display
+                    photo_img = ImageTk.PhotoImage(img)
+
+                    # Store in cache to prevent garbage collection
+                    self.image_cache[part_num] = photo_img
+
+                    logging.debug(f"Loaded image for part {part_num} from {image_path}, resized to {panel_width}x{target_height}")
+                    return photo_img
+                except Exception as e:
+                    logging.error(f"Error loading image for part {part_num}: {e}")
+                    return None
+
+        # Use debug level instead of info to reduce console noise
+        logging.debug(f"No image found for part {part_num}")
+        return None
+
 if __name__ == "__main__":
     try:
         logging.info("Starting Lego Parts Search application")
@@ -801,6 +1084,7 @@ if __name__ == "__main__":
         app.lift()  # Bring window to front
         app.attributes("-topmost", True)  # Make window topmost
         app.after(100, lambda: app.attributes("-topmost", False))  # Remove topmost after showing
+        app.after(200, app.ensure_on_screen)  # Ensure window is visible on screen
 
         # Try macOS-specific window activation
         if sys.platform == 'darwin':

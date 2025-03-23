@@ -49,7 +49,7 @@ cat > "Lego Parts Search.app/Contents/Info.plist" << EOL
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
     <key>CFBundleIconFile</key>
-    <string>3001.icns</string>
+    <string>icon.icns</string>
 </dict>
 </plist>
 EOL
