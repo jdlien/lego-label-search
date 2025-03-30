@@ -1,4 +1,5 @@
 import csv
+from collections import Counter
 
 # Read categories data
 categories = {}
@@ -13,64 +14,51 @@ with open('data/ba_categories.csv', 'r') as f:
         cat_name = row[1]
         parent_id = row[2]
 
-        categories[cat_id] = cat_name
+        categories[cat_id] = {
+            'name': cat_name,
+            'parent_id': parent_id
+        }
 
         # If this is a top-level category (empty parent_id), store it separately
         if parent_id == '':
             parent_categories[cat_id] = cat_name
 
 # Read parts data and count by category
-parts_by_category = {}
-parts_by_parent_category = {}
+category_counts = Counter()
 
-# Initialize parent category counts
-for parent_id in parent_categories:
-    parts_by_parent_category[parent_id] = 0
-
-# Map each category to its top-level parent
-category_to_parent = {}
-for cat_id, cat_name in categories.items():
-    # If it's a top-level category, its parent is itself
-    if cat_id in parent_categories:
-        category_to_parent[cat_id] = cat_id
-    # Otherwise, need to find the parent chain
-    else:
-        current_id = cat_id
-        while current_id not in parent_categories and current_id != '':
-            # Find this category's parent
-            for row in csv.reader(open('data/ba_categories.csv', 'r')):
-                if row[0] == current_id:
-                    current_id = row[2]
-                    break
-            else:
-                # If we can't find the parent, stop the chain
-                current_id = ''
-
-        # Now current_id should be a top-level category or empty
-        if current_id in parent_categories:
-            category_to_parent[cat_id] = current_id
-
-# Count parts by category
 with open('data/ba_parts.csv', 'r') as f:
     reader = csv.reader(f)
     next(reader)  # Skip header
 
     for row in reader:
-        cat_id = row[2]
-
-        # Count this part for its direct category
-        if cat_id not in parts_by_category:
-            parts_by_category[cat_id] = 0
-        parts_by_category[cat_id] += 1
-
-        # Also count it for its parent category
-        if cat_id in category_to_parent:
-            parent_id = category_to_parent[cat_id]
-            if parent_id in parts_by_parent_category:
-                parts_by_parent_category[parent_id] += 1
+        category_id = row[2]
+        category_counts[category_id] += 1
 
 # Print top-level categories and their part counts
-print("Top-level categories and part counts:")
+print("Top-level categories:")
 for parent_id, parent_name in sorted(parent_categories.items(), key=lambda x: int(x[0])):
-    part_count = parts_by_parent_category.get(parent_id, 0)
-    print(f"{parent_id}: {parent_name} - {part_count} parts")
+    parent_part_count = sum(count for cat_id, count in category_counts.items()
+                           if categories.get(cat_id, {}).get('parent_id') == parent_id
+                           or cat_id == parent_id)
+    print(f"{parent_id}: {parent_name} - {parent_part_count} parts")
+
+# Also show the distribution for subcategories of category 1 (Basic)
+print("\nSubcategories of 1. Basic:")
+for cat_id, cat_info in sorted(categories.items(), key=lambda x: int(x[0])):
+    if cat_info['parent_id'] == '1':  # If parent is the Basic category
+        part_count = sum(count for c_id, count in category_counts.items()
+                        if categories.get(c_id, {}).get('parent_id') == cat_id
+                        or c_id == cat_id)
+        print(f"{cat_id}: {cat_info['name']} - {part_count} parts")
+
+# Show parts distribution across all categories
+print("\nParts per category (all levels):")
+sorted_categories = sorted([(cat_id, categories[cat_id]['name'], category_counts[cat_id])
+                           for cat_id in categories if cat_id in category_counts],
+                          key=lambda x: x[2], reverse=True)
+for cat_id, cat_name, count in sorted_categories[:20]:  # Show top 20
+    print(f"{cat_id}: {cat_name} - {count} parts")
+
+print(f"\nTotal categories: {len(categories)}")
+print(f"Categories with parts: {len(category_counts)}")
+print(f"Total parts: {sum(category_counts.values())}")
