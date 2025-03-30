@@ -15,8 +15,28 @@ A simple GUI application to search for Lego parts in a local SQLite database.
 - Python 3.6+
 - Tkinter (must be installed separately on some systems)
 - SQLite3 (comes with Python)
+- python-dotenv (for loading environment variables)
 
 ## Setup
+
+### Install Dependencies
+
+```
+pip install python-dotenv pillow
+```
+
+### Configure Environment
+
+The application uses environment variables from a `.env` file for configuration:
+
+```
+# Database path for Lego Parts Search application
+DB_PATH=~/bin/lego-data/lego.sqlite
+# Base data directory (contains images folder)
+DATA_DIR=~/bin/lego-data
+```
+
+Copy the example above to a file named `.env` in the project root and adjust the paths as needed.
 
 ### Install Tkinter (if not already installed)
 
@@ -77,3 +97,7 @@ CREATE TABLE IF NOT EXISTS "parts" (
 );
 CREATE INDEX idx_parts_label_file ON parts(label_file);
 ```
+
+## To Do
+
+- Scrape each of the https://brickarchitect.com/parts/category-<number> pages and extract the list of parts by getting the list of PNG images

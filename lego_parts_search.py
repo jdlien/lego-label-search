@@ -12,6 +12,10 @@ import tkinter as tk
 from tkinter import ttk, filedialog
 from pathlib import Path
 from PIL import Image, ImageTk
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Lego Parts Search Application')
@@ -106,7 +110,7 @@ class LegoPartsSearch(tk.Tk):
             self.update_debug("Window configured")
 
             # Set up database connection
-            db_path = os.path.expanduser("~/bin/lego-data/lego.sqlite")
+            db_path = os.path.expanduser(os.getenv("DB_PATH", "~/bin/lego-data/lego.sqlite"))
             logging.info(f"Connecting to database at: {db_path}")
             try:
                 self.connection = sqlite3.connect(db_path)
@@ -385,8 +389,8 @@ class LegoPartsSearch(tk.Tk):
             self.image_cache = {}
 
             # Set images root path - it's in the same folder as the database file
-            db_path = os.path.expanduser("~/bin/lego-data")
-            self.images_root = os.path.join(db_path, "images")
+            data_dir = os.path.expanduser(os.getenv("DATA_DIR", "~/bin/lego-data"))
+            self.images_root = os.path.join(data_dir, "images")
             logging.info(f"Images folder set to: {self.images_root}")
 
             # Create initial treeview

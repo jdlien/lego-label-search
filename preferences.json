@@ -1,11 +1,11 @@
 {
-  "search_term": "1 x 1",
+  "search_term": "3001",
   "category": "All Categories",
-  "has_labels": true,
+  "has_labels": false,
   "show_category": true,
-  "show_material": false,
+  "show_material": true,
   "show_label_file": true,
   "show_image": true,
-  "label_files_root": "/Users/jdlien/Library/Mobile Documents/com~apple~CloudDocs/Lego/LEGO_BRICK_LABELS-v40/Labels",
-  "window_geometry": "1802x918+-2111+255"
+  "label_files_root": "",
+  "window_geometry": "1011x706+597+679"
 }

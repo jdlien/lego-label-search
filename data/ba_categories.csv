@@ -1,0 +1,192 @@
+"id","name","parent_id"
+1,"1. Basic",""
+15,"Brick",1
+27,"1× Brick",15
+28,"2× Brick",15
+29,"Tall Brick",15
+30,"Hollow Brick",15
+176,"Large Brick",15
+189,"Minitalia",15
+16,"Plate",1
+31,"1× Plate",16
+32,"2× Plate",16
+33,"Large Plate",16
+35,"Other Plate",16
+17,"Blate",1
+18,"Tile",1
+36,"1× Tile",18
+37,"2× Tile",18
+38,"Large Tile",18
+39,"Inverted Tile",18
+34,"Baseplate",1
+2,"2. Wall",""
+19,"Window and Door",2
+20,"Fence",2
+40,"Decorative",2
+42,"Stairs",2
+43,"Panel",2
+3,"3. SNOT",""
+22,"Brick",3
+21,"Bracket",3
+44,"Jumper",3
+7,"4. Angle",""
+56,"Slope",7
+59,"10-30° Slope",56
+60,"33° Slope",56
+61,"45° Slope",56
+62,"55-75° Slope",56
+63,"Inverted Slope",56
+57,"Windscreen",7
+58,"Wedge",7
+64,"45° Wedge Plate",58
+65,"63° Wedge Plate",58
+66,"72° Wedge Plate",58
+67,"76° Wedge Plate",58
+68,"80° Wedge Plate",58
+69,"Other Wedge Plates",58
+70,"Wedge Tile",58
+71,"Wedge Nose",58
+72,"Wedge Nose, Inverted",58
+73,"Wedge Brick",58
+8,"5. Curve",""
+76,"Curved Brick",8
+74,"Curved Plate",8
+75,"Curved Blate",8
+77,"Curved Tile",8
+78,"Cylinder",8
+79,"Cone",8
+80,"Dish and Dome",8
+81,"Ball",8
+82,"Curved",8
+96,"1Ø Curved",82
+97,"2×⅔ Curved",82
+98,"3×1 Curve",82
+99,"4×1 Curve",82
+100,"8×1 Curved",82
+101,"1×1 Curved",82
+102,"2×2 Curved",82
+103,"Inverted Curve",82
+104,"Other Curved",82
+105,"Curved Panel",82
+83,"Arch and Bow",8
+85,"Wedge",8
+86,"Mudguard",8
+87,"Heart and Star",8
+88,"Other Curved Parts",8
+106,"6. Articulation",""
+5,"Hinge",106
+46,"Smooth",5
+51,"Plate",5
+52,"Brick",5
+53,"Click Other",5
+48,"Turntable",5
+6,"Joint",106
+54,"Towball Joint",6
+55,"Ball Joint",6
+49,"Click-Socket",106
+41,"Rail and Groove",106
+26,"Flexible",106
+153,"Chain",26
+179,"Flex Axles",26
+180,"Ribbed Hose",26
+181,"Flex Tube",26
+182,"Pneumatic Hose",26
+183,"Flex Cable & Hose",26
+184,"String",26
+185,"Band & Belt",26
+186,"Other",26
+4,"7. Clip",""
+23,"Bar",4
+24,"Clip",4
+25,"Handle",4
+45,"Flag",4
+50,"Door",4
+155,"Ladder & Railing",4
+10,"8. Minifig",""
+110,"Minifigure",10
+111,"Minidoll",10
+114,"Torso",111
+115,"Skirts & Dresses",111
+117,"Pants & Shorts",111
+192,"Big Fig",10
+187,"Robot",10
+112,"Nanofig",10
+175,"Hair",10
+121,"Hat & Hair Accessories",10
+120,"Clothing",10
+119,"Footwear",10
+116,"Food & Drink",10
+118,"Tools",10
+123,"Container",10
+193,"Armor",10
+124,"Weapon",10
+122,"Transportation",10
+113,"Animal",10
+11,"9. Nature",""
+125,"Produce",11
+126,"Plants",11
+127,"Flowers",11
+128,"Elemental",11
+129,"Tooth",11
+130,"Barb, Horn, Tail & Feather",11
+188,"Web",11
+9,"10. Vehicle",""
+131,"Wheel",9
+140,"8mm",131
+141,"11mm",131
+142,"14mm & 15mm",131
+143,"18mm",131
+144,"30mm & 30.4mm",131
+145,"43.2mm",131
+146,"56mm",131
+147,"Motorcycle",131
+148,"Integrated Tire",131
+149,"Other Wheels",131
+191,"Wheel Cover",131
+132,"Wheel Pin",9
+133,"Bracket & Vehicle Base",9
+135,"Train",9
+136,"Coaster",9
+137,"Stuntz",9
+139,"Steering",9
+150,"Nose & Roof",9
+134,"Propeller, Engine, Fin & Mast",9
+12,"11. Technic",""
+138,"Brick",12
+156,"Plate",12
+157,"Beam",12
+159,"Thin Beam",12
+158,"Panel",12
+171,"Flat Panel",158
+172,"Curved Panel",158
+173,"Fairing",158
+174,"Mudguard",158
+160,"Connector",12
+161,"Axle",160
+162,"Pin",160
+163,"Hub",160
+164,"Other Connector",160
+165,"Gears",12
+166,"Link & Chain",12
+167,"Steering",12
+168,"Engine",12
+169,"Mechanical & Pneumatic",12
+170,"Other Technic",12
+13,"12. Electronics",""
+107,"Hub",13
+108,"Motor",13
+109,"Sensor & Accessories",13
+178,"Dimensions",13
+14,"13. Other",""
+151,"Shooter",14
+152,"Structural",14
+154,"Miscellaneous",14
+89,"14. DUPLO",""
+90,"Brick",89
+91,"Plate",89
+92,"Angle",89
+93,"Curved",89
+190,"Ball Tube",89
+94,"Other",89
+95,"QUATRO",89
+177,"PRIMO",89
