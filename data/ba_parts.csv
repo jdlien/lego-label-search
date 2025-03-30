@@ -1,0 +1,2564 @@
+"part_num","ba_name","ba_cat_id"
+"3005","1×1 Brick",15
+"3004","1×2 Brick",15
+"3622","1×3 Brick",15
+"3010","1×4 Brick",15
+"3009","1×6 Brick",15
+"3008","1×8 Brick",15
+"6111","1×10 Brick",15
+"6112","1×12 Brick",15
+"2465","1×16 Brick",15
+"2357","2×2 Brick, Corner",15
+"3005","1×1 Brick",27
+"3004","1×2 Brick",27
+"3622","1×3 Brick",27
+"3010","1×4 Brick",27
+"3009","1×6 Brick",27
+"3008","1×8 Brick",27
+"6111","1×10 Brick",27
+"6112","1×12 Brick",27
+"2465","1×16 Brick",27
+"2357","2×2 Brick, Corner",27
+"3003","2×2 Brick",28
+"3002","2×3 Brick",28
+"3001","2×4 Brick",28
+"2456","2×6 Brick",28
+"3007","2×8 Brick",28
+"3006","2×10 Brick",28
+"14716","1×1×3 Brick",29
+"2453","1×1×5 Brick",29
+"3245","1×2×2 Brick",29
+"22886","1×2×3 Brick",29
+"2454","1×2×5 Brick",29
+"30145","2×2×3 Brick",29
+"3755","1×3×5 Brick",29
+"49311","1×4×3 Brick",29
+"30144","2×4×3 Brick",29
+"3754","1×6×5 Brick",29
+"3065","1×2 Brick without Bottom Tube",30
+"46212","1×2×5 Brick without Support",30
+"3066","1×4 Brick without Bottom Tubes",30
+"3067","1×6 Brick without Bottom Tubes",30
+"2356","4×6 Brick",176
+"6212","4×10 Brick",176
+"4202","4×12 Brick",176
+"4201","8×8 Brick",176
+"4204","8×16 Brick",176
+"m3003","Minitalia 2×2 Brick",189
+"m3001","Minitalia 2×4 Brick",189
+"3024","1×1 Plate",16
+"3023","1×2 Plate",16
+"3623","1×3 Plate",16
+"3710","1×4 Plate",16
+"78329","1×5 Plate",16
+"3666","1×6 Plate",16
+"3460","1×8 Plate",16
+"4477","1×10 Plate",16
+"60479","1×12 Plate",16
+"2420","2×2 Plate, Corner",16
+"77844","3×3 Plate, Corner",16
+"15397","3×3 Plate, Cross",16
+"73831","2×3 Plate w/ Cutout",16
+"64799","4×4 Plate w/ 2×2 cutout",16
+"3024","1×1 Plate",31
+"3023","1×2 Plate",31
+"3623","1×3 Plate",31
+"3710","1×4 Plate",31
+"78329","1×5 Plate",31
+"3666","1×6 Plate",31
+"3460","1×8 Plate",31
+"4477","1×10 Plate",31
+"60479","1×12 Plate",31
+"2420","2×2 Plate, Corner",31
+"77844","3×3 Plate, Corner",31
+"15397","3×3 Plate, Cross",31
+"73831","2×3 Plate w/ Cutout",31
+"64799","4×4 Plate w/ 2×2 cutout",31
+"3022","2×2 Plate",32
+"3021","2×3 Plate",32
+"3020","2×4 Plate",32
+"3795","2×6 Plate",32
+"3034","2×8 Plate",32
+"3832","2×10 Plate",32
+"2445","2×12 Plate",32
+"91988","2×14 Plate",32
+"4282","2×16 Plate",32
+"2639","4×4 Plate, Corner",32
+"11212","3×3 Plate",33
+"3031","4×4 Plate",33
+"3032","4×6 Plate",33
+"3035","4×8 Plate",33
+"3030","4×10 Plate",33
+"3029","4×12 Plate",33
+"3958","6×6 Plate",33
+"3036","6×8 Plate",33
+"3033","6×10 Plate",33
+"3028","6×12 Plate",33
+"3456","6×14 Plate",33
+"3027","6×16 Plate",33
+"41539","8×8 Plate",33
+"92438","8×16 Plate",33
+"91405","16×16 Plate",33
+"3026","6×24 Plate",33
+"41740","1×4 Plate w/ 2-studs",35
+"33909","2×2 Plate w/ studs edge",35
+"6179","4×4 Plate w/ studs edge",35
+"6180","4×6 Plates w/ studs 3-edges",35
+"6178","6×12 Plate w/ studs 3-edges",35
+"6205","6×16 Plate w/ studs 3-edges",35
+"88646","3×4 Plate w/ studs center",35
+"4151","8×8 Plate w/ Grille",35
+"86996","1×1×⅔ Blate",17
+"2628","8×8×⅔ w/ Studs",17
+"2629","8×16×⅔ w/ Studs",17
+"15624","8×8×⅔ w/ studs 4-edges",17
+"18922","8×16×⅔ w/ studs 4-edges",17
+"71772","8×16×⅔ Smooth w/ recessed studs",17
+"69958","16×16×⅔ Smooth w/ recessed studs",17
+"3070","1×1 Tile",18
+"3069","1×2 Tile",18
+"63864","1×3 Tile",18
+"2431","1×4 Tile",18
+"6636","1×6 Tile",18
+"4162","1×8 Tile",18
+"14719","2×2 Tile, Corner",18
+"3070","1×1 Tile",36
+"3069","1×2 Tile",36
+"63864","1×3 Tile",36
+"2431","1×4 Tile",36
+"6636","1×6 Tile",36
+"4162","1×8 Tile",36
+"14719","2×2 Tile, Corner",36
+"3068","2×2 Tile",37
+"26603","2×3 Tile",37
+"87079","2×4 Tile",37
+"69729","2×6 Tile",37
+"1751","4×4 Tile",38
+"10202","6×6 Tile",38
+"90498","8×16 Tile",38
+"11203","2×2 Tile, Inverted",39
+"35459","1×3 Tile, Inverted w/ Hole",39
+"3395","2×4 Tile, Inverted",39
+"83496","4×8 Tile, Inverted",39
+"3867","16×16 Baseplate",34
+"3857","16×32 Baseplate",34
+"3811","32×32 Baseplate",34
+"4186","48×48 Baseplate",34
+"3865","8×16 Baseplate",34
+"60592","1×2×2 Window Frame",19
+"73878","3×3×2 Window Frame, Curved",19
+"90195","1×2×2 Panel w/ Round Window",19
+"60601","Glass for 2×2 Window",19
+"38320","Pane for 2×2 Window, Lattice",19
+"6798","1×3×2 Window Frame",19
+"7757","Glass for 3×2 Frame",19
+"60593","1×2×3 Window Frame",19
+"60602","Glass for 2×3 Window",19
+"51239","1×3×3 Window Frame",19
+"51266","Glass for 3×3 Window",19
+"60594","1×4×3 Window Frame",19
+"60598","2×4×3 Window Frame",19
+"60607","2×3 Pane, Lattice",19
+"60608","2×3 Pane",19
+"60614","2×3 Door",19
+"60800","2×3 Shutter",19
+"3855","Glass for 4×3 Window",19
+"60603","Glass for 4×3 Window, Opening",19
+"4133","Panes for 4×3 Window",19
+"62113","Grille for 2×3 Window",19
+"6154","1×4×4 Window Frame",19
+"6155","4×4 Door, Lift",19
+"2657","3×5 Door",19
+"2493","1×4×5 Frame",19
+"4130","2×4×5 Window/Door Frame",19
+"4347","1×4×5 Window w/ Glass",19
+"4131","Door for 4×5 Frame, 2-Panels",19
+"60596","1×4×6 Window/Door Frame",19
+"57894","1×4×6 Window Frame, 3-panes",19
+"6160","4×6 Frame w/ 3-Panes, Glass",19
+"60599","2×4×6 Window/Door Frame",19
+"35103","2×16×6 Frame w/ 3-Panes",19
+"57895","Glass for 4×6 Frame",19
+"60616","Door for 4×6 Frame",19
+"60797","Door for 4×6 Frame, 3-Panes",19
+"60623","Door for 4×6 Frame, 4-panes",19
+"79730","Door for 4×6 Frame w/ Pet Door",19
+"60621","Door for 4×6 Frame, Grille",19
+"92589","Grille for 4×6 Frame",19
+"42205","1×6×6 Window/Door Frame",19
+"80400","2×8×6 Window/Door Frame",19
+"80683","3×6 Door",19
+"42509","Glass for 6×6 Frame",19
+"60032","2×2×2 Window, Plane",19
+"61345","1×4×2 Window, Double Plane",19
+"4862","Glass for 1×2 Plane Window",19
+"4035","1×2×3 Window, Train",19
+"4033","1×4×3 Window, Train",19
+"30044","1×2×2⅔ Window w/ Round Top",19
+"94161","Shutter for 2×2⅔ Window w/ Round Top",19
+"30046","Pane for 2×2⅔ Window w/ Round Top, Lattice",19
+"30045","Pane for 2×2⅔ Window w/ Round Top, Barred",19
+"64390","1×4×6 Door, Round Top w/ Window and Keyhole",19
+"65066","Glass for 4×7 Window, Arched",19
+"20309","1×4×1⅔ Window, Arch",19
+"60808","1×4×5 Panel w/ Arched Window",19
+"35565","2×6×6 2/ Gothic Arch",19
+"2352","75° 2×4×3 Window Frame, Sloped",19
+"28327","4×4×6 Window/Door Frame, Corner",19
+"60806","4×4×3 Window Frame, Sloped w/ Bottom Panel",19
+"4447","4×4×3 Window Frame, Sloped, Large Glass",19
+"4741","4×4×6 Window Frame, Sloped, Convex",19
+"4448","4×4×3 Roof Window Glass",19
+"3087","1×1 Window w/ Glass",19
+"29","1×2 Window w/ Glass",19
+"27","1×2 Window w/ Glass",19
+"3081","2×2 Window w/ Glass",19
+"31","3×2 Window w/ Glass",19
+"453","4×2 Window w/ Glass",19
+"645","6×2 Window w/ Glass, 3-Panes",19
+"646","6×2 Window w/ Shutters",19
+"3853","1×4×3 Window w/ Shutter Tabs",19
+"3581","1×1×2 w/ Shutter Holder",19
+"3582","2×2 Shutter",19
+"3856","2×3 Shutter",19
+"92262","3×2 Door, Left",19
+"92263","3×2 Door, Right",19
+"60658","3×3 Door, Left",19
+"60657","3×3 Door, Right",19
+"58381","3×4 Door, Left",19
+"58380","3×4 Door, Right",19
+"3861","4×5 Door",19
+"47899","4×5 Door w/ Glass, Left",19
+"73194","4×5 Door w/ Glass, Right",19
+"4181","4×5 Train Door, Left",19
+"4182","4×5 Train Door, Right",19
+"35157","Train Door Glass",19
+"93096","5×3 Door w/ 3-Studs",19
+"32bc01","2×3 Door w/ Glass, Left",19
+"33bc01","2×3 Door w/ Glass, Right",19
+"42448","4×9 Gate, Arched w/ Bars, 3-Studs",20
+"3224","1×2×1⅔ Frame w/ Diagonal Bar",20
+"3633","1×4×1 Fence, Lattice",20
+"3185","1×4×2 Fence, Lattice",20
+"33303","1×4×2 Fence, Picket",20
+"15332","1×4×2 Railing w/ Studs, Spindled",20
+"19121","1×4×2 Railing w/ Studs, Ornamented",20
+"5103","1×4×2 Railing w/ Studs, Asian Round Lattice",20
+"32932","1×4×2 Railing w/ Studs, Asian Lattice",20
+"41823","3×3×2, Ø6 Curved Railing w/ Studs, Ornamented",20
+"21229","4×4×2, Ø8 Curved Railing w/ Studs, Spindled",20
+"2412","1×2 Tile, Grille",40
+"2877","1×2 Brick, Ribbed",40
+"71752","2×2×⅔ Brick, Ribbed",40
+"98283","1×2 Brick, Masonry",40
+"15533","1×4 Brick, Masonry",40
+"30136","1×2 Brick, Log (Palisade)",40
+"30137","1×4 Brick, Log (Palisade)",40
+"20310","1×1 Brick w/ Scroll",40
+"30134","7×4×6 Stairs, Open",42
+"40243","Stair, Spiral",42
+"4175","1×2 Ladder",42
+"6231","1×1 Panel, Corner",43
+"4865","1×2 Panel",43
+"23969","1×2 Panel w/ 2-sides",43
+"93095","1×2 Panel w/ Divider",43
+"23950","1×3 Panel",43
+"15207","1×4 Panel",43
+"91501","2×2 Panel, Corner",43
+"87552","1×2×2 Panel with Studs",43
+"14718","1×4×2 Panel with Studs",43
+"87544","1×2×3 Panel with Studs",43
+"60581","1×4×3 Panel with Studs",43
+"59349","1×6×5 Panel with Studs",43
+"23405","1×6×5 Panel with Studs, Corrugated",43
+"98280","1×6×3 Panel, Studs 2-sides",43
+"4594","2×4×2 Windscreen",43
+"64453","1×6×3 Windscreen",43
+"65735","1×10×4 Windscreen",43
+"4444","2×5×6 Panel w/ Corner Indentations",43
+"78594","2×2×5 Panel, Corner",43
+"87421","3×3×6 Panel with Studs, Corner",43
+"2345","3×3×6 Panel, Corner w/ Bottom Indentations",43
+"30246","3×4×6 Wedge Panel w/ Arched Window",43
+"2468","3×3×6 Panel, Convex Corner",43
+"4737","4×4×6 Panel, Convex Corner",43
+"2466","3×2×6 Panel, Convex",43
+"47847","2×4×6 Rock Panel",43
+"30022","Panel, Angled with Studs 3-sides (Tipper)",43
+"6082","4×6×10 Rock Panel (BURP)",43
+"6083","3×8×7 Triangular Rock Panel (LURP)",43
+"3131","2×2 Hollow Panel, 4-Corners",43
+"23996","8×8×6 Corner Rock Panel",43
+"3386","1×1×⅔ Stud 1-side, Ø1 Rounded End",22
+"4070","1×1 Brick, Headlight",22
+"87087","1×1 Brick, Stud, 1-side",22
+"47905","1×1 Brick, 2-studs, Opposite Sides",22
+"26604","1×1 Brick, 2-studs, Adjacent Sides",22
+"4733","1×1 Brick, Studs 4-sides",22
+"11211","1×2 Brick, Studs 1-side",22
+"52107","1×2 Brick, Studs 1-side",22
+"30414","1×4 Brick, Studs 1-side",22
+"32952","1×1×1⅔ Brick, Studs 1-side",22
+"22885","1×2×1⅔ Brick, Studs 1-side",22
+"80796","1×2×1⅔ Brick, Studs 2-sides",22
+"67329","1×2×1⅔ Brick, Studs 3-sides",22
+"2434","2×4×4 Brick w/ Studs, Opposite Sides",22
+"4595","1×2×⅔ Studs 2-sides, Antistud",22
+"15071","1×2×⅔ Studs 5-sides w/ Angled Handle",22
+"36841","1×1 Bracket",21
+"36840","1×1 Bracket, Inverted",21
+"99781","1×2 Bracket",21
+"99780","1×2 Bracket, Inverted",21
+"28802","1×4 Bracket w/ 1×2 Plate",21
+"79389","2×1 Bracket",21
+"73825","2×1 Bracket, Inverted",21
+"44728","2×2 Bracket",21
+"99207","2×2 Bracket, Inverted",21
+"93274","2×4 Bracket w/ 2×1 Plate",21
+"5175","1×4 Bracket w/ 2×4 Plate",21
+"64570","1×6 Bracket w/ 2×6 Plate, Inverted",21
+"5090","2×6 Bracket, Inverted",21
+"3956","2×2 Bracket w/ 2-holes",21
+"98287","3×4 Bracket w/ 3×4 Plate",21
+"4598","3×2 Bracket, Space",21
+"4304","2×2×⅔ 2-studs, Side",21
+"87609","2×6×⅔ 4-studs, Side",21
+"14520","1×4×1⅔ Bumper w/ Arches",21
+"41682","2×2 Bracket, Centered",21
+"4585","2×1 Bracket, Centered",21
+"69906","2×2 Bracket w/ 3×2 Plate, Curved",21
+"28974","Minifig Bracket w/ 1-stud",21
+"18986","Minifig Bracket w/ 2-studs",21
+"6970","2×6 Bracket w/ 2×1 Plate",21
+"15573","1×2 Jumper",44
+"87580","2×2 Jumper",44
+"34103","1×3 Jumper w/ 2-studs (Double)",44
+"65509","2×4 Jumper w/ 2-studs",44
+"86876","1×2 Brick w/ Jumper Stud, 1-side",44
+"4081","1×1 Ring",44
+"4590","1×4 Offset w/ 2-rings",44
+"4596","1×2 w/ 3L Space Wing",44
+"2342","1×2 Console w/ 3-studs",44
+"4569","10° 6×1 Slope",56
+"4515","10° 6×8 Slope",56
+"5404","18° 2×1×⅔ Slope",56
+"61409","18° 2×1×⅔ Slope (Cheese Grater)",56
+"60477","18° 4×1 Slope w/ Stud",56
+"30363","18° 4×2 Slope w/ 2-Studs",56
+"49618","25° 8×1×3 Slope w/ Stud",56
+"54200","30° 1×1×⅔ Cheese Slope",56
+"85984","30° 1×2×⅔ Double Cheese Slope",56
+"5654","13° 4×1 Slope",56
+"4569","10° 6×1 Slope",59
+"4515","10° 6×8 Slope",59
+"5404","18° 2×1×⅔ Slope",59
+"61409","18° 2×1×⅔ Slope (Cheese Grater)",59
+"60477","18° 4×1 Slope w/ Stud",59
+"30363","18° 4×2 Slope w/ 2-Studs",59
+"49618","25° 8×1×3 Slope w/ Stud",59
+"54200","30° 1×1×⅔ Cheese Slope",59
+"85984","30° 1×2×⅔ Double Cheese Slope",59
+"5654","13° 4×1 Slope",59
+"4286","33° 3×1 Slope w/ 1-Stud",60
+"3298","33° 3×2 Slope w/ 2-Studs",60
+"4161","33° 3×3 Slope w/ 3-Studs",60
+"3297","33° 3×4 Slope w/ 4-Studs",60
+"58181","33° 3×6 Slope w/ 2-Studs",60
+"3675","33° 3×3 Corner Slope w/ 1-Stud",60
+"99301","33° 3×3 Inside Corner Slope w/ 5-Studs",60
+"3300","33° 2×2 Double Slope",60
+"3299","33° 2×4 Double Slope",60
+"3040","45° 2×1 Slope w/ 1-Stud",61
+"3039","45° 2×2 Slope w/ 2-Studs",61
+"3038","45° 2×3 Slope w/ 2-Studs",61
+"3037","45° 2×4 Slope w/ 4-Studs",61
+"23949","45° 2×6 Slope w/ 6-Studs",61
+"4445","45° 2×8 Slope w/ 8-Studs",61
+"3045","45° 2×2 Corner Slope w/ 1-Stud",61
+"3046","45° 2×2 Inside Corner Slope w/ 3-Studs",61
+"92946","45° 2×1 Cutout",61
+"28192","45° 2×2 w/ Cutout, Smooth",61
+"5540","45° 2×4 w/ Cutout, Smooth",61
+"22388","45° 1×1×⅔ Pyramid",61
+"35464","45° 1×1 Double Slope",61
+"3044","45° 2×1 Double Slope",61
+"3043","45° 2×2 Double Slope",61
+"3042","45° 2×3 Double Slope",61
+"3041","45° 2×4 Double Slope",61
+"3049","45° 1×2 Double Slope, Inverted",61
+"15571","45° 2×1 Triple Slope",61
+"13269","45° / 33° 6×4 Train Roof",61
+"32083","45° 6×4 Train Roof",61
+"80545","45° 2×4×1⅓ Double Slope",61
+"30180","45° 10×2×2 Double Slope",61
+"30249","55° 6×1×5 Slope w/ 2-Studs",62
+"60481","65° 2×1×2 Slope w/ 1-Stud",62
+"3678","65° 2×2×2 Slope w/ 2-Studs",62
+"4460","75° 2×1×3 Slope w/ 1-Stud",62
+"98560","75° 2×2×3 Slope w/ 2-Studs",62
+"3685","75° 2×2×3 Corner Slope w/ 1-Stud",62
+"3688","75° 2×2×2 Square Cone w/ 1-Stud",62
+"4287","-33° 3×1 Inverted Slope w/ 3-Studs",63
+"3747","-33° 3×2 Inverted Slope w/ 6-Studs",63
+"4228","-33° 5×6×2 Inverted Slope",63
+"3665","-45° 2×1 Inverted Slope w/ 2-Studs",63
+"3660","-45° 2×2 Inverted Slope w/ 4-Studs",63
+"3676","-45° 2×2 Inverted Corner Slope w/ 4-Studs",63
+"18759","-45 3×1 Inverted Double Slope w/ 3-Studs",63
+"2310","-45° 2×1 Inv. Slope w/ Cutout",63
+"32802","-45° 4×1 Inverted Double Slope",63
+"4871","-45° 4×2 Inverted Double Slope",63
+"72454","-45° 4×4 Inverted Double Slope",63
+"52501","-45° 6×1 Inverted Double Slope",63
+"22889","-45° 6×2 Inverted Double Slope",63
+"60219","-45° 6×4 Inverted Double Slope",63
+"67440","-60° 4×1×3 Inverted Slope w/ 4-Studs",63
+"30373","-65° 6×6×2 Inverted Slope, Quad",63
+"2449","-75° 2×1×3 Inverted Slope w/ 2-Studs",63
+"3823","65° 2×4×2 Windscreen w/ 2-Studs",57
+"57783","3×4×1⅓ Windscreen w/ 2-Studs",57
+"2437","3×4×1⅓ Windscreen w/ 2-Studs",57
+"6238","45° 4×4×1 Windscreen w/ 4-Studs",57
+"4176","65° 2×6×2 Windscreen w/ 6-Studs",57
+"92583","45° 3×6×2 Windscreen w/ 2-Studs",57
+"6070","5×2×1⅔ Windscreen w/ 2-Studs",57
+"27262","6×4×1 Windscreen, Hexagonal w/ Handle",57
+"11289","4×4×4⅔ Windscreen w/ Handle",57
+"4474","33° 6×4×2 Windscreen w/ Hinge",57
+"2418","6×6×2 Windscreen, Octagonal",57
+"4872","3×4×4 Windscreen, Inv.",57
+"22483","6×4×1⅓ Windscreen, Pointed",57
+"6152","6×4×1⅓ Windscreen",57
+"2507","10×4×2⅓ Windscreen w/ Hinge",57
+"84954","3×4×3 Windscreen",57
+"62576","5×8×2 Windscreen",57
+"87606","6×6×2 Windscreen",57
+"21849","8×4×2 Windscreen w/ Handle",57
+"26601","45° 2×2 Corner Plate",58
+"2450","45° 3×3 Corner Plate",58
+"30503","45° 4×4 Corner Plate",58
+"3936","45° 4×4 Wing, Left",58
+"3935","45° 4×4 Wing, Right",58
+"6106","45° 6×6 Corner Plate",58
+"30504","45° 8×8 Corner Plate",58
+"92584","45° 10×10 Corner Plate w/ Edge Studs",58
+"2419","45° 3×6 Double Corner Plate",58
+"68297","45° 4×8 Double Corner Plate",58
+"89523","45° 10×10 Octagonal Plate",58
+"6063","45° 10×10 Octagonal Plate w/ Cutout",58
+"2401","45° 10×10 Corner Plate w/ 4×4 Cutout",58
+"26601","45° 2×2 Corner Plate",64
+"2450","45° 3×3 Corner Plate",64
+"30503","45° 4×4 Corner Plate",64
+"3936","45° 4×4 Wing, Left",64
+"3935","45° 4×4 Wing, Right",64
+"6106","45° 6×6 Corner Plate",64
+"30504","45° 8×8 Corner Plate",64
+"92584","45° 10×10 Corner Plate w/ Edge Studs",64
+"2419","45° 3×6 Double Corner Plate",64
+"68297","45° 4×8 Double Corner Plate",64
+"89523","45° 10×10 Octagonal Plate",64
+"6063","45° 10×10 Octagonal Plate w/ Cutout",64
+"2401","45° 10×10 Corner Plate w/ 4×4 Cutout",64
+"24299","63° 2×2 Wedge Plate, Left",65
+"24307","63° 2×2 Wedge Plate, Right",65
+"65429","63° 2×4 Wedge Plate, Left",65
+"65426","63° 2×4 Wedge Plate, Right",65
+"48208","63° 4×6 Wedge Plate, Left",65
+"48205","63° 4×6 Wedge Plate, Right",65
+"51739","63° 2×4 Double Wedge Plate",65
+"32059","63° 4×6 Double Wedge Plate",65
+"47407","63° 4×6 Double Wedge Plate w/ Cutout",65
+"43723","72° 3×2 Wedge Plate, Left",66
+"43722","72° 3×2 Wedge Plate, Right",66
+"54384","72° 6×3 Wedge Plate, Left",66
+"54383","72° 6×3 Wedge Plate, Right",66
+"50305","72° 8×3 Wedge Plate, Left",66
+"50304","72° 8×3 Wedge Plate, Right",66
+"30355","72° 12×6 Wedge Plate, Left",66
+"30356","72° 12×6 Wedge Plate, Right",66
+"48183","72° 3×4 Double Wedge Plate",66
+"41770","76° 4×2 Wedge Plate, Left",67
+"41769","76° 4×2 Wedge Plate, Right",67
+"3544","76° 8×3 Wedge Plate, Left",67
+"3545","76° 8×3 Wedge Plate, Right",67
+"43719","76° 4×4 Double Wedge Plate",67
+"78443","80° 6×2 Wedge Plate, Left",68
+"78444","80° 6×2 Wedge Plate, Right",68
+"47397","80° 12×3 Wedge Plate, Left",68
+"47398","80° 12×3 Wedge Plate, Right",68
+"3933","67° 8×4 Wedge Plate, Left",69
+"3934","67° 8×4 Wedge Plate, Right",69
+"14181","85° 4×9 Double Wedge Plate",69
+"50303","7×6 Double Wedge Plate",69
+"15706","45° A-Shape, 8-Studs",69
+"79846","2×6×⅔ 135° Bend",69
+"27255","6×6 Hexagon w/ 3-Bars & Technic Pin (Nexogon)",69
+"22385","2×3 Tile, Pentagonal",70
+"27263","2×2 Tile, Corner w/ Cutout",70
+"27928","2×2 Wedge w/ Jumper",70
+"35787","2×2 Tile, Triangular",70
+"5091","1×2 Tile, Corner Left",70
+"5092","1×2 Tile, Corner Right",70
+"22390","6×8 Pointed Wedge Slope w/ Cutout",71
+"13548","2×2 Wedge Slope",71
+"47759","2×4 Double Wedge Slope",71
+"43708","4×4 Wedge Slope",71
+"4861","3×4 Corner Slope",71
+"43711","4×2 Wedge Slope. Right",71
+"43710","4×2 Wedge Slope, Left",71
+"48933","4×4 Wedge Slope",71
+"78886","65° 2×2×2 Wedge Slope, Corner",71
+"47757","4×4 Wedge, Pyramid",71
+"22391","4×4 Wedge, Pointed",71
+"93348","4×4 Wedge, Taper w/ Cutout",71
+"64867","4×4 Wedge, Fractured",71
+"6153","6×4 Wedge Slope w/ Cutout",71
+"42862","3×3 Wedge Slope, Left",71
+"48165","3×3 Wedge Slope, Right",71
+"1762","33° 2×2 Double Wedge, Curved",71
+"32084","8×6 Wedge, Slope w/ Cutout",71
+"30382","2×16 Wedge Slope, Double",71
+"3505","5×2 Wedge Slope, Right",71
+"3504","5×2 Wedge Slope, Left",71
+"3388","1×5×1⅓ Wedge Slope Left",71
+"3389","1×5×1⅓ Wedge Slope, Right",71
+"13349","4×4 Wedge Slope, Inverted",72
+"4856","6×4 Wedge Slope, Inverted",72
+"43713","4×4 Wedge Curve, Inverted",72
+"41765","6×2 Wedge Curve, Inverted, Left",72
+"41764","6×2 Wedge Curve, Inverted, Right",72
+"29115","6×6 Wedge Slope, Inverted",72
+"47404","10×12 Boat Bow w/ Cutout",72
+"87620","45° 2×2 Corner Brick, Facet",73
+"2462","45° 3×3 Corner Brick, Facet",73
+"14413","45° 4×4 Corner Brick, Facet",73
+"30505","45° 3×3 Corner Brick",73
+"6565","72° 3×2 Wedge, Left",73
+"6564","72° 3×2 Wedge, Right",73
+"50373","72° 3×4 Wedge Brick w/ Cutout",73
+"41768","76° 4×2 Wedge Brick, Right",73
+"41767","76° 4×2 Wedge Brick, Right",73
+"6066","4×8×2⅓ Castle Turret (Balcony)",73
+"3062","1×1 Round Brick",76
+"3941","2×2 Round Brick",76
+"85080","2×2 Ø4 Round Corner Brick (Macaroni)",76
+"5152","3×3 Ø6 Round Corner Brick (Medium Macaroni)",76
+"87081","4×4 Round Brick w/ Pin Hole",76
+"68325","4×4 Round Brick w/ Recess",76
+"48092","4×4 Ø8 Round Corner Brick (Large Macaroni)",76
+"2577","4×4 Ø8 ¼-Circle Brick",76
+"3626","Minifigure Head",76
+"92947","2×2 Round w/ Grille",76
+"43888","1×1×6 Round w/ Square Base",76
+"75347","2×2×11 Round w/ Square Base",76
+"6141","1×1 Round Plate",74
+"85861","1×1 Round Plate w/ Hole",74
+"35480","1×2 Plate, Ø1 Rounded Ends",74
+"77850","1×3 Plate, Ø1 Rounded Ends",74
+"77845","1×4 Plate, Ø1 Rounded Ends",74
+"38799","Ø1⅖ w/ 1-stud (Saucer)",74
+"4032","2×2 Round Plate w/ Axle Hole",74
+"15535","2×2 Round Tile w/ Pin Hole",74
+"18674","2×2 Round Jumper Plate",74
+"1745","1×2, Ø2 ½-Circle Jumper Plate",74
+"3176","3×2, Ø2 Rounded End Plate w/ Pin Hole",74
+"60474","4×4 Round Plate w/ Pin Hole",74
+"11833","4×4 Round Plate w/ 2×2 Round Cutout",74
+"30357","3×3 Plate w/ Ø4 Rounded Corner",74
+"18980","2×6, Ø4 Plate w/ 2-Rounded Corners",74
+"65140","8×8, Ø4 Plate w/ Rounded Corners",74
+"11213","6×6 Round Plate",74
+"18646","3×6, Ø6 ½-Circle Plate w/ 1×2 Cutout",74
+"74611","8×8 Round Plate",74
+"6177","8×8 Round Plate w/ 2×2 Studs",74
+"30565","4×4, Ø8 ¼-Circle Plate",74
+"22888","4×8, Ø8 ½-Circle Plate",74
+"6003","6×6, Ø8 Corner Plate",74
+"41948","8×8, Ø8 Plate w/ Rounded End",74
+"80031","10×10, Ø8 Plate w/ Rounded End",74
+"79491","2×2, Ø2 Corner Plate w/ 1×1 Cutout",74
+"68568","3×3, Ø4 Corner Plate w/ 2×2 Curved Cutout",74
+"80015","5×5, Ø8 Corner Plate w/ 4×4 Curved Cutout",74
+"35044","4×4 Plate w/ Ø6 3×3 ¼-Circle Cutout",74
+"5518","2½×2 w/ Ø1 Corners, Extension",74
+"3263","3×4×⅔, Ø2 Blate w/ 2-Rounded Corners",75
+"66792","4×4×⅔, Ø2 Blate w/ Rounded Corners",75
+"79387","4×4×⅔, Ø2 Blate w/ Rounded Corners, 2×2 Cutout",75
+"89681","4×6×⅔, Ø4 Blate w/ 2-Rounded Corners",75
+"66789","6×6×⅔, Ø4 Blate w/ Rounded Corners",75
+"73832","8×4×⅔, Ø4 Blate w/ 2-Rounded Corners",75
+"66790","8×8×⅔, Ø4 Blate w/ Rounded Corners",75
+"74166","8×16×⅔, Ø8 Blate w/ 2-Rounded Corners",75
+"98138","1×1 Tile, Round",77
+"24246","1×1 Tile w/ Ø1 Rounded End",77
+"1126","1×2 Tile w/ Ø1 Rounded Ends",77
+"14769","2×2 Tile, Round",77
+"5520","2×2 Tile w/ Ø2 Rounded End",77
+"66857","2×4 Tile, Ø2 Rounded Ends",77
+"25269","1×1 Tile w/ Ø2 ¼-Circle",77
+"1748","1×2 Tile w/ Ø2 ½-Circle",77
+"3396","2×2 Tile w/ 2 Ø2 Cutouts",77
+"67095","3×3 Tile, Round",77
+"65474","6×8 Tile w/ Ø6 Rounded Ends",77
+"3567","2×2 Tile, Inverted",77
+"74169","3×4×⅔ Tile, Mickey Mouse",77
+"27925","2×2 Tile, Ø4 Corner w/ 1×1 Ø2 Cutout",77
+"79393","3×3 Tile, Ø6 Corner w/ 2×2 Ø4 Cutout",77
+"27507","4×4 Tile, Ø8 Corner w/ 3×3 Ø6 Cutout",77
+"68869","4×4×⅔, Ø2 Tile w/ Rounded Corners",77
+"87617","1×5½ Cylinder w/ Handle",78
+"68013","1×2, Ø2 ½-Circle Brick",78
+"73111","3×3×2 Round w/ Recess, 4-Studs, Axle Hole",78
+"30987","2×2×5, Ø4 ¼-Cylinder",78
+"24593","2×4×2, Ø4 ½-Cylinder",78
+"6259","2×4×4. Ø4 ½-Cylinder",78
+"85941","2×4×5, Ø4 ½-Cylinder",78
+"60373","3×3×5, Ø4 ¼-Cylinder w/ 2-Bows",78
+"87926","3×6×6, Ø6 ½-Cylinder",78
+"3535","3×3×2, Ø6 ¼-Cylinder",78
+"4041","4×4×3, Ø8 ¼-Cylinder",78
+"30562","4×4×6, Ø8 ¼-Cylinder",78
+"93168","3×6×2⅔ Cylinder, Horizontal w/ Cutouts",78
+"66787","6×6×3⅓, Ø4 Rounded Cylinder (Warp Pipe)",78
+"49736","4L Ø4 Tube, Straight",78
+"49737","Ø4 Tube, 45° Curved",78
+"85975","1×1×⅔ Cone (Fez)",79
+"59900","1×1 Cone",79
+"33492","1½×1½×⅔ Cone",79
+"98100","2×2 Cone, Truncated",79
+"3942","2×2×2 Cone",79
+"6233","3×3×2 Cone",79
+"3943","4×4×2 Cone",79
+"4742","4×4×2 Cone, Hollow",79
+"38317","4×2×3 ½-Cone",79
+"47543","8×4×6 ½-Cone",79
+"29096","10×5×6 ½-Cone",79
+"28598","2×2×3 Cone, Jagged",79
+"35563","2×4×4 ½-Cone w/ Roof Tiles",79
+"4588","1×1 w/ Fins",79
+"4591","2×2×2 w/ Fins",79
+"1744","3×3×3 Cone, Paraboloid",79
+"18909","6×3×6 ½-Cone, Paraboloid",79
+"6059","3×3×6 ¼-Cylinder w/ Curved Top",79
+"11610","1×1 Cone, Inv. w/ Bar (Ice Cream Cone)",79
+"49309","2×2×2 Cone, Inverted",79
+"4740","2×2 Dish",80
+"43898","3×3 Dish",80
+"35394","4×4 Dish",80
+"65138","4×4×⅔ Dish",80
+"79850","4×4×1 Dome w/ 2×2 Recess",80
+"44375","6×6 Dish",80
+"4285","6×6 Dish, Radar",80
+"3961","8×8 Dish",80
+"50990","10×10 Dish",80
+"5852","2×2×⅔ Curved Corner",80
+"76797","3×3 Curved Corner",80
+"65617","3×3 Round Corner",80
+"24599","5×5 Round Corner",80
+"76795","5×5 Round Corner, Truncated",80
+"95188","6×6 Round Corner w/ Studs",80
+"58846","10×10 Round Corner w/ Studs",80
+"87559","6×6×2 Corner",80
+"20952","1½×1½×⅔ Dome",80
+"51283","Fishbowl Helmet",80
+"30106","2×2×2 Globe",80
+"6908","1×1×⅔ Dome",80
+"3262","2×2 Dome",80
+"30151","2×2×1⅔ Dome",80
+"20953","2×2 Sphere w/ Stud",80
+"61287","2×2 Hemisphere w/ Cutout",80
+"49308","3×3×1⅓ Dome",80
+"86500","4×4 Hemisphere",80
+"88293","3×3×2 ¼-Dome",80
+"49612","4×4×2⅔ ¼-Dome",80
+"76776","5×5×3⅓ ¼-Dome",80
+"18990","4×4×1⅔ Hemisphere w/ Bar",80
+"18675","6×6 Dish w/ Handle",80
+"87752","6×4×2⅓ Bubble Canopy w/ Bar",80
+"87375","Ø16 ¼-Dome Panel w/ Bars (Windscreen)",80
+"50018f","Hemisphere w/ Stud, 3-Ribs",80
+"15395","2×2 Dome, Inverted w/out Studs",80
+"24947","2×2 Dome, Inverted w/ Studs",80
+"72824","Ball, Soccer",81
+"54821","Ball, Bionicle (Zamor Sphere)",81
+"24946","Egg",81
+"49307","1×1×⅔ Curved, Double",82
+"3563","1×2×⅔ Curved, Double",82
+"79756","1×4×⅔ Curved, Double",82
+"79757","2×2×⅔ Curved, Double, Corner",82
+"49307","1×1×⅔ Curved, Double",96
+"3563","1×2×⅔ Curved, Double",96
+"79756","1×4×⅔ Curved, Double",96
+"79757","2×2×⅔ Curved, Double, Corner",96
+"11477","2×1×⅔ Curved",97
+"15068","2×2×⅔ Curved",97
+"93273","4×1×⅔ Curved, Double",97
+"88930","2×4×⅔ Curved",97
+"66955","4×3½×1 Curved, Double w/ 3-Steps",97
+"50950","3×1 Curved",98
+"24309","3×2 Curved",98
+"78522","4×6 Curved, Double",98
+"61678","4×1 Curved",99
+"93606","4×2 Curved",99
+"42022","6×1 Curved w/ 2-Studs",99
+"44126","6×2 Curved 2/ 4-Studs",99
+"71771","5×8×⅔ Curved",99
+"15625","5×8×⅔ Curved w/ 4-Studs",99
+"42918","8×2 Curved",100
+"13731","10×1 Curved",100
+"1871","1×1×1⅓ Curved, Corner",101
+"5841","1×2 Curved w/ Cutout",101
+"6091","1×2×1⅓ Curved w/ Cutout",101
+"5846","2×2 Curved, Corner",101
+"67810","2×2×1⅓ Curved Corner w/ Cutout",101
+"7126","1×1 Curved",101
+"37352","2×1×1 Curved",101
+"10314","4×1×1⅓ Curved",101
+"6081","4×2×1⅓ Curved w/ Cutout",101
+"6215","2×3 Curved w/ 4-Studs",101
+"4045","4×1×1⅓ Curved w/ 2-Corners",101
+"30165","2×2 Curved w/ 2-Studs",101
+"6192","2×4 Curved",101
+"4744","2×4×2 Double",101
+"6005","1×3×2 Curved w/ Curved Cutout",102
+"6183","1×6×2 Curved, Double w/ Curved Cutout",102
+"33243","1×3×2 Curved",102
+"5843","3×1×1⅔ Curved",102
+"24201","2×1×⅔ Curved, Inverted",103
+"32803","2×2×⅔ Curved, Inverted",103
+"1750","2×2 Curved, Inverted w/ Cutouts",103
+"13547","4×1 Curved, Inverted w/ Cutouts",103
+"42023","6×1 Curved, Inverted",103
+"5174","2×4 Curved Double, Inverted",103
+"6826","2×2 Curved, Inverted",103
+"35477","1×3 Brick w/ Round Ends, 2-Studs",104
+"5907","2×1×1⅔ Curved w/ Cutout",104
+"3573","4×1×1⅔ Curved w/ Cutout",104
+"65734","1×4×2⅔ Curved",104
+"5845","1×5×3⅓ Curved w/ Curved Cutout, 1-Stud",104
+"6060","1×6×3⅓ Curved w/ Curved Cutout, 2-Studs",104
+"6184","1×12×5 Double",104
+"78666","1×2 Half Arch, Inverted",104
+"70681","1×3 Inverted",104
+"4190","2×2 Inverted, Corner",104
+"73682","3×3 Curved Corner, Inverted",104
+"11290","2×8×2 Curved Double",104
+"54095","8×8×2 Curved Double",104
+"11301","2×8×2 Curved Double, Inverted",104
+"54091","2×8×2 Curved Double, Inverted",104
+"61487","4×4×2 Curved w/ 4-Studs, 2-Pin Holes",104
+"46413","4×8×2 Curved w/ 2 Click Hinges",105
+"2571","3×4×6 Panel w/ Curved Top",105
+"18910","3×4×3 Curved Panel w/ Hinge",105
+"76798","5×8×3⅔ Curved Panel w/ 2-Axle Holes",105
+"92474","6×2×2 Curved w/ Bar",105
+"5065","6×5×3⅓ Panel, Curved",105
+"65783","10×4×13 Panel, Curved w/ 2-Bars, 4-Studs",105
+"4490","1×3 Arch",83
+"3659","1×4 Arch",83
+"6182","1×4×2 Arch",83
+"92950","1×6 Arch",83
+"15254","1×6×2 Arch",83
+"16577","1×8×2 Arch",83
+"18838","1×12×3 Arch",83
+"38583","1×2 Dbl. ½-Arch",83
+"38585","1½×1½×1 Dbl. ½-Arch",83
+"50967","8×1 Curved w/ Arch",83
+"88292","1×3×2 Bow, Pointed",83
+"13965","1×3×3 Bow, Pointed",83
+"80543","1×4×3 Bow",83
+"14395","1×5×4 Bow",83
+"3572","1×5×2 Bow",83
+"30099","1×5×4 Bow, Inverted",83
+"18653","1×3×2 Bow, Inverted",83
+"40066","1×4×6 Arch w/ 2 Round Pillars",83
+"30613","3×6×5 Arch w/ Pillars, Ornamented",83
+"29119","2×1 Wedge, Curved Right",85
+"29120","2×1 Wedge, Curved Left",85
+"5414","4×1 Wedge, Curved Right",85
+"5415","4×1 Wedge, Curved Left",85
+"66956","2×2 Wedge. Curved",85
+"5095","2×2 Wedge, Curved Left",85
+"5093","2×2 Wedge, Curved Right",85
+"80178","3×2 Wedge, Curved Right",85
+"80177","3×2 Wedge, Curved Left",85
+"64225","3×4 Wedge, Curved",85
+"47753","4×4 Wedge, Curved",85
+"41747","6×2 Wedge, Curved Right w/ 2-Studs",85
+"41748","6×2 Wedge, Curved Left w/ 2-Studs",85
+"43712","6×4 Wedge, Curved w/ 4-Studs",85
+"50956","10×3 Wedge, Curved Right w/ 2-Studs",85
+"50955","10×3 Wedge, Curved Left w/ 2-Studs",85
+"42060","12×3 Wedge, Curved Right w/ 4-Studs",85
+"42061","12×3 Wedge, Curved Left w/ 4-Studs",85
+"45301","16×4 Wedge, Curved w/ 10-Studs",85
+"41749","8×3×2 Wedge, Curved Right w/ 2-Studs",85
+"41750","8×3×2 Wedge, Curved Left w/ 2-Studs",85
+"41751","8×6×2 Curved w/ 4-Studs, 3-Pin Holes",85
+"77182","10×2×2 Wedge, Curved Right w/ 1-Stud",85
+"77180","10×2×2 Wedge, Curved Left w/ 1-Stud",85
+"45705","10×6×2 Curved w/ 8-Studs, 3-Pin Holes",85
+"43721","4×2 Wedge, Twist Left",85
+"43720","4×2 Wedge, Twist Right",85
+"47755","4×3 Curve w/ Cutout",85
+"81911","2×4 Windscreen, Curved",85
+"35299","3×6 Windscreen, Curved",85
+"30841","2×4×1⅓ Curved Panel",85
+"61484","5×6×2 Windscreen, Curved",85
+"65632","6×6×1⅔ Windscreen, Curved",85
+"92279","7×4×2 Round Windscreen w/ Handle",85
+"23448","8×4×2 Windscreen, Curved w/ Handle",85
+"92579","8×4×2 Windscreen, Curved w/ Handle, 4-Studs",85
+"18973","6×4×1⅓ Windscreen, Curved",85
+"18972","5×4×1⅔ Windscreen, Curved",85
+"3384","4×6×1⅓ Windscreen, Curved",85
+"3383","6×6×1⅓ Windscreen, Curved",85
+"47406","10×6×2 Cockpit, Wedge, Curved Inverted",85
+"87611","6×10 Fuselage, Inverted",85
+"11295","6×8 Fuselage, Inverted",85
+"85834","4×5×1⅔ Domed Curve (Armor)",85
+"49097","3×2½×1 Mudguard",86
+"50745","4×2½×2 Mudguard",86
+"98282","4×2½×1 Mudguard",86
+"1846","4×3×1⅔ Arch Mudguard",86
+"3387","4×2½×2 Arch Mudguard",86
+"35789","4×2½×2 Arch Mudguard w/ Curved Bottom",86
+"18974","4×2½×2⅓ Arch Mudguard",86
+"62361","1½×6×1 Arch Mudguard",86
+"28326","4×3×1 Mudguard",86
+"98835","3×4×1⅔ Curved",86
+"41854","2×4 Flared Mudguard",86
+"44674","2×4 Mudguard, Overhanging",86
+"11291","3×4×⅔ Wedge w/ Cutout",86
+"93590","2×4 Mudguard w/ 2-Headlights",86
+"50947","1×4½ Mudguard",86
+"60212","2×4 Mudguard",86
+"3787","2×4 Mudguard, Angled",86
+"39739","1×1 Tile, Heart",87
+"39613","3×3 Plate, Heart",87
+"46342","6×6 Plate, Heart",87
+"3498","1×1 Star w/ Round Base",87
+"39611","4×4×⅔ Star w/ 2×2 Round Base",87
+"65700","2×2 Cake Frosting",88
+"40145","2×2 Round w/ Rotation Stem",88
+"1686","Shoulder Cover, Round w/ Bars",88
+"11267","7×12×8⅓ Slide, Curved 180°",88
+"28387","6×6×6 Slide, Curved 90°",88
+"27976","4×6×6 Slide",88
+"15470","1×1 Round, Swirled Top",88
+"74698","2×2 Round w/ Technic Pin Hole (Ring)",88
+"2654","2×2 Round, Curved Inverted Tile (Boat Stud)",88
+"3940","2×2×2 Round Support",88
+"27266","2×2 Round Brick w/ 8-Spikes",88
+"80677","2×2 Round, Splat",88
+"18969","4×4×13, ⅛-Balloon Panel w/ Clip",88
+"35470","3×5 Plate, Cloud w/ 3-Studs",88
+"58176","Light Cover (Bionicle Eye)",88
+"44358","2×2 Socket, Hemisphere",88
+"53119","1×1 Round w/ Twist (Poop)",88
+"11010","1×1 Ring",88
+"11641","Basketball Net w/ Axle",88
+"21560","Shoulder Cover, Round w/ 2-Bars",88
+"1927","1×4 Hinge Plate",5
+"2429","1×4 Hinge Plate, Base",5
+"2430","1×4 Hinge Plate, Top",5
+"3937","1×2 Hinge Brick, Base",5
+"3938","1×2 Hinge, Top",5
+"6134","2×2 Hinge, Top",5
+"4275","1×2 Hinge, 3-Finger End",5
+"4276","1×2 Hinge, 2-Finger End",5
+"2452","1×2 Hinge, 3-Finger Side",5
+"4531","1×2 Hinge, 2-Finger Top",5
+"2433","Hinge, 3-Finger Bar w/ Stud",5
+"4315","1×4 Hinge, 5-Finger Side",5
+"4625","1×4 Hinge, 5-Finger Side",5
+"4214","1×4×2 Hinge, Roof Holder",5
+"4213","4×4 Hinge, Roof",5
+"2349","4×4 Hinge, Sunroof",5
+"3149","2×5 Hinge",5
+"3830","1×4 Hinge, Top",5
+"3831","1×4 Hinge, Base",5
+"3639","2×4 Plate w/ Hinge, A.",5
+"3640","2×4 Plate w/ Hinge, B.",5
+"3613","Arm Piece w/ 3-Fingers, Towball Socket",5
+"3612","Arm Piece w/ 2-Finger and 3-Finger",5
+"792c03","2×2 Brick, 2-Arms w/ 2-Fingers",5
+"1927","1×4 Hinge Plate",46
+"2429","1×4 Hinge Plate, Base",46
+"2430","1×4 Hinge Plate, Top",46
+"3937","1×2 Hinge Brick, Base",46
+"3938","1×2 Hinge, Top",46
+"6134","2×2 Hinge, Top",46
+"4275","1×2 Hinge, 3-Finger End",46
+"4276","1×2 Hinge, 2-Finger End",46
+"2452","1×2 Hinge, 3-Finger Side",46
+"4531","1×2 Hinge, 2-Finger Top",46
+"2433","Hinge, 3-Finger Bar w/ Stud",46
+"4315","1×4 Hinge, 5-Finger Side",46
+"4625","1×4 Hinge, 5-Finger Side",46
+"4214","1×4×2 Hinge, Roof Holder",46
+"4213","4×4 Hinge, Roof",46
+"2349","4×4 Hinge, Sunroof",46
+"3149","2×5 Hinge",46
+"3830","1×4 Hinge, Top",46
+"3831","1×4 Hinge, Base",46
+"3639","2×4 Plate w/ Hinge, A.",46
+"3640","2×4 Plate w/ Hinge, B.",46
+"3613","Arm Piece w/ 3-Fingers, Towball Socket",46
+"3612","Arm Piece w/ 2-Finger and 3-Finger",46
+"792c03","2×2 Brick, 2-Arms w/ 2-Fingers",46
+"54657","1×2 Plate w/ Click Hinge, 2-Finger, End",51
+"44301","1×2 Plate w/ Click Hinge, 1-Finger, End",51
+"30383","1×2 Plate w/ Click Hinge, 1-Finger, Top",51
+"50340","1×2 Plate w/ Click Hinge, 2-Finger, Side",51
+"44567","1×2 Plate w/ Click Hinge, 1-Finger, Side",51
+"44300","1×3 Tile w/ Click Hinge, 1-Finger, Top",51
+"92582","2×2 Plate w/ Click Hinge, 1-Finger, Top",51
+"44568","1×4 Plate w/ Dual 1-Finger Click Hinges, Side",51
+"44822","1×4 Tile w/ Dual 1-Finger Click Hinges, Top",51
+"50337","3×4 Plate w/ Dual 2-Finger Click Hinges, Side",51
+"65133","4×6 Plate w/ Dual 1-Finger Click Hinges, Side",51
+"92092","2×4 Gate w/ Dual 2-Finger Click Hinges, Side",51
+"30364","1×2 Brick w/ 2-Finger Click Hinge on End, Vertical",52
+"54671","1×2 Brick w/ 2-Finger Click Hinge, Vertical",52
+"30541","1×2 Brick w/ 2-Finger Click Hinge, Horizontal",52
+"54672","1×2 Brick w/ 2-Finger Click Hinge, Horizontal",52
+"76385","1×2 Brick w/ 1-Finger Click Hinge, Top",52
+"39893","1×2 Brick w/ Click Hinge on Both Ends, Vertical",52
+"47975","1×2 Brick w/ Click Hinges on Both Ends, Both Orientations",52
+"54661","1×4 Brick w/ Click Hinges on Both Ends, Vertical",52
+"53914","1×6 Brick w/ Click Hinges on Both Ends, Vertical",52
+"53029","2×2 Brick w/ 2-Finger Click Hinge, Vertical",52
+"30389","2×2 Brick w/ 1-Finger Click Hinge, Vertical",52
+"54662","1×2 Cylinder w/ Click Hinge, Both Ends",53
+"51482","2-Finger Click Hinge w/ Towball Socket",53
+"47973","1×3 1-Finger Click Hinge w/ 2-Pins",53
+"57360","1×2 Cylinder 2-Finger Click Hinge w/ Axle Hole",53
+"53923","1×2 Cylinder 1-Finger Click Hinge w/ Axle Hole",53
+"57697","1×2 Cylinder 1-Finger Click Hinge w/ Technic Pin",53
+"14137","1×8 2-Finger Click Hinge w/ Angled Edge",53
+"57906","1×12 2-Finger Click Hinge w/ Angled and Tapered Edges",53
+"65132","4×5×5 Bracket w/ 2-Finger Hinges (Vidiyo)",53
+"3679","2×2 Turntable, Top",48
+"27448","2×2 Turntable Base",48
+"61485","4×4 Turntable Base",48
+"35442","2×2 Plate Gear w/ 6 Tooth",48
+"35443","4×4 Plate Gear w/ 10 Tooth",48
+"35446","6×6 Plate Gear w/ 14 Tooth",48
+"3680","2×2 Turntable, Base",48
+"3403c01","4×4 Turntable",48
+"22890","1×2 Plate w/ Towball, End",6
+"3170","1×2 Plate w/ Towball, Both Ends",6
+"14419","1×2 Plate w/ Towball & Socket, Ends",6
+"14417","1×2 Plate w/ Towball, Side",6
+"3184","1×4 Plate w/ Towball, Side",6
+"15456","2×2 Plate w/ Towball, Side",6
+"14418","1×2 Plate w/ Towball Socket, End",6
+"14704","1×2 Plate w/ Towball Socket, Side",6
+"98263","1×4 Plate w/ Flat Towball Socket, Side",6
+"63082","2×2 Plate w/ Towball Socket",6
+"22484","Bar 1L w/ Towball",6
+"2736","Technic Axle w/ Towball",6
+"66906","Technic Pin w/ Towball",6
+"80477","3L Towball, Bar w/ Pin",6
+"30395","Hook w/ Towball",6
+"2508","2×4 Wedge w/ Towball",6
+"4089","-33° 3×2 Scoop w/ 2-Studs, Towball",6
+"3614","1×1 Round Plate w/ Towball",6
+"6076","12L Bar w/ Towball, Open Stud",6
+"3183","1×4 Plate w/ Towball Socket, Side",6
+"22890","1×2 Plate w/ Towball, End",54
+"3170","1×2 Plate w/ Towball, Both Ends",54
+"14419","1×2 Plate w/ Towball & Socket, Ends",54
+"14417","1×2 Plate w/ Towball, Side",54
+"3184","1×4 Plate w/ Towball, Side",54
+"15456","2×2 Plate w/ Towball, Side",54
+"14418","1×2 Plate w/ Towball Socket, End",54
+"14704","1×2 Plate w/ Towball Socket, Side",54
+"98263","1×4 Plate w/ Flat Towball Socket, Side",54
+"63082","2×2 Plate w/ Towball Socket",54
+"22484","Bar 1L w/ Towball",54
+"2736","Technic Axle w/ Towball",54
+"66906","Technic Pin w/ Towball",54
+"80477","3L Towball, Bar w/ Pin",54
+"30395","Hook w/ Towball",54
+"2508","2×4 Wedge w/ Towball",54
+"4089","-33° 3×2 Scoop w/ 2-Studs, Towball",54
+"3614","1×1 Round Plate w/ Towball",54
+"6076","12L Bar w/ Towball, Open Stud",54
+"3183","1×4 Plate w/ Towball Socket, Side",54
+"57909","2×2 Brick, Ball Joint, 1-Ball",55
+"17114","2×2 Brick w/ Ball Joints, 2-Balls",55
+"67696","2×2 Brick w/ Ball Joint Socket",55
+"67697","1×2 Technic Liftarm w/ Ball Joint, Straight",55
+"50923","1×2 Technic Liftarm w/ Ball Joint, Angled",55
+"74261","2L Extender, 1-Ball, 1-Socket",55
+"67695","2×3 Ball Socket w/ Axle Hole",55
+"98577","1×3 Liftarm w/ Middle Ball",55
+"47300","3×3 Angle, 2-Balls, 1-Axle Hole",55
+"90622","5L Bean, 1-Ball, 2-Sockets",55
+"90617","5L Forked, 2-Balls, 1-Socket",55
+"90616","6L Forked, 2-Balls, 1-Socket, 2-Pin Holes",55
+"90615","7L Forked, 2-Balls, 1-Socket, 2-Pin Holes",55
+"90613","9L Forked, 2-Balls, 1-Socket, 4-Pin Holes",55
+"90612","3L Beam, 1-Ball, 1-Socket",55
+"90611","4L Beam, 1-Ball, 1-Socket",55
+"90609","5L Beam, 2-Balls, 1-Socket",55
+"90608","6L Beam, 2-Balls, 1-Socket, 1-Pin Hole",55
+"90607","7L Beam, 2-Balls, 1-Socket, 2-Pin Holes",55
+"90605","9L Beam, 2-Balls, 2-Socket, 4-Pin Holes",55
+"89650","5×2 Dbl. Socket w/ Axle & Pin Holes",55
+"50898","7×2 Dbl. Socket w/ Axle & Pin Holes",55
+"90640","Armor #4, Ball Socket",55
+"93575","Hand w/ Socket & Axle Hole",55
+"90641","Armor #3, Ball Socket",55
+"41670","3×3 Angle, 2-Balls, 1-Axle Hole",55
+"90639","Armor #5, Ball Socket",55
+"47306","5L Beam w/ 2-Ball, ½ Gear",55
+"32173","2×7 Limb w/ 2-Ball",55
+"90652","Large Torso Armor w/ Ball Socket",55
+"32476","4×7 45° Limb w/ Ball, Axle Hole",55
+"45749","8L Limb w/ Wedge Sides",55
+"1994","2×2×2 Round w/ Rotation Joint Socket",49
+"79505","Ø3 Rotation Disk w/  2-Rotation Joints",49
+"80431","1×2×1⅓ Rotation Joint",49
+"48171","2×2 Click Socket, Vertical",49
+"48170","2×2 Click Socket, Horizontal",49
+"48169","2×2 Click Socket, End",49
+"48172","2×2 Click Socket, 2-Ends",49
+"47455","Click Joint, 2-Pins",49
+"47452","2×2 Click Socket, 1-Horizontal, 1-End",49
+"47454","2×3 Click Socket, 1-Horizontal, 1-End",49
+"47432","2×3 Click Socket, 1-Vertical, 1-End",49
+"47431","2×2 Click Socket, 1-Horizontal, 1-Hand w/ Axle Hole",49
+"4920","1×2 Brick w/ Click Pin",49
+"4218","Garage Door Section w/out Handle",41
+"32028","1½×2 Door Rail",41
+"4510","1½×8 Door Rail",41
+"30586","2×8 Door Rail",41
+"4216","1×2 Brick w/ Groove, Vertical",41
+"88393","1×2×5 Brick w/ Groove, Vertical",41
+"2653","1×4 Brick w/ Groove, Horizontal",41
+"4217","1×14 Brick w/ Groove, Curved Horizontal",41
+"4219","Garage Door Section w/ Handle",41
+"92338","6L Chain (5 Links)",26
+"60169","16L Chain (21 Links)",26
+"92338","6L Chain (5 Links)",153
+"60169","16L Chain (21 Links)",153
+"32580","7L Flex Axle",179
+"32199","11L Flex Axle",179
+"32200","12L Flex Axle",179
+"32201","14L Flex Axle",179
+"32202","16L Flex Axle",179
+"32235","19L Flex Axle",179
+"78c02","2L Ribbed Hose",180
+"78c03","3L Ribbed Hose",180
+"78c04","4L Ribbed Hose",180
+"78c05","5L Ribbed Hose",180
+"78c06","6L Ribbed Hose",180
+"78c07","7L Ribbed Hose",180
+"78c08","8L Ribbed Hose",180
+"78c09","9L Ribbed Hose",180
+"78c10","10L Ribbed Hose",180
+"78c11","11L Ribbed Hose",180
+"78c12","12L Ribbed Hose",180
+"78c13","13L Ribbed Hose",180
+"78c14","14L Ribbed Hose",180
+"78c15","15L Ribbed Hose",180
+"78c16","16L Ribbed Hose",180
+"78c17","17L Ribbed Hose",180
+"78c18","18L Ribbed Hose",180
+"78c19","19L Ribbed Hose",180
+"78c24","24L Ribbed Hose",180
+"78c26","26L Ribbed Hose",180
+"78c31","31L Ribbed Hose",180
+"27328","10L Ribbed Hose w/ Bar Ends",180
+"14301","12L Ribbed Hose w/ Bar Ends",180
+"57539","19L Ribbed Hose w/ Bar Ends",180
+"75c03","3L Flex Tube",181
+"75c04","4L Flex Tube",181
+"75c05","5L Flex Tube",181
+"75c06","6L Flex Tube",181
+"75c07","7L Flex Tube",181
+"75c08","8L Flex Tube",181
+"75c09","9L Flex Tube",181
+"75c10","10L Flex Tube",181
+"75c11","11L Flex Tube",181
+"75c12","12L Flex Tube",181
+"75c13","13L Flex Tube",181
+"75c14","14L Flex Tube",181
+"75c15","15L Flex Tube",181
+"75c16","16L Flex Tube",181
+"75c17","17L Flex Tube",181
+"75c18","18L Flex Tube",181
+"75c19","19L Flex Tube",181
+"75c20","20L Flex Tube",181
+"75c21","21L Flex Tube",181
+"75c22","22L Flex Tube",181
+"75c23","23L Flex Tube",181
+"75c24","24L Flex Tube",181
+"75c26","26L Flex Tube",181
+"75c27","27L Flex Tube",181
+"75c28","28L Flex Tube",181
+"75c29","29L Flex Tube",181
+"75c30","30L Flex Tube",181
+"75c31","31L Flex Tube",181
+"75c32","32L Flex Tube",181
+"75c33","33L Flex Tube",181
+"75c34","34L Flex Tube",181
+"75c38","38L Flex Tube",181
+"75c40","40L Flex Tube",181
+"75c47","47L Flex Tube",181
+"75c53","53L Flex Tube",181
+"5102c02","2L Pneumatic Hose",182
+"5102c03","3L Pneumatic Hose",182
+"5102c04","4L Pneumatic Hose",182
+"5102c05","5L Pneumatic Hose",182
+"5102c06","6L Pneumatic Hose",182
+"5102c07","7L Pneumatic Hose",182
+"5102c08","8L Pneumatic Hose",182
+"5102c09","9L Pneumatic Hose",182
+"5102c11","11L Pneumatic Hose",182
+"5102c13","13L Pneumatic Hose",182
+"5102c14","14L Pneumatic Hose",182
+"5102c16","16L Pneumatic Hose",182
+"5102c20","20L Pneumatic Hose",182
+"5102c23","23L Pneumatic Hose",182
+"5102c24","24L Pneumatic Hose",182
+"5102c25","25L Pneumatic Hose",182
+"5102c27","27L Pneumatic Hose",182
+"5102c28","28L Pneumatic Hose",182
+"5102c32","32L Pneumatic Hose",182
+"5102c37","37L Pneumatic Hose",182
+"5102c40","40L Pneumatic Hose",182
+"27965","22L Flex Cable w/ Bar Hole (Zipline)",183
+"2630","21L Flex Cable w/ Bar Connectors",183
+"73590","8.5L Hose, Flexible",183
+"63141","21L String w/ Bar Grips",184
+"14226","11L String w/ 2-Studs",184
+"75924","21L String w/ 2-Studs",184
+"14225","31L String w/ 2-Studs",184
+"14224","41L String w/ 2-Studs",184
+"2584","2×2 String Reel Holder",184
+"2585","2×2 String Reel w/ Hole",184
+"78333","2×2 String Reel w/ Stud",184
+"85543","Ø15mm Rubber Belt, Round",185
+"85544","Ø24mm Rubber Belt, Round",185
+"85545","Ø26 Rubber Belt",185
+"85546","Ø33mm Rubber Belt, Round",185
+"23229","Ø15mm Rubber Band, Square",185
+"66821","25L Bracelet, 2×14 Studs",186
+"67196","25L Bracelet, 1×14 Studs",186
+"73767","4×4 Attachment Ring w/ closure",186
+"3957","1×4 Antenna",23
+"2569","1×8 Whip Antenna",23
+"78258","2L Bar w/ Stop Ring",23
+"87994","3L Bar",23
+"30374","4L Bar",23
+"87618","5L Bar w/ Handle",23
+"63965","6L Bar w/ Stop Ring",23
+"2714","8L Bar w/ Pin & Ring",23
+"42445","12L Bar w/ 1×2 Plate",23
+"30359","1×8 Bar w/ 1×2 Brick",23
+"3849","9L Bar w/ Handle (Lance)",23
+"37762","Candle",23
+"64567","Lightsaber Handle",23
+"92690","Bar 1L 1-stud, stud 2-sides",23
+"66909","Bar 2L w/ 2-studs",23
+"73117","Candleabra w/ 3-arms",23
+"1566","Bar Stem w/ 1-branch",23
+"37494","Pantograph Shoe w/ 4 Bars",23
+"4042","Bar, Curved w/ Axle & 2-studs",23
+"79851","Ø7 Bar Ring w/ 2-Axle Holes",23
+"50018e","1L Bar w/ Stud, Offset",23
+"50018a","1×1 w/ 3-Bars, 120°",23
+"50018d","1×1 w/ 2-Bars, 90°",23
+"6331","1×1 Round w/ 3-Bars, 67°",23
+"61252","1×1 Plate w/ Clip, Horizontal",24
+"4085","1×1 Plate w/ Clip, Vertical",24
+"78256","1×2 Plate w/ Vertical Clip, End",24
+"63868","1×2 Plate w/ Horizontal Clip, End",24
+"11476","1×2 Plate w/ Horizontal Clip, Side",24
+"44861","1×2 Plate w/ Horizontal Clip, Top",24
+"60470","1×2 Plate w/ 2-clips, Side",24
+"15712","1×1 Plate w/ Clip, Top",24
+"79987","1×3 Plate w/ 2-clips, Top",24
+"2555","1×1 Plate w/ Clip, Top (Straight Sides)",24
+"60476","1×1 Brick w/ Clip, Horizontal",24
+"60475","1×1 Brick w/ Clip, Vertical",24
+"30237","1×2 Brick w/ Vertical Clip, Side",24
+"60583","1×1×3 Brick w/ 2-clips",24
+"30350","2×3 Tile, 2-clips, Side",24
+"11399","4×4 Plate, 2-clips",24
+"66252","4×4 Plate w/ 2-clips, Studs 3-edges",24
+"3628","2L Bar w/ 3-clips",24
+"11090","Bar Holder w/ Clip",24
+"5264","1×1 Round w/ Clip, Bottom",24
+"72869","Bar Holder w/ Clip 90°",24
+"23443","Bar Holder w/ Handle",24
+"48729","Bar w/ Clip",24
+"4735","1×3 Bar w/ Clip (Robot Arm)",24
+"59230","Droid Arm, Straight",24
+"30377","Droid Arm, Bent",24
+"93609","Skeleton Arm, Bent w/ Horizontal Clip",24
+"93061","Skeleton Arm, Bent w/ Vertical Clip",24
+"98313","Mechanical Arm w/ Bar Holder and Clip",24
+"6266","Skeleton Leg",24
+"23769","Skeleton Leg, Tall",24
+"30376","Droid Legs",24
+"26047","1×1 Plate, Round w/ Handle",25
+"78257","1×1 Plate w/ Handle, Both Ends",25
+"60478","1×2 Plate w/ Handle, End",25
+"18649","1×2 Plate w/ Handle, Both Ends",25
+"48336","1×2 Plate w/ Handle, Side",25
+"2540","1×2 Plate w/ Handle, Side (free ends)",25
+"88072","1×2 Plate w/ Handle, Side (arm up)",25
+"30043","1×4 Plate w/ Handle, Side (arm down)",25
+"2921","1×1 Brick w/ Handle, Vertical",25
+"30236","1×2 Brick w/ Handle, Side (free ends)",25
+"34816","1×2 Brick w/ Vertical Handle, End",25
+"92692","1×2 Plate w/ 3-handles, Angled",25
+"79194","1×1 Round Plate w/ Handle",25
+"77808","1×2 Rounded Brick w/ 2-handles",25
+"2566","Palm Tree Top",25
+"98284","2×2 Round Plate w/ 4-handles",25
+"3839","1×2 Plate w/ 2-handles",25
+"2397","Horse Hitching",25
+"2432","1×2 Tile w/ Handle, Top",25
+"3900","Paddle",25
+"32828","1×1 Round Plate w/ 1L Handle",25
+"65578","1×1 Round Plate w/ 45° Bar, Bottom",25
+"36452","Minifig Bracket w/ 4-handles",25
+"30166","2×3 Shield w/ 4-studs, Handle",25
+"3171","Clip w/ Bar, Angled",25
+"3661","1×1 Plate w/ Bar (arm down)",25
+"3917","2.4×2.4 Bar Ring w/ Stud Holder",25
+"20482","1×1 Round Plate w/ Bar",25
+"75937","2×2 Bar Frame, Octagonal w/ 4-Studs",25
+"30094","4×4 Bar Frame, Square w/ 4-Studs",25
+"5066","2×2 Plate w/ 2-handles, Bottom",25
+"1941","1×1 w/ 3-Handles, 3-Bar Holes",25
+"98549","2×2×5 Bar w/ Stud",25
+"80326","2×2 Flag",45
+"44676","2×2 Flag, Trapezoid",45
+"4495","4×1 Flag, Wave",45
+"2525","6×4 Flag",45
+"17979","5×6 Flag, Hexagonal",45
+"30292","7×3 Flag w/ Bar",45
+"15210","2×2 Road Sign, Square",45
+"65676","2×2 Road Sign, Triangle",45
+"28220","Armor Plate w/ 2-bars",45
+"35649","1×2 Kite / Diamond w/ Bar",45
+"30261","2×2 Road Sign, Round",45
+"5555","2×4 Flag, Triangle",45
+"98341","4×4 Ring w/ 2×2 Hole, 4-Arrows (Ninjago Spinner Crown)",45
+"92107","6×8 Plate, Trap Door Frame, Horizontal",50
+"92099","4×6 Trap Door",50
+"69934","10×16 Plate w/ Studs Edges, Bar 1-edge (Book Cover)",50
+"6020","7×3 Ladder, 2-Clips",155
+"30095","7×3 Ladder, 4-Clips",155
+"6140","1×6 Railing w/ 4-Studs",155
+"4083","1×4×2 Railing w/ 2-Studs",155
+"6187","1×4×2 Railing",155
+"2486","1×8×2 Railing w/ 2-Studs",155
+"23444","1×6×3 Bar w/ 4-Studs",155
+"35654","1×4×1⅔ Grille Guard w/ Handle",155
+"3626pb","Minifigure Head",110
+"973","Minifigure Torso",110
+"73200","Minifigure Legs, Normal Length",110
+"37364","Minifigure Legs, Medium Length",110
+"41879","Minifigure Legs, Short Length",110
+"36036","Minifigure Dress",110
+"66788","Arm, Long w/ Technic Pin",110
+"28660","Arm, Short w/ Technic Pin",110
+"3820","Minifigure Hand",110
+"19729","Minifig Head, Cube",110
+"60115","Skeleton Torso",110
+"17","Minifigure Torso w/ Arm Ridges",110
+"15","Minifigure Hips, Tapered w/out Legs",110
+"92198","Minidoll Head",111
+"73141","Minidoll Torso, Girl",114
+"73161","Minidoll Torso, Boy",114
+"73152","Minidoll Torso, Woman",114
+"73441","Minidoll Torso, Man",114
+"20381","Minidoll Skirt, Asymmetrical Layered Right",115
+"92817","Minidoll, Long Skirt",115
+"11407","Minidoll, Wrap Skirt",115
+"36187","Minidoll, Dress",115
+"80336","Minidoll, Ball Gown, Octagonal",115
+"16530","Minidoll Mermaid Tail",115
+"16925","Minidoll Pants (Trousers)",117
+"92819","Minidoll Pants, Cropped (Capris)",117
+"36198","Minidoll, Shorts",117
+"10126","Giant Hand, Right",192
+"10127","Giant Hand, Left",192
+"30375","Torso, Battle Droid",187
+"30362","1×2×2 Droid Leg w/ Technic Pin",187
+"90398","Statuette (Nanofig)",112
+"85863","Microfig",112
+"68212","Hair, Tuft",175
+"3901","Hair, Short, Smooth",175
+"62810","Hair, Short Tousled w/ Side Part",175
+"92081","Hair, Combed Back",175
+"99930","Hair, Combed Sideways",175
+"21778","Hair, Coiled",175
+"21268","Hair, Swept back w/ Sideburns",175
+"98385","Hair, Short, Spiked",175
+"87991","Hair, Tousled w/ Side Part",175
+"23186","Hair, Tousled, Swept Left",175
+"88283","Hair, Mid-length Tousled w/ Center Part",175
+"62711","Hair, Short Bob",175
+"20877","Hair, Swept Sideways",175
+"11256","Hair, Wavy w/ Side Part",175
+"4530","Hair, Shoulder Length w/ Center Part",175
+"87990","Hair, Ponytail w/ Swept Sideways Fringe",175
+"6093","Hair, Ponytail",175
+"27186","Hair, High Bun",175
+"59363","Hair, Long w/ Braid Around Sides",175
+"85974","Hair, Part Over Right Shoulder",175
+"62696","Hair, Ponytail w/ Long Bangs",175
+"64807","Hair, Short w/ Braid Around Sides",175
+"44751","Hair, Short & Messy",175
+"61183","Hair, Swept Back, Tousled (Anakin)",175
+"35701","Hair, Short Pigtails",175
+"77108","Top Hat w/ Mini Bar",121
+"11618","Heart Bow w/ Mini Bar",121
+"18853","Flower, 5-Petal w/ Mini Bar",121
+"18854","Sunglasses w/ Mini Bar",121
+"54568","Propeller w/ Mini Bar",121
+"24131","Clown Hat w/ Mini Bar",121
+"33322","Tiara w/ Mini Bar",121
+"79806","Plume w/ Mini Bar",121
+"94725","Bow w/ Heart",121
+"94717","Bow",121
+"90541","Hat, Beanie",121
+"11303","Cap / Hat w/ Curved Bill",120
+"3624","Cap / Hat, Police",120
+"41334","Cap / Hat, Knitted",120
+"2514","Hat, Flat Cap",120
+"3898","Hat, Chef / Baker",120
+"3833","Hat, Construction Helmet",120
+"3834","Helmet, Fire",120
+"46303","Helmet, Sports w/ Vent Holes",120
+"93560","Helmet, Football",120
+"30171","Cap / Hat, Aviator",120
+"35458","Helmet, Dirt Bike",120
+"61506","Hat, Fedora",120
+"3878","Top Hat",120
+"6131","Hat, Wizard",120
+"93059","Hat, Conical Asian",120
+"26007","Hat, Conical Asian w/ Raised Center",120
+"50665","Classic Helmet",120
+"2446","Helmet, Motorcycle",120
+"89159","Visor, Space",120
+"61190c","Visor",120
+"30170","Goggles",120
+"30090","Diver's Mask",120
+"2447","Visor",120
+"46304","Snow Googles",120
+"63586","Rangefinder w/ Mini Bar",120
+"4485","Cap / Hat, w/ Straight Bill",120
+"25516","Crown, 6-point w/ Bar",120
+"61976","Satchel",120
+"2543","Hat, Bandana / Rag Wrap",120
+"30924","Bandage, Arm",120
+"30381","Hood",120
+"2526","Epaulette",120
+"15619","Bandana",120
+"25376","Scarf, Long Wrapped",120
+"24504","Face Scarf",120
+"26066","Fur Collar",120
+"50231","Minifig Cape",120
+"93091","Handbag w/ Zipper",120
+"3838","Air Tanks",120
+"38781","Life Jacket",120
+"2524","Backpack",120
+"41811","Harness w/ 4-Studs",120
+"66913","Headphones",120
+"2599","Flipper",119
+"11253","Roller Skate",119
+"93555","Ice Skate",119
+"30284","Snowshoe",119
+"99774","4L Ski",119
+"90509","6L Ski",119
+"18746","Snowboard",119
+"66858","2×2×⅔ w/ Feet, 4-Studs",119
+"3899","Mug",116
+"38014","Teacup",116
+"2343","Goblet (Glass)",116
+"15496","Cup, Takeaway",116
+"95228","Bottle",116
+"34172","Rice Bowl",116
+"6256","3×3 Dish",116
+"4528","Frying Pan",116
+"4529","Saucepan",116
+"98374","Cauldron",116
+"4341","3×3×1¾ Cauldron w/ Handles (Fabuland Pot)",116
+"23986","Teapot",116
+"29636","Whisk",116
+"98369","Cleaver",116
+"79741","Fork",116
+"34173","Spoon",116
+"79735","Chopsticks",116
+"6254","Ice Cream Scoops",116
+"30222","Popsicle",116
+"79743","Cupcake",116
+"10170","Pretzel",116
+"67338","Croissant",116
+"4342","Bread (Baguette)",116
+"33078","Sausage",116
+"42876","Turkey Leg (Drumstick)",116
+"25386","Hotdog Bun",116
+"68504","Ice Cream Sundae Glass",116
+"4079","2×2 Seat, Minifig",118
+"13770","1×2 Faucet",118
+"4006","Wrench",118
+"4522","Hammer",118
+"92585","Crowbar",118
+"3837","Shovel",118
+"12885","Paint Roller Handle",118
+"19220","Radio",118
+"4349","Megaphone",118
+"6190","1×3 Phone w/ 2-Antistuds",118
+"30162","Binoculars",118
+"64644","Telescope",118
+"64728","Dynamite",118
+"73587","Lever",118
+"4599","1×1 Tap",118
+"18920","Scissors",118
+"30089","Camera",118
+"37776","Lantern",118
+"61482","Handcuffs",118
+"90370","Microphone",118
+"93094","Lipstick",118
+"88704","Whip",118
+"25375","Tassel",118
+"3852","Hairbrush",118
+"53020","Syringe",118
+"92691","5L Bone",118
+"93160","2L Bone",118
+"15745","Heart Jewel",118
+"99563","1×2 Gold Bar",118
+"98375","Winder Key",118
+"90540","Ski Pole",118
+"31990","Oar/Paddle Head",118
+"87585","Oar/Paddle",118
+"30340","Life Ring",118
+"25892","Boomerang",118
+"4449","Suitcase (Briefcase)",118
+"10172","Trophy",118
+"4332","Broom",118
+"3836","Push Broom",118
+"24085","Mop Head",118
+"90826","Broom Bristles",118
+"6124","Magic Wand (Star)",118
+"30229","Zipline Handle",118
+"52494","1×1×⅔ w/ Binoculars",118
+"30192","Grappling Hook w/ String Hole",118
+"15534","Grappling Hook w/ Handle",118
+"62808","Key",118
+"64000","Hockey Stick",118
+"27150","Umbrella, Closed",118
+"95345","Pitchfork",118
+"30304","Space Binoculars",118
+"11062","2×2×7 Lamp Post",118
+"24093","Book Cover",118
+"24324","Book Binding w/ 2-Studs",118
+"3841","Pickaxe",118
+"3835","Axe",118
+"4360","Camera w/ Sight (Space Gun)",118
+"93106","Metal Detector",118
+"13793","Welding Torch/Gun w/ Hose",118
+"2516","Chainsaw Body",118
+"97053a","Coin, 1",118
+"97053b","Coin, 2",118
+"97053c","Coin, 5",118
+"97053d","Coin, 10 Gothic",118
+"70501a","Coin, 10 Sans-Serif",118
+"70501b","Coin, 20",118
+"70501c","Coin, 30",118
+"70501d","Coin, 40",118
+"604550","Screwdriver",118
+"33009","2×3 Book",118
+"18738","Ice Axe",118
+"11640","Guitar, Electric",118
+"30194","Circular Saw",118
+"79736","Watering Can",118
+"61975","Whip, Coiled",118
+"18789","Pickaxe, Pixelated (Minecraft)",118
+"30154","Sextant",118
+"13808","Saxophone",118
+"18791","Shovel, Pixelated (Minecraft)",118
+"2614","12L Fishing Rod",118
+"98368","1×3 Toolbox",118
+"53118","Game Controller",118
+"604547","Hammer, Small",118
+"98383","Oil Lamp (Genie)",118
+"30228","Jackhammer",118
+"93552","Paint Brush",118
+"92290","Trident",118
+"55296","Oil Can, Smooth Handle",118
+"604548","Oil Can, Ribbed Handle",118
+"55297","Drill, Electric",118
+"604549","Drill, Cordless",118
+"55299","Wrench, 6-Rib Handle",118
+"604551","Wrench, 3-Rib Handle",118
+"604552","Box-End Wrench, 3-Rib Handle",118
+"55300","Box-End Wrench, 6-Rib Handle",118
+"604553","4-Way Lug Wrench",118
+"604614","Adjustable Spanner Wrench",118
+"604615","Socket / Ratchet Wrench",118
+"50018c","Socket Wrench, Short w/ Stud & Hexagonal Head",118
+"50018g","Circular Saw w/ Bar",118
+"6900","Yarn Ball (Wool)",118
+"4094","Umbrella, Open",118
+"25972","Hair, Swept Back w/ Widow's Peak",118
+"95343","1×1×1 Bucket",123
+"12884","Paint Bucket",123
+"95344","Bucket Handle",123
+"69066","1×3 Box",123
+"35700","2×2×1 Box",123
+"61780","2×2×2 Box",123
+"30150","3×4×1⅔ Crate",123
+"2489","2×2×1⅔ Barrel",123
+"64951","½ Barrel, Large (Tub)",123
+"4738","2×4 Treasure Chest",123
+"4739","2×4 Treasure Chest Lid, Curved",123
+"80835","2×4 Treasure Chest Lid, Flat w/ 2-Studs",123
+"92410","2×3×2 Cupboard",123
+"2656","2×3×5 Cupboard",123
+"4536","2×3 Drawer",123
+"4533","2×3 Cupboard Door",123
+"4345","2×2×2 Box",123
+"4346","2×2 Box Door",123
+"92926","Trash Can",123
+"93092","Basket",123
+"10169","Sack",123
+"4523","Minifig Basket",123
+"92590","Backpack, Open",123
+"3844","Knights Helmet",193
+"3846","Shield (Classic)",193
+"2586","Shield, Ovoid",193
+"75902","Shield, Bowed w/ Handle",193
+"3876","Shield, Round, 3-Ridges w/ Stud",193
+"22408","Shield, Pentagonal (Nexo Knights)",193
+"91884","Shield, Round w/ Stud",193
+"2530","Sword, Cutlass (Pirate)",124
+"76764","Shortsword",124
+"29109","Machete",124
+"66964","Greatsword, Curved Crossguard",124
+"11156","Sword, Elven Warrior w/ Long Hilt",124
+"37341c","Sword w/ Square Crossguard",124
+"60752","Sword, Scimitar",124
+"18031","Greatsword, Straight Crossguard",124
+"21459","Sword, Katana",124
+"25111","Sword, Saber / Dao",124
+"18034","Sword, Roman Gladius",124
+"10050","Sword, Uruk-hai",124
+"44658","Knife",124
+"98139","Sai",124
+"37341b","Dagger / Knife",124
+"37341a","Sword, Curved Blade w/ Bar",124
+"93055","Sword, Katana w/ Dragon Guard (Ninjago Sword of Fire)",124
+"93550","Sword, Foil / Rapier",124
+"98137","Sword, Large",124
+"93789","Spear",124
+"18041","Harpoon",124
+"64727","3L Blade w/ Bar",124
+"23860","3⅘L Blade w/ Bar",124
+"36017","Hilt, Dragon Head",124
+"37341d","Scythe / Hook",124
+"98141","Serrated Blade w/ Bar",124
+"37341e","Scythe / Hook, Double",124
+"53454","Axe Blade",124
+"10187","3-Finger Claw",124
+"3848","Axe / Halberd",124
+"75904","Sledgehammer",124
+"93058","Throwing Star",124
+"98721","Batarang (Batman)",124
+"35485","Chakram / Ring",124
+"11092","Gorilla Fist / Hand",124
+"15407","Hand Armor w/ 2-Studs",124
+"36752a","Wand",124
+"6117","Chainsaw Blade",124
+"18787","Sword, Pixelated (Minecraft)",124
+"18788","Axe, Pixelated (Minecraft)",124
+"4499","Bow w/ Arrow",124
+"2570","Crossbow",124
+"4498","Quiver",124
+"60849","Nozzle",124
+"86208","Space Gun",124
+"2562","Flintlock Pistol",124
+"30132","Revolver",124
+"62885","Pistol, Med. Barrel",124
+"92738","Blaster, Small",124
+"58247","Blaster, Short",124
+"57899","Blaster, Long",124
+"15445","Blaster w/ Clip",124
+"50018b","Gun / Impact Driver",124
+"95199","Pistol, 2-Barrel",124
+"17010","Blaster, Small",124
+"13608","Ray Gun",124
+"44709","Blaster w/ Studs, 4-Sides",124
+"2561","Musket",124
+"30141","Rifle",124
+"13591","Spear Gun",124
+"42511","Skateboard",122
+"90397","Surfboard",122
+"5491","Stroller",122
+"24312","Wheelchair",122
+"92851","Bicycle Wheel",122
+"65574","Bicycle",122
+"50015","Tricycle Frame",122
+"98288","Wheelbarrow",122
+"15396","Scooter",122
+"18895","Motorcycle Fairing, Racing",122
+"18896","Motorcycle Chassis",122
+"50859","Motorcycle Chassis w/ Axle Hole",122
+"21301","14×5×2 Rowing Boat",122
+"93140","2×6 Stretcher",122
+"29111","Spider",113
+"30238","Spider w/ Clip",113
+"30169","Scorpion",113
+"80674","Butterfly w/ Stud Holder",113
+"2550","Monkey",113
+"40234","Rat / Mouse",113
+"33320","Frog",113
+"30103","Bat",113
+"41835","Bird",113
+"27063","Parrot",113
+"64648","Fish",113
+"33121","Crab",113
+"30115","Snake",113
+"38801","Snake, Raised Head",113
+"28588","Snake w/ Bar",113
+"2548","Shark Head",113
+"2547","Shark Body",113
+"14518","Shark Body w/ Gills",113
+"35692","Balloon Dog",113
+"4491","Saddle",113
+"93086","Saddle, Friends",113
+"33051","Apple w/ Leaf",125
+"33085","Banana",125
+"33172","Carrot",125
+"33183","Carrot Top",125
+"22667","Cherries",125
+"35574","Beehive",125
+"51270","Pumpkin",125
+"5234","Peach",125
+"5215","Banana Peel",125
+"1747","Stem w/ Bar, 2 Leaves",126
+"1997","Curled Vine w/ Bar",126
+"2682","Round 1×1 w/ Leaf (Fern)",126
+"2423","4×3 Leaves",126
+"2417","6×5 Leaves",126
+"6148","Palm Leaf, Small",126
+"3565","2×6 Leaf, Smooth",126
+"10884","Finger Leaf w/ Clip",126
+"32607","1×1 Plate w/ 3-Leaves",126
+"2435","Conical Tree, Small",126
+"3471","Conical Tree, Large",126
+"6064","Bush",126
+"6255","Plant w/ 3 Large Leaves",126
+"30176","3×3 Bamboo",126
+"37695","3-Leaves w/ Pin",126
+"15279","Grass",126
+"30093","Sea Grass",126
+"49577","Seaweed",126
+"55236","Spiky Vine",126
+"2488","Whip / Vine",126
+"28870","Stem w/ Swirls",126
+"5058","1×2 Plate w/ Leaves, Layered",126
+"5151","1×2 w/ Leaf (Large Fern)",126
+"6135","Palm Tree Trunk",126
+"1578","Vine w/ Bar & Bar Holder",126
+"15469","2×2 Round w/ 4-Petals",127
+"24866","1×1 Flower, 5-Petals",127
+"33291","1×1 Flower, 4-Petals",127
+"3742","Small Flower",127
+"3741","3-Stem, Flower",127
+"24855","3-Stem w/ Pin",127
+"19119","6-Stem, Flower",127
+"68211","Bar 1L w/ 3-Mini Bar",127
+"32606","Flower w/ Bar",127
+"98262","2×2 Flower",127
+"4727","2×2 Flower Leaves",127
+"39262","Crown, 5-Points",127
+"33286","1×1×⅔ Flower, 4-Petals",127
+"5904","Flower, Peony",127
+"5903","Flower, Tulip",127
+"35473","4×4 Flower, 4-Petals",127
+"6901","2×2 Sunflower w/ 16-Petals",127
+"36451a","Gem w/ Mini Bar (Infinity Stone)",128
+"65092","1×1 Jewel, Octagonal",128
+"30153","Diamond w/ Bar",128
+"11127","Crystal, 4-Points, 1-Stud",128
+"30385","Crystal, 5-Points",128
+"35646","Rock, Nugget",128
+"30293","Rock Boulder, Top",128
+"30294","Rock Boulder, Bottom",128
+"80337","4×4 Rock, Bottom",128
+"37775","Flame, Candle",128
+"64647","Mini Flame, Plume",128
+"6126","Flame",128
+"80519","Flame w/ Clip",128
+"18395","5L Flame w/ Bar",128
+"70880","1×4 Flame w/ 2-studs",128
+"68547","Cloud Swirl w/ Bar 1L",128
+"27256","Lightning Bolt",128
+"59233","Lighting Bolt, Double",128
+"27393","Power Blast w/ Handle",128
+"73304","Power Burst, 5×5×⅔ Stand w/ 2-Studs",128
+"35032d","5L Power Burst, Spiral w/ Bar Ends",128
+"35032b","5L Power Burst, Bolt w/ Bar Ends",128
+"35032a","Power Burst, Blaster w/ Bar",128
+"35032f","Power Burst, Small Shield",128
+"35032e","Power Burst, Large Shield",128
+"42409","Ø4 Star / Snowflake",128
+"49668","1×1 Tooth, Horizontal",129
+"15070","1×1 Tooth, Vertical",129
+"15209","1×2 2-Teeth, Vertical",129
+"15208","1×2 3-Teeth, Horizontal",129
+"27257","Spear Tip w/ Bar",130
+"24482","Spear Tip w/ 4-Fins",130
+"89522","Horn, Unicorn",130
+"53451","Barb, Small",130
+"87747","Barb, Medium",130
+"64847","Cattle Horn, Short",130
+"13564","Cattle Horn, Long",130
+"69858","4L Wave / Flame",130
+"11089","4L Claw, Flexible",130
+"15362","6.4L Claw w/ Axle",130
+"27261","1×2 w/ 3-Claws (Rock)",130
+"40379","Tail, End",130
+"67361","2×2 Round Tail w/ Pin Hole",130
+"2142","Tail, 45° Stepped w/ Axle Holes",130
+"40378","Tail, Middle",130
+"24204","Tail, Bladed w/ Bar",130
+"80497","Elephant Trunk",130
+"15064","Segmented Leg",130
+"16770","Barb/Claw w/ Clip",130
+"92220","Lg. Claw w/ Clip",130
+"15429","Cat Tail",130
+"18970","2×2 Plate w/ Clam Shell",130
+"11437","Antlers w/ Bar",130
+"67928","Wing, Rounded w/ Bar, 5-Feathers",130
+"11100","Wing, Feathered w/ Bar",130
+"15082","Wing w/ Bar",130
+"6133","Wing, Dragon",130
+"30126","Feathers w/ Bar, Mini Bar",130
+"37704","Ball, Winged (Quidditch Snitch)",130
+"90981","Spider Web w/ Bar",188
+"36083f","4L Web Effect, 2-Branches",188
+"36083a","5L Web Effect, Narrow",188
+"36083d","Web, Small w/ Bar",188
+"36083c","Web, Medium w/ Bar",188
+"36083e","Web, Large w/ Bar, 2-Handles",188
+"36083b","Handcuffs, Web",188
+"34337","8mm D. × 6mm, Small Pin",131
+"59895","8mm ID Smooth, (14mm × 4mm)",131
+"87414","8mm ID. Offset (15mm × 6mm)",131
+"74967","8mm D. × 9mm, Small Pin",131
+"30028","8mm ID Smooth (14mm × 9mm)",131
+"4084","8mm ID. Offset, (21×9mm)",131
+"34337","8mm D. × 6mm, Small Pin",140
+"59895","8mm ID Smooth, (14mm × 4mm)",140
+"87414","8mm ID. Offset (15mm × 6mm)",140
+"74967","8mm D. × 9mm, Small Pin",140
+"30028","8mm ID Smooth (14mm × 9mm)",140
+"4084","8mm ID. Offset, (21×9mm)",140
+"93593","11mm D. × 6mm, Small Pin",141
+"42610","11m D. × 8mm, Technic Pin",141
+"50951","11m ID. Smooth, (14mm × 6mm)",141
+"92409","11mm ID. Staggered, (17.5mm × 6mm)",141
+"6014","11m D. × 12mm, Small Pin",141
+"87697","11mm ID. Offset, (21mm × 12mm)",141
+"56890","11mm ID. Balloon, (24mm × 12mm)",141
+"11208","14mm D × 9.9mm, Small Pin",142
+"11209","14mm ID. Tire, (21×9.9mm)",142
+"50862","15 mm D. × 6mm, Motorcycle",142
+"50861","15mm ID Tire, (21×6mm)",142
+"13971","18mm D. × 8mm, Technic Pin",143
+"56903","18mm D. × 8mm, Technic Axle",143
+"61254","18mm ID. Offset, (23×7mm)",143
+"56897","18mm ID. Offset. (30×10.5mm)",143
+"18976","18mm D. × 12mm w/ Axle Hole",143
+"18977","18mm ID. Low Profile, (24×12mm)",143
+"55981","18mm D. × 14mm, Technic Pin",143
+"55982","18mm D. × 14mm, Technic Axle",143
+"89201","18mm ID. Shallow, (24×14mm)",143
+"92402","18mm ID. Offset, (30.4×14mm)",143
+"58090","18mm ID. VR, (30.4×14mm)",143
+"35578","18mm ID. Offset, (37×14mm)",143
+"56891","18mm ID. Off-Road R, (37×18mm)",143
+"56904","30mm D. × 14mm, Axle Hole",144
+"56898","30mm ID. Offset, (43.2×14mm)",144
+"30699","30mm ID. Solid, (43.2×14mm)",144
+"66155","30mm D. × 20mm Wheel, Axle Hole, Angled Spokes",144
+"70490","30.4mm ID. Tire, (49.5×14mm)",144
+"56145","30.4mm D. × 20mm, Axle Hole",144
+"55978","30.4mm ID. Street ZR, (37×22mm)",144
+"44309","30.4mm ID. Street ZR, (43.2×22mm)",144
+"61481","30.4mm ID. Balloon, (43.2×26mm)",144
+"15413","30.4mm ID. Street ZR, (49.5×20mm)",144
+"55976","30.4mm ID. Balloon, (56×26mm)",144
+"70695","30.4mm ID. Tractor, (56×26mm)",144
+"86652","43.2 D. × 18mm, Technic Axle",145
+"32019","43.2mm ID. Street, (62.4×20mm)",145
+"56908","43.2mm D. × 26mm, Technic Axle",145
+"41897","43.2 ID. Street ZR, (56×28mm)",145
+"61480","43.2mm ID. Balloon R, (68.7×34mm)",145
+"45982","43.2 ID. Balloon R, (81.6×38mm)",145
+"18450","43.2mm ID, Street R, (81.6×44mm)",145
+"15038","56mm D. × 34mm, Technic Axle",146
+"44771","56mm ID. ZR Tire, (68.8×36mm)",146
+"92912","56mm ID. R Tire, (94.3×38mm)",146
+"54120","56mm ID. Balloon Tire, (94.8×44mm)",146
+"2903","61.6mm D. × 13.6mm, Technic Axle",147
+"2902","61.6mm ID. Motorcycle Tire, (81.6×15mm)",147
+"88517","75mm D. × 17mm. Technic Axle",147
+"88516","75mm ID. Motorcycle R Tire, (94.2×22mm)",147
+"11957","75mm ID. Motorcycle Tire, (100.6×22mm)",147
+"55889","18mm D. × 14mm Spherical Wheel w/ Tire, Pin",148
+"72206","24mm D. × 11mm Wheel w/ Tire, Pin",148
+"65834","35mm D. × 14mm Technic Wheel w/ Tire, Axle",148
+"39367","56mm D. × 14mm Technic Wheel w/ Tire, Axle",148
+"49295","87mm D. × 14mm Technic Wheel w/ Tire, Axle",148
+"4288","20mm D × 13mm Balloon Wheel w/ Axle Hole",148
+"4489","Wagon Wheel w/ Wheel Pin Hole",148
+"6118","22mm D. × 24mm Wheel w/ Tire",148
+"3486","36mm D. × 16mm Wheel w/ Tire",148
+"2515","54mm D. × 30mm Wheel w/ Tire",148
+"22410","37mm D. × 22mm w/ 7 Pin Holes",148
+"68327","41mm D. × 15mm, 7-Pin Holes",148
+"55817","55mm D. × 22mm Wheel, Viking",148
+"64712","62mm D. × 32 Wheel, Conical w/ Studs",148
+"3464","8mm D. Small Pulley",149
+"2496","Trolley Wheel (Skateboard)",149
+"2655","2×2 Round w/ Wheel Holder, Bottom",149
+"2415","2×2 Plane Wheel Holder, Bottom",149
+"122c01","2×2 Plate w/ 8mm D. Wheels",149
+"3137c01","2×2 Brick w/ 8mm D. Wheels",149
+"3482","17mm D. × 8mm w/ Split Axle Hole",149
+"7049","2×4 w/ Wheel Holder",149
+"7039","2×2 Wheel w/ Metal Axle, 4-studs",149
+"6248","2×2 Wheel w/ Pin Hole, 4-studs",149
+"132","Tire for 2×2 Wheel",149
+"2994","24mm D. × 14mm, w/ Axle Hole",149
+"30155","2×2 Wheel, Spoked",149
+"18978a","15mm D. Wheel Cover, 5 Spokes",191
+"18978b","15mm D. Wheel Cover, 10 Spokes",191
+"72210a","18mm D. Wheel Cover, 5-Spoke",191
+"72210b","18mm D. Wheel Cover, 9-Spoke",191
+"62701","24mm D. Wheel Cover w/ 9-Spokes",191
+"21445","1×2 Plate w/ 1 Wheel Pin",132
+"4600","2×2 Plate w/ 2 Wheel Pins",132
+"67688","2×2×⅔ Plate w/ 1 Wheel Pin",132
+"6157","2×2 Wide Plate w/ 2 Wheel Pins",132
+"2926","1×4 Plate w/ 2 Wheel Pins",132
+"4870","2×2 Plane Holder w/ 2 Wheel Pins, Bottom",132
+"18892","2×4 Brick w/ 2 Wheel Pins, Cutout",132
+"24326","4×4×⅔ w/ 4 Wheel Pins",132
+"2441","4×7×⅔ w/ 4 Wheel Pins",132
+"12622","4×10×2½ Vehicle Base w/ 4 Wheel Pins",132
+"65202","6×10×1 Vehicle Base w/ 4 Wheel Pins",132
+"69963","2×4 Tilt Steering Holder",132
+"69964","Tilt Steering Axle w/ 2 Wheel Pins",132
+"73562","3×2×1⅓ Bracket",133
+"11215","5×2×1⅓ Bracket",133
+"76766","5×2×2⅓ Bracket",133
+"4732","8×2×1⅓ Bracket",133
+"4211","4×5×⅔ Vehicle Base",133
+"4212","4×10×⅔ Vehicle Base",133
+"30029","10×4×⅔ Vehicle Base",133
+"52036","4×12×⅚ Vehicle Base",133
+"28324","6×12×⅚ Vehicle Base",133
+"65634","6×12×1 Vehicle Base",133
+"3385","6×12×1 Vehicle Base, Notched Ends",133
+"4597","6×6×1⅓ Cabin Base",133
+"30076","4×10×1 Vehicle Base w/ 4-Pins",133
+"6920","2×6 Vehicle Base w/ 4-Protruding Axle Holes",133
+"5712","5×1×1⅓ Bracket",133
+"53401","Train Track, Straight",135
+"53400","Train Track, Curved",135
+"64022","Train Track, Flexible",135
+"3228","16L Train Track",135
+"3229","Train Track, Curved, Outer",135
+"3230","Train Track, Curved, Inner",135
+"4166","2×2 Train Track Sleeper Plate (Railway Tie)",135
+"3242","12V Conducting Rail, Straight",135
+"3241","12V Conducting Rail, Curved",135
+"50254","Train Wheel w/ Wheel Pin Hole",135
+"57878","Train Wheel w/ Metal Axle Hole",135
+"38340","Train Wheel w/ Pin",135
+"57999","RC Train Wheel w/ Axle Hole",135
+"85489b","RC Train Wheel, Spoked, Axle & Pin",135
+"38339","3×6 Train Wheel Holder (Bogie)",135
+"6583","1×6 Train Wagon End",135
+"4025","4×6 Train Bogey Plate w/ Short Pin",135
+"2871","Train Motor Decorative Side",135
+"4022","Train Buffer Beam",135
+"64415","Train Buffer w/ Plow, Magnet",135
+"73092","Magnet, Cylindrical",135
+"4023","Magnetic Train Coupling",135
+"2609","2×2 Magnet Holder",135
+"4093","6×28×⅔ Train Base w/ 1×2 Holes",135
+"26021","4×5 Roller Coaster Car",136
+"24869","Roller Coaster Wheels",136
+"80562","4L Coaster Track, Straight",136
+"26022","8L Coaster Track, Straight",136
+"25059","16L Coaster Track, Straight",136
+"25061","Coaster Track, Curved 90°",136
+"80566","Coaster Track, Curved 90° Ramp",136
+"34738","Coaster Track, Small Ramp",136
+"26559","Coaster Track, Ramp Bottom",136
+"26561","Coaster Track, Slope",136
+"26560","Coaster Track, Ramp Top",136
+"75539","5×8×⅔ Ramp w/ Rounded Corners",137
+"77823","Ramp Loop 30° Section",137
+"75538","8×8×4 Ramp, Concave",137
+"77822","8×11 Ramp Base",137
+"3829","1×2 w/ Steering Wheel",139
+"30663","2×2 Steering Wheel w/ Antistud",139
+"67811","5×5 Steering Wheel w/ 2×2 Round Plate",139
+"30031","Handlebar w/ Handle",139
+"98397","Bent Handlebar w/ Handle",139
+"4790","Boat / Ship Wheel",139
+"44675","2×2 Recessed Sides",150
+"30602","2×2 Lip",150
+"47457","2×2×⅔ Curved End",150
+"47458","1×2×⅔ Wing End",150
+"41855","2×2×⅔ Curved w/ Lip End",150
+"47456","2×3×⅔ Wing End, 2-Studs",150
+"93589","4×2×1⅓ w/ 1×4 Base",150
+"93604","3×4×⅔ Curved Roof",150
+"45677","4×4×⅔ Wedge Roof",150
+"52031","4×6×⅔ Wedge Roof",150
+"98281","4×6×⅔ Quad Roof",150
+"32739","4×6×⅔ Wedge Roof w/ Studs",150
+"64450","6×4×3⅓ Roll Cage",150
+"3822","1×3 Car Door, Left",150
+"3821","1×3 Car Door, Right",150
+"2421","Ø4 Propeller, 3-Blades w/ Wheel Pin Hole",134
+"6041","Ø3½ Propeller, 3-Blades w/ Axle Hole",134
+"65768","Ø3½ Propeller, 3-Blades w/ Pin Hole",134
+"92842","Ø5 Propeller, 3-Blades w/ Pin Hole",134
+"41530","Ø5 Propeller, 8-Blades w/ Axle Hole",134
+"67737","Ø5 Propeller, 4-Blades w/ Studs, Pin Hole",134
+"4617b","Ø5½ Propeller, 3-Blades w/ Pin Hole",134
+"87751","Ø6 Propeller, 7-Blades w/ Pin Hole",134
+"15790","Ø9 Propeller, 3-Blades w/ Pin Hole",134
+"3481","2×2 Helicopter Tail Rotor Holder",134
+"50949","1×2 w/ Racer Grille",134
+"61072","1×4 w/ Angled Tube",134
+"41862","2×2 w/ Raised Grille",134
+"50943","Air Scoop",134
+"65571","Exhaust w/ Pin",134
+"98302","1×2 Plate w/ Engine",134
+"4229","Engine w/ Strakes, 2×2 Thin Plate",134
+"4868","Jet Engine",134
+"4869","Jet Engine Center",134
+"4746","4×2×2 Rocket Engine Tail",134
+"43121","4×5×3 Engine",134
+"41531","4×4×1⅔ Cylinder w/ Bar, 3-Pin Holes",134
+"46667","Propeller, 10-Blades w/ Pin",134
+"62743","2×16 Rotor Blade w/ Studs",134
+"44661","2×3×2 Fin",134
+"6239","2×6×4 Fin",134
+"23930","1×8×2⅓ Stepped Fin",134
+"28779","4×1 Batman Tail / Rudder",134
+"2340","1×4×3 Tail",134
+"4289","2×2×3 Mast w/ 3-Studs",134
+"30925","1×4 Spoiler w/ 2-Studs",134
+"98834","Spoiler w/ Handle",134
+"3480","Propeller, 2-Blades w/ Rotor Holder Hole",134
+"3479","4×2×2 Tail",134
+"95354","Anchor",134
+"48002","3×2×20 Boat Mast",134
+"30248","12×6 Helicopter Skids",134
+"6541","1×1 Technic Brick",138
+"3700","1×2 Technic Brick",138
+"3701","1×4 Technic Brick",138
+"3894","1×6 Technic Brick",138
+"3702","1×8 Technic Brick",138
+"2730","1×10 Technic Brick",138
+"3895","1×12 Technic Brick",138
+"32018","1×14 Technic Brick",138
+"3703","1×16 Technic Brick",138
+"32000","1×2 Technic Brick, 2-Pin Holes",138
+"73109","2×2 Technic Brick w/ Cutaways",138
+"73230","1×1 Technic Brick w/ Axle Hole",138
+"32064","1×2 Technic Brick w/ Axle Hole",138
+"90258","2×2 Brick w/ Grooves, Vertical Axle Hole",138
+"39789","2×4 Technic Brick w/ Vertical Axle Holes",138
+"32324","4×4 Technic Frame, Open Center",138
+"32531","4×6 Technic Frame, Open Center",138
+"32532","6×8 Technic Frame, Open Center",138
+"65803","16×16×1⅓ Technic Plate (Art)",138
+"32555","5×5 Technic Brick, Corner",138
+"44865","1×2 Brick, Pin 1-Side",138
+"30526","1×2 Brick, 2-Pins, 1-Side",138
+"6232","2×2 Brick, Pin 1-Side",138
+"30000","2×2 Brick, 2-Pins, 2-Sides",138
+"6249","2×4 Brick, 2-Pins, 2-Sides",138
+"30592","2×4 Brick, Pin Top, Cutouts",138
+"67446","2×4×1⅓ 2-Axle Holes, Cutout",138
+"3668","2×6×1⅓ 2-Axle Holes, Cutout",138
+"85943","1×2 w/ 2-Liftarms",138
+"91176","2×2×13 Technic Panel w/ 5-Pin Holes",138
+"49699","1×6×4⅓ Angled Brick w/ Cutout, 4-Pin Holes",138
+"2744","1×6×1⅔ Slope w/ 3-Pin Holes",138
+"17485","2×2 Round w/ 2-Pin Holes",138
+"30361","2×2×2 Robot Body w/ 2-Pin Holes",138
+"6222","4×4 Round w/ 4-Pin Holes",138
+"32333","1×5×3 Connector Block",138
+"3709","2×4 Plate w/ 3-Holes",156
+"32001","2×6 Plate w/ 5-Holes",156
+"3738","2×8 Plate w/ 7-Holes",156
+"32124","1×5 Plate w/ Rounded Corners, Axle Hole",156
+"4262","1×6 Plate w/ Rounded Corners w/ Toothed Ends",156
+"32125","Technic 3-Blade Rotor w/ Axle Hole",156
+"69984","Technic 6-Blade w/ 6-Clips (Waterwheel)",156
+"18677","1×2 Plate, 1-Pin Hole, Bottom",156
+"11458","1×2 Plate, 1-Pin Hole, Top",156
+"3172","1×3 w/ 2 studs, Hole Bottom",156
+"10247","2×2 Plate, 1-Pin Hole, Bottom",156
+"2817","2×2 Plate, 2-Pin Holes, Bottom",156
+"26599","2×4 Plate, 2-Pin Holes, Bottom",156
+"32529","1×2 Plate, 1-Pin Hole, Bottom",156
+"32530","1×2 Plate, 2-Pin Holes, Top",156
+"43045","2×4 Pin Hole Hinge, Top",156
+"43056","2×4 Pin Hole Hinge, Bottom",156
+"2476","2×2 Plate, 1-Pin, Bottom",156
+"15092","2×2 Plate, 2-Pins, Bottom",156
+"2460","2×2 Plate, 1-Pin, Top",156
+"40687","2×4 Plate, 2-Pins, Ends",156
+"30390","2×4 Dbl. Inv w/ 2-Pins, Sides",156
+"77598","2×2×⅔ Wheel Fork",156
+"47720","2×2 Plate, 2-Pins, Wide",156
+"18654","1×1 Beam (Spacer)",157
+"43857","1×2 Beam",157
+"60483","1×2 Beam w/ 1-Axle Hole",157
+"32523","1×3 Beam",157
+"32316","1×5 Beam",157
+"32524","1×7 Beam",157
+"40490","1×9 Beam",157
+"32525","1×11 Beam",157
+"41239","1×13 Beam",157
+"32278","1×15 Beam",157
+"2391","1×7 Beam w/ Alternating Holes",157
+"73507","1×11 Beam w/ Alternating Holes",157
+"71710","1×15 Beam w/ Alternating Holes",157
+"32348","1×7 Beam, Bent (4-4)",157
+"6629","1×9 Beam, Bent (6-4)",157
+"32271","1×9 Beam, Bent (7-3)",157
+"32009","1×11½ Beam, Double Bent",157
+"32140","2×4 Beam, L-Shape",157
+"32526","3×5 Beam, L-Shape",157
+"2477","3×5 Liftarm, L-shape w/ Alternating Holes",157
+"60484","3×3 Beam, T-Shape",157
+"71708","2×3 Beam, ¼-Ellipse",157
+"80286","2×5 Beam, ¼-Ellipse",157
+"3916","3×9 Beam, ¼-Ellipse",157
+"64179","5×7 Frame, Open Center",157
+"39794","7×11 Frame, Open Center",157
+"39790","11×15 Frame, Open Center",157
+"67491","3×19 Frame, 2-Cross Beams",157
+"39369","11×19 Technic Frame (Baseplate)",157
+"14720","3×5 Beam, H-Shape",157
+"64178","5×11 Beam, H-Shape, Open Center",157
+"39793","3×3 Pin Connector Block",157
+"79768","7×16 Frame, A-Shape w/ Bars",157
+"77107","Ø11 Frame, Round",157
+"3250","Ø15 Frame, Round",157
+"11455","4×2 Beam, L-Shape w/ 90° Offset",157
+"3167","2×3 Liftarm, U-shape",157
+"41677","1×2 Beam, Thin",159
+"6632","1×3 Beam, Thin",159
+"32449","1×4 Beam, Thin",159
+"32017","1×5 Beam, Thin",159
+"11478","1×5 Beam, Thin w/ 2-Axle Holes",159
+"32063","1×6 Beam, Thin",159
+"32065","1×7 Beam, Thin",159
+"32056","3×3 L-Shaped Liftarm, Thin",159
+"32249","3×3 Beam, Thin w/ D-Shape",159
+"32250","3×5 Beam, Thin w/ D-Shape",159
+"99773","3×5 Triangle Beam, Thin",159
+"61408","1×3 Beam, Thin w/ 1-Pin & 1-Axle Hole",159
+"2825","1×4 Beam, Thin w/ 1-Stud Connector",159
+"71709","3×7 Panel",158
+"15458","3×11 Panel",158
+"64782","5×11 Panel",158
+"18945","5×11 Panel, Tapered",158
+"67139","3×5 Panel w/ Cutout",158
+"71709","3×7 Panel",171
+"15458","3×11 Panel",171
+"64782","5×11 Panel",171
+"18945","5×11 Panel, Tapered",171
+"67139","3×5 Panel w/ Cutout",171
+"89679","2×1 Panel, Curved",172
+"71682","2×3 Panel, Curved",172
+"24119","3×7×2 Panel, Curved",172
+"62531","3×11×2 Panel, Curved",172
+"11954","3×11×2 Panel, Curved w/ 10-Pin Holes",172
+"80285","3×5×2 Panel, Curved",172
+"5427","3×9 Panel, Curved",172
+"18944","3×13×2 Panel, Curved",172
+"61069","Panel, Engine Block",172
+"67142","#50 5×13 Panel, Curved, L.",172
+"68196","#51 5×13 Panel, Curved, R.",172
+"24116","3×5×3 Panel, Bent",172
+"80271","5×4×3 Panel, Bent w/ Angle, Right",172
+"80272","5×4×3 Panel, Bent w/ Angle, Left",172
+"2387","#7 2×3 Fairing, Tapered, A.",173
+"2389","#8 2×3 Fairing, Tapered, B.",173
+"2395","#9 3×3 Fairing, Tapered, Lt.",173
+"2403","#10 3×3 Fairing, Tapered, Rt.",173
+"11946","#21 2×5 Fairing, B.",173
+"11947","#22 2×5 Fairing, A.",173
+"87086","#2 3×5 Fairing, B",173
+"87080","#1 3×5 Fairing, A",173
+"64391","#4 3×7 Fairing, B",173
+"64683","#3 3×7 Fairing, A",173
+"64393","#6 3×11 Fairing, B",173
+"64681","#5 3×11 Fairing, A",173
+"64680","#14 5×7 Fairing, B",173
+"64394","#13 5×7 Fairing, A",173
+"64682","#18 5×11 Fairing, B",173
+"64392","#17 5×11 Fairing, A",173
+"80268","#60 5×7 Fairing, Tapered, Rt.",173
+"80267","#61 5×7 Fairing, Tapered, Lt.",173
+"80278","#63 5×4 Fairing, Tapered, Lt.",173
+"80274","#62 5×4 Fairing, Tapered, Rt.",173
+"2442","5×3×2 Fairing, Rounded, R.",173
+"2438","5×3×2 Fairing, Rounded, L.",173
+"2457","#3 3×2 Fairing, Angled 22.5°",173
+"32527","#5 Panel Fairing, Short, A.",173
+"32528","#6 Panel Fairing, Short, B.",173
+"46882","15×2×7 Mudguard, Trapezoid",174
+"69911","13×2×5 Mudguard, Arched",174
+"71689","13×2×5 Mudguard Extension",174
+"42531","#30 9×2×3 Mudguard, Arched",174
+"24118","15×2×5 Mudguard, Arched",174
+"32062","2L Axle",160
+"4519","3L Axle",160
+"3705","4L Axle",160
+"32073","5L Axle",160
+"3706","6L Axle",160
+"44294","7L Axle",160
+"3707","8L Axle",160
+"60485","9L Axle",160
+"3737","10L Axle",160
+"23948","11L Axle",160
+"3708","12L Axle",160
+"50451","16L Axle",160
+"50450","32L Axle",160
+"24316","3L Axle w/ Stop",160
+"87083","4L Axle w/ Stop",160
+"15462","5L Axle w/ Stop",160
+"55013","8L Axle w/ Stop",160
+"6587","3L Axle w/ Stud",160
+"99008","4L Axle w/ Center Stop",160
+"32209","5½L Axle w/ Stop",160
+"3749","Smooth Pin & Axle",160
+"43093","Friction Pin & Axle",160
+"65249","1L Smooth Pin & 2L Axle",160
+"18651","1L Friction Pin & 2L Axle",160
+"11214","2L Friction Pin & 1L Axle",160
+"32062","2L Axle",161
+"4519","3L Axle",161
+"3705","4L Axle",161
+"32073","5L Axle",161
+"3706","6L Axle",161
+"44294","7L Axle",161
+"3707","8L Axle",161
+"60485","9L Axle",161
+"3737","10L Axle",161
+"23948","11L Axle",161
+"3708","12L Axle",161
+"50451","16L Axle",161
+"50450","32L Axle",161
+"24316","3L Axle w/ Stop",161
+"87083","4L Axle w/ Stop",161
+"15462","5L Axle w/ Stop",161
+"55013","8L Axle w/ Stop",161
+"6587","3L Axle w/ Stud",161
+"99008","4L Axle w/ Center Stop",161
+"32209","5½L Axle w/ Stop",161
+"3749","Smooth Pin & Axle",161
+"43093","Friction Pin & Axle",161
+"65249","1L Smooth Pin & 2L Axle",161
+"18651","1L Friction Pin & 2L Axle",161
+"11214","2L Friction Pin & 1L Axle",161
+"4274","½-Pin, Smooth",162
+"89678","½-Pin, Friction",162
+"32002","¾-Pin, Smooth",162
+"3673","Pin, Smooth",162
+"2780","Pin, Friction",162
+"32556","3L Pin, Smooth",162
+"6558","3L Pin, Friction",162
+"65304","3L Pin w/ Bush",162
+"65826","½ Pin w/ Stud Holder",162
+"77765","3L Pin w/ Stop",162
+"61184","½-Pin w/ Bar (Flick Missile)",162
+"49731","Technic Pin w/ Foil Connector",162
+"22961","Pin Hub, 1-Axle",163
+"27940","Pin Hub, 2-Axle",163
+"10197","Pin Hub, 2-Axle 90°",163
+"57585","Pin Hub, 3-Axle 120°",163
+"32013","Angled Connector #1",163
+"32034","Angled Connector #2, 180°",163
+"32016","Angled Connector #3, 157½°",163
+"32192","Angled Connector #4, 135°",163
+"32015","Angled Connector #5, 112½°",163
+"32014","Angled Connector #6, 90°",163
+"4450","Angled Connector #7, 168¾°",163
+"10288","Angled Connector, Triple 120°",163
+"65487","Pin Hub, 1-Pin",163
+"44874","Pin Connector, 2-Pins",163
+"68888","Axle Hub, 4-Bars 90°",163
+"24122","Axle Hub, 2-Bar Holders",163
+"90202","Pin Hub, 4-Clips 90°",163
+"3713","Bush",164
+"32123","½ Bush",164
+"59443","2L Axle Connector",164
+"42195","3L Axle Connector",164
+"62462","2L Pin Connector",164
+"40244","5⅓ Spiral Staircase Connector",164
+"53586","Axle & Pin w/ Extension",164
+"6536","2L Axle & Pin, Perpendicular",164
+"42003","3L Axle & 2-Pin Hole",164
+"32068","3L 1-Axle & 1-Pin",164
+"32184","3L 2-Axle & Center Pin",164
+"32291","1-Axle & Double Pin",164
+"63869","1-Axle & 3-Pin",164
+"98989","4L Axle & Double Pin",164
+"44809","3-Pin, L-Shape",164
+"80910","2×4 2-Axle & 2-Pin",164
+"69819","Split Axle & 2-Pin",164
+"92907","2×2×2 Axle & Pin, Split",164
+"6553","2L Axle w/ Axle Hole (Pole Reverser Handle)",164
+"11272","2×3 4-Axle Connector",164
+"42135","Axle & Axle Connector",164
+"45590","2-Axle Connector, Rubber",164
+"48496","Toggle Dbl. w/ 2-Pins",164
+"87408","Toggle Db. w/ Axles & Pins",164
+"32126","Toggle Joint Connector",164
+"15461","3L Pin, 2-Pins & 1-Pin Hole",164
+"2393","1×3 Cross Block w/ 2-Pins, 3-Pin Holes",164
+"65489","3L H-Shaped Connector w/ 4-Pins, 2-Pin Holes",164
+"55615","3×3 L-Shaped Connector w/ 4-Pins",164
+"72008","2×2 Liftarm w/ Cutout, Axle Holes",164
+"32557","3L w/ 2-Pin Holes",164
+"98585","3×3 Round Connector",164
+"60208","31mm D. × 15mm w/ 7-Pin Holes",164
+"25214","1×1 90° Elbow, 2-Axle Holes",164
+"65473","2×2 45° Elbow, 2-Axle Holes, Short",164
+"5489","2×2 45° Elbow, 2-Axle Holes, Long",164
+"65098","3L Double Pin",164
+"19159","1×3 Double Pin w/ 2-Clips",164
+"6538","2L Pin Connector, Ridged",164
+"32175","3×3 Connector w/ Axle, 3-Pin Holes",164
+"3651","Axle and Pin Connector",164
+"85940","1×2 Beam w/ Bar, 45°",164
+"10928","8 Tooth",165
+"11955","8 Tooth w/out Friction",165
+"69778","12 Tooth",165
+"6589","12 Tooth, Bevel",165
+"32270","12 Tooth, Dbl. Bevel",165
+"69762","14 Tooth, Thick Bevel",165
+"94925","16 Tooth",165
+"6542","16 Tooth w/ Clutch",165
+"18946","16 Tooth, Dbl. Clutch",165
+"69779","20 Tooth",165
+"81346","20 Tooth, Dbl. Clutch",165
+"32198","20 Tooth, Bevel",165
+"32269","20 Tooth, Dbl. Bevel",165
+"87407","20 Tooth Bevel w/ Pin Hole",165
+"35185","20 Tooth, Dbl. Clutch, Dbl. Bevel",165
+"69761","22 Tooth, Thick Bevel",165
+"24505","24 Tooth",165
+"76244","24 Tooth, Clutch",165
+"46372","28 Tooth, Dbl. Bevel",165
+"65413","28 Tooth, Dbl. Bevel w/ Pin Hole",165
+"65414","Differential Housing",165
+"62821","28 Tooth, Differential",165
+"99010","28-Tooth Turntable, Top",165
+"99009","28-Tooth Turntable Base",165
+"18938","60 Tooth Turntable, Top",165
+"18939","60 Tooth Turntable, Base",165
+"32498","36-Tooth, Dbl. Bevel",165
+"3649","40 Tooth",165
+"27938","1L Worm Gear",165
+"32905","2L Worm Gear",165
+"73763","6L Worm Gear",165
+"73764","2×2×1⅔ w/ Worm Gear Hole",165
+"78442","6×6 15-Tooth ¼ Gear Ring",165
+"24121","11×11 35-Tooth ¼ Gear Ring",165
+"6585","4×4×1⅔ Gearbox",165
+"6588","2×4×3⅓ Gearbox",165
+"24014","8 Tooth Gear w/ 1½L Axle",165
+"3743","1×4 Rack",165
+"87761","1×7 Rack w/ 2-Pin Holes & 2-Axle Holes",165
+"64781","1×13 Rack w/ 2-Pin Holes & 2-Axle Holes",165
+"18940","1×14×2 Rack Housing",165
+"18942","1×14×2 Rack w/ 4-Axle Holes & 7-Pin Holes",165
+"3650","24-Tooth Gear, Crown",165
+"4143","14-Tooth, Bevel",165
+"32005","6L Technic Link",166
+"32293","1×9 Link",166
+"2637","1×16 Link",166
+"64451","1×9 Link, Bent (6-4)",166
+"32294","1×9 Wishbone Suspension Arm",166
+"3711","1L Link, Chain",166
+"15379","Link, Tread",166
+"88323","5L Wide Track",166
+"69910","7L Wide Track",166
+"24375","Rubber Tread Pin",166
+"57520","6 Tooth Small Spocket",166
+"57519","10 Tooth Large Sprocket",166
+"42529","14 Tooth XL Sprocket",166
+"32072","4 Knob Wheel",166
+"5405","4 Knob Wheel, 45°",166
+"4185","Belt Wheel (Pulley)",166
+"2815","Technic Belt Wheel Tire",166
+"273","Technic Link w/ 2-Studs",166
+"69900","2L Chain Link w/ Slope, Center Panel (Escalator)",166
+"31794","5×1 Steering Arm w/ Towball Socket",167
+"32195","6½×2 Steering Arm w/ Towball Socket",167
+"57515","6×2 Steering Arm w/ Towball Socket",167
+"32069","2×2 Steering Arm w/ 2-Pins",167
+"92909","Steering Wheel Hub, 3-Pins",167
+"11950","Steering Hub Holder w/ 2-Pin Holes",167
+"65766","Steering Hub Holder w/ Pin & Axle Holes",167
+"92908","Steering Portal Frame",167
+"69636","Steering Hub w/ Shock Socket",167
+"80563","Rotation Socket w/ 2-Pins",167
+"2819","Ø3 Steering Wheel",167
+"2741","Ø4 Steering Wheel",167
+"3736","Steering Pulley, Large",167
+"40001","Steering Yoke",167
+"61903","3L Universal Joint",167
+"9244","4L Universal Joint",167
+"44225","Ø3 Rotation Disk w/ 3L Beam, Socket",167
+"44224","Ø3 Rotation Disk w/ 3L Beam, Plug",167
+"15460","Steering Arm w/ 3-Balls, Pin Hole",167
+"32494","CV Joint, Ball",167
+"92906","CV Joint, Socket",167
+"52731","3L CV Joint, Ball",167
+"77590","5L Sliding CV Joint, Ball",167
+"4192","2L CV Joint, Socket",167
+"52730","4L CV Joint, Socket",167
+"35189","Disc Brake Hub w/ 3-Pin Holes",167
+"65416","Ø6 Brake Disk w/ Axle Hole",167
+"4261","Steering Arm",167
+"18948","3L Driving Ring Conn.",168
+"18947","3L Driving Ring",168
+"32187","Driving Ring Extension, 4-Tooth",168
+"35186","Driving Ring Extension, 8-Tooth",168
+"6641","Changeover Catch",168
+"35188","Rotary (Wave) Shifter",168
+"46834","Clutch w/ Axle Hole, Outside",168
+"46835","Clutch w/ Axle Hole, Inside",168
+"6575","Cam",168
+"2850","Engine Cylinder",168
+"2851","Engine Piston",168
+"2852","Connecting Rod",168
+"2853","Crankshaft",168
+"2854","Center Crankshaft",168
+"4368","Crank Disk",168
+"4369","Piston w/ Stud",168
+"92693","7-9L Linear Actuator",169
+"61927","10-15L Linear Actuator",169
+"61904","Linear Actuator Holder",169
+"19474","Pneumatic Switch",169
+"47223","Pneumatic Switch, Welded",169
+"26674","1×6 Pneumatic Pump",169
+"19475","1×5 Pneumatic Cylinder",169
+"99021","Bush w/ Pneumatic Hose Connector",169
+"4697","Pneumatic T-Piece",169
+"26288","2×3×11 Pneumatic Pump",169
+"76537","6½L Shock Absorber",169
+"79717","9L Shock Absorber",169
+"69633","18L Shock Absorber",169
+"12799","6×3×5 Pullback Motor",169
+"57779","16L Crane Arm, Exterior",169
+"2351","16L Crane Arm, Center",169
+"39370","5×3 Socket w/ H-Shape",170
+"52629","19mm D. Ball",170
+"44359","Ø3 Ball Turret Hemisphere",170
+"99012","8L Rotor Blade",170
+"65422","19L Rotor Blade w/ 3-Pin Holes",170
+"98135","16L Blade w/ Axle",170
+"61800","Small Wing w/ Axle Hole",170
+"2723","3×3 Disc",170
+"32474","Ball Joint w/ Axle Hole, 1-Side",170
+"53585","Ball Joint w/ Axle Hole, Through",170
+"15540","1×6 Ski w/ Pin Hole",170
+"48267","1×3 Tooth w/ Axle Hole",170
+"41125","Ninja Star (Saw) w/ 6-Blades",170
+"61510","Ø2×2 Reel w/ Axle Hole",170
+"32012","Ø2×3 Reel w/ Axle Hole",170
+"26910","6×16×4 Move Hub (2-Ports, 2-Motors, 6x AAA)",107
+"28738","4×8×4 Small Hub (2-Ports, 6x AAA)",107
+"85824","9×9×5 Medium Hub (4-Port, 6x AA)",107
+"85825","9×9×5 Battery Box (2-Port, 6x AA)",107
+"67351","7×5×4 Small Intelligent Hub (2-Port, Rechargeable)",107
+"45601","7×11×4 Large Intelligent Hub (6-Ports, Rechargeable)",107
+"19071","6×8×3 WeDo 2.0 Hub (2-Ports, 2x AA)",107
+"19106","6×8×2 WeDo 2.0 Rechargeable Battery",107
+"103479","16×9×6 Hub w/ 3-Motors, 6-Lights",107
+"21980","3×3×6 Simple Medium Motor w/ 4-Studs",108
+"26913","4×3×6 Medium Motor w/ 20-Studs (w/ Rot.)",108
+"22169","3×4×8 Technic Large Motor (w/ Absolute Position)",108
+"22172","5×5×8 Technic Extra-Large Motor (w/ Absolute Position)",108
+"68488","3×4×5 Small Angular Motor (w/ Absolute Position)",108
+"54696","3×4×9 Medium Angular Motor (w/ Absolute Position)",108
+"54675","5×4×9 Large Angular Motor (w/ Absolute Position)",108
+"28740","4×2½×10 Motor, Simple Train",108
+"20844","2×4 Motion Sensor",109
+"20841","2×4 Tilt Sensor",109
+"26912","2×4×2 Color & Distance Sensor",109
+"37308","3×3×3 Color Sensor",109
+"37316","3×7×4 Distance Sensor",109
+"37312","3×3×5 Force Sensor",109
+"47592","3×3×3 9-Pixel Color Matrix",109
+"49283","Axle & Wire Connector",109
+"22168","Powered Up Light",109
+"28739","Bluetooth Speed Remote",109
+"3134","1×2 Brick w/ Cable Cutout",109
+"19981","4×4×⅔ Character Tag w/ 2-Studs",178
+"18868","4×4×⅔ Toy Tag",178
+"18601","12×24 Plate w/ Square and Circle Cutouts (LEGO Dimensions)",178
+"69767","Launcher, Square",151
+"15403","1×2 Plate w/ Stud Shooter",151
+"15391","Stud Shooter w/ Bar (Blaster Gun)",151
+"41812","Tile Shooter w/ Axle",151
+"69754","1×2 plate w/ Tile Shooter",151
+"16968","1×4 Brick w/ 2×2 Round Tile Shooter",151
+"15400","1×4 Spring Shooter",151
+"15303","8L Bar Dart, Rounded End",151
+"15392","Blaster Trigger",151
+"69755","Launcher Trigger",151
+"18588","Launcher, 6-Barrel",151
+"18587","Revolver w/ 6-Stud Shooters",151
+"49743","2×6×1⅓ Spring Shooter",151
+"46537","Arrow w/ Rubber End (Projectile)",151
+"88289","4L Catapult w/ Pin Hole",151
+"95347","2×2×10 Girder",152
+"64448","1×6×5 Girder",152
+"4476","2×4×5 Inclined Stanchion",152
+"64449","1×6×10 Girder, Triangular",152
+"1749","2×4×13 Support, ½-Circle w/ Pin Holes",152
+"4207","14×2½ Ladder",152
+"87913","6×2 Ladder Holder",152
+"77813","1×1 w/ Mini Handle",154
+"79896","4×3×2 Ridged Cover w/ 2×2 Studs, Handle",154
+"27167","4×3×3 Chest Plate w/ 2×2 Studs, Handle",154
+"78168","2×6 Plate w/ Hanger",154
+"96874","Brick/Axle Separator",154
+"3963","1×2 w/ 3-Loudspeakers",154
+"79897","2×5 Slope, 4-Studs top, 2-Studs sides",154
+"46296","CLIKITS Ring",154
+"73090","2×6×2 Brick, Counter Weight",154
+"66859","2×3×⅔ Feet w/ 6-Studs",154
+"37452","1×2×2 Brick w/ Photo Clip",154
+"90754","2×4×1⅓ Magnet w/ 2×2 Round Plate",154
+"2229","2×2×⅔ Tile w/ Photo Clip",154
+"65129","8×8×2 Pod w/ Ø4 Corners (Vidiyo)",154
+"65146","Container Snap (Vidiyo)",154
+"65128","8×8×5⅔ Lid w/ Ø4 Corners (Vidiyo)",154
+"67075","6×2×5⅓ Swing w/ 4-Studs",154
+"72024","8×8×3 Cupcake Cup",154
+"69182","3×3 Cube w/ Ring (Dots)",154
+"64462","3×8×6⅔ Container, Front",154
+"64454","3×8×6⅔ Container, Back",154
+"65200","6×16 Book Spine w/ 4-Pin Holes (Binding)",154
+"65196","16×12×2⅔ Book Cover w/ 2-Pin Holes",154
+"2498","2×3×3 Ø3 Sweeper Brush (Car Wash)",154
+"98876","4×2×3 Cockpit w/ 2×2 Studs, 2-Clips",154
+"3437","DUPLO 2×2 Brick",90
+"87084","DUPLO 2×3 Brick",90
+"3011","DUPLO 2×4 Brick",90
+"2300","DUPLO 2×6 Brick",90
+"4199","DUPLO 2×8 Brick",90
+"2291","DUPLO 2×10 Brick",90
+"76371","DUPLO 1×2×2 Brick",90
+"31110","DUPLO 2×2×2 Brick",90
+"69716","DUPLO 2×2 Brick, Hay Bale",90
+"25550","DUPLO 1×2×2 Panel, Masonry",90
+"18783","DUPLO 1×2×2 Panel, Log",90
+"42234","DUPLO 1×2×2 Brick w/ Curved Cutouts",90
+"31061","DUPLO 2×2×2 Brick w/ Indented Sides",90
+"40666","DUPLO 2×4 Plate",91
+"98233","DUPLO 2×6 Plate",91
+"44524","DUPLO 2×8 Plate",91
+"14721","DUPLO 4×4 Plate",91
+"25549","DUPLO 4×6 Plate",91
+"4672","DUPLO 4×8 Plate",91
+"4196","DUPLO 6×12 Plate",91
+"6490","DUPLO 8×16 Plate",91
+"4268","DUPLO 24×24 Baseplate",91
+"51262","DUPLO 8×8 Plate",91
+"35114","DUPLO 33° 3×2 Slope",92
+"63871","DUPLO 42° 3×2×2 Slope",92
+"6474","DUPLO 45° 2×2×1½ Slope",92
+"49570","DUPLO 45° 4×2×3 Slope",92
+"29303","DUPLO 45° 4×2 Slope, Double",92
+"70676","DUPLO 54° 2×2×2 Slope",92
+"2302","DUPLO 2×3 Curved",93
+"98223","DUPLO 2×4 Curved, Double",93
+"11170","DUPLO 2×2×1½ Curved",93
+"98252","DUPLO 2×3 Curved, Inv.",93
+"98224","DUPLO 2×4 Curved, Inverted Double",93
+"11169","DUPLO 2×2×1½ Concave",93
+"2301","DUPLO 2×3×2 Concave",93
+"98225","DUPLO",93
+"11198","DUPLO 2×4×2 Arch",93
+"98222","DUPLO 4×4 Plate, Round",93
+"29304","DUPLO 4×8 Plate, ½-Round",93
+"98218","DUPLO 4×4 Plate, ¼-Round",93
+"3664","DUPLO 2×2×2 Curved Dbl.",93
+"4198","DUPLO 2×4×2 Rounded Ends",93
+"51704","2×10×2 Arch",93
+"11197","DUPLO 2×6×2 Curved w/ 2×2 Cutout",93
+"11344","DUPLO 2×3×2 Curved",93
+"41250","DUPLO 51mm D. Ball",190
+"31452","DUPLO Ball Tube, Straight",190
+"31195","DUPLO Ball Tube, 45°",190
+"31191","DUPLO 2×6×5 Ball Tube Exit",190
+"61649","DUPLO 2×4×3 Window Frame",94
+"92094","DUPLO 2×4×5 Door Frame",94
+"65273","DUPLO 2×2 Stool",94
+"4890","DUPLO 2×2×1½ Cabinet",94
+"4891","DUPLO 2×2×1½ Drawer",94
+"13358","DUPLO 2×2 Hinge Base",94
+"6510","DUPLO Flower",94
+"12602","DUPLO 1×6 Fence",94
+"12651","DUPLO 2×2×2 Chair",94
+"6394","DUPLO 2×4×2 Square Arch",94
+"90265","DUPLO 4×3 Door w/ 4-panes",94
+"15515","DUPLO 4×4 Flower w/ 4-Studs",94
+"4375","DUPLO Sign Post",94
+"6377","DUPLO Train Track, Straight",94
+"6378","DUPLO Train Track, Curved",94
+"65109","DUPLO 2×4 Tile w/ Wood Grain",94
+"47408","DUPLO 2×2×2 Cone",94
+"65111","DUPLO 4×5 Door, 2-Panes",94
+"31925","DUPLO 4×3 Flag, Wavy",94
+"93353","DUPLO 2×2×4 Support Column",94
+"92005","DUPLO 4×4 Turntable",94
+"98459","DUPLO Door, Wooden",94
+"27395","DUPLO 2×4×5 Cabinet",94
+"35965","DUPLO Train Track Straight, w/ 4×8 Plate",94
+"48287","QUATRO 1×2 Brick",95
+"48411","QUATRO 1×4 Brick",95
+"48138","QUATRO 2×2 Brick",95
+"48201","QUATRO 2×4 Brick",95
+"49465","QUATRO 2×2 Curved",95
+"31000","PRIMO 1×1 Brick",177
+"31001","PRIMO 1×2 Brick",177
+"31002","PRIMO 1×3 Brick",177
+"31007","PRIMO 1×1 Brick w/ 4-DUPLO Studs",177
+"31012","PRIMO 3×3 Plate",177
