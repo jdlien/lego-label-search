@@ -189,4 +189,4 @@ The caching system ensures fast API responses while keeping count data up-to-dat
 
 ## To Do
 
-- Scrape each of the https://brickarchitect.com/parts/category-<number> pages and extract the list of parts by getting the list of PNG images
+- Update the next.js app to allow either generating or downloading the labels (e.g. from brickarchitect.com or just generate them from scratch to suit my preferences)
