@@ -1,6 +1,6 @@
 /** @format */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Box, Input, InputGroup, InputLeftElement, Select, Flex, Icon } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 
@@ -25,6 +25,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery)
   const [debouncedCategory, setDebouncedCategory] = useState(initialCategory)
   const router = useRouter()
+  const isUrlUpdate = useRef(false)
 
   // Fetch categories when component mounts
   useEffect(() => {
@@ -112,7 +113,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
 
   // Trigger search when debounced values change
   useEffect(() => {
-    if (router.isReady) {
+    if (router.isReady && !isUrlUpdate.current) {
       const params = new URLSearchParams()
       if (debouncedQuery) params.append('q', debouncedQuery)
       if (debouncedCategory) params.append('category', debouncedCategory)
@@ -124,7 +125,23 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
         router.push(url, undefined, { shallow: true })
       }
     }
+    isUrlUpdate.current = false
   }, [debouncedQuery, debouncedCategory, router.isReady])
+
+  // Sync state with URL when router changes
+  useEffect(() => {
+    if (router.isReady) {
+      // Get query and category from URL
+      const { q, category } = router.query
+
+      // Mark that we're updating from URL to prevent triggering the URL update effect above
+      isUrlUpdate.current = true
+
+      // Update state with URL values
+      setQuery(q || '')
+      setCategory(category || '')
+    }
+  }, [router.isReady, router.asPath])
 
   return (
     <Box width="100%">

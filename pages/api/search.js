@@ -52,10 +52,14 @@ export default async function handler(req, res) {
     const baseQuery = `
       SELECT p.part_num as id, p.name, p.part_cat_id as category_id,
              p.part_material, p.label_file, p.ba_cat_id, p.ba_name,
-             c.name as category_name, b.name as ba_category_name
+             c.name as category_name, b.name as ba_category_name,
+             parent.id as parent_cat_id, parent.name as parent_category,
+             grandparent.id as grandparent_cat_id, grandparent.name as grandparent_category
       FROM parts p
       LEFT JOIN part_categories c ON p.part_cat_id = c.id
       LEFT JOIN ba_categories b ON p.ba_cat_id = b.id
+      LEFT JOIN ba_categories parent ON b.parent_id = parent.id
+      LEFT JOIN ba_categories grandparent ON parent.parent_id = grandparent.id
     `
 
     // Base query for count - use estimated count for faster performance
