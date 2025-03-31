@@ -14,6 +14,7 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  useColorModeValue,
 } from '@chakra-ui/react'
 import Header from '../components/Header'
 import SearchBar from '../components/SearchBar'
@@ -22,6 +23,8 @@ import SearchResults from '../components/SearchResults'
 export default function Home() {
   const router = useRouter()
   const { q, category } = router.query
+  const pageBg = useColorModeValue('gray.50', 'gray.900')
+  const textColor = useColorModeValue('gray.600', 'gray.300')
 
   const [results, setResults] = useState([])
   const [totalResults, setTotalResults] = useState(0)
@@ -78,7 +81,7 @@ export default function Home() {
   }, [q, category, router.isReady])
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box minH="100vh" bg={pageBg}>
       <Header />
 
       <Container maxW="container.xl" py={8}>
@@ -87,7 +90,7 @@ export default function Home() {
             <Heading as="h1" size="xl" mb={2}>
               Find LEGO Parts
             </Heading>
-            <Text color="gray.600">Search by part number, name, or category to create printable labels</Text>
+            <Text color={textColor}>Search by part number, name, or category to create printable labels</Text>
           </Box>
 
           <SearchBar initialQuery={q || ''} initialCategory={category || ''} />
@@ -114,7 +117,7 @@ export default function Home() {
           {/* Initial state - no search yet */}
           {!isLoading && !error && !hasSearched && (
             <Box textAlign="center" py={10}>
-              <Text color="gray.500" fontSize="lg">
+              <Text color={textColor} fontSize="lg">
                 Start typing to search for LEGO parts
               </Text>
             </Box>
