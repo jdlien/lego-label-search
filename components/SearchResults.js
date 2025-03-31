@@ -207,7 +207,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
       boxShadow="sm"
       borderRadius="md"
       transition="all 0.2s"
-      _hover={{ boxShadow: 'md', transform: 'translateY(-2px)' }}
+      _hover={{ boxShadow: 'md' }}
       position="relative"
       overflow="hidden"
       width="100%"
@@ -224,7 +224,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
         />
       </Box>
 
-      <CardBody padding="3" height="100%" display="flex" flexDirection="column">
+      <CardBody padding="2" height="100%" display="flex" flexDirection="column">
         <Flex direction="row" gap={3} width="100%" flex="1">
           {/* Image container - clickable to part details */}
           <NextLink href={`/part?id=${part.id}`} passHref>
@@ -296,9 +296,10 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   colorScheme="gray"
                   alignSelf="flex-start"
                   borderRadius="full"
-                  px={2}
-                  py={0.5}
+                  px={1.5}
+                  py={0.25}
                   fontSize="xs"
+                  fontWeight="normal"
                   onClick={(e) => handleCategoryClick(e, part.grandparent_cat_id)}
                   cursor="pointer"
                   _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
@@ -307,8 +308,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   bg={grandparentBadgeBg}
                   color={badgeTextColor}
                 >
-                  {part.grandparent_category.length > 12
-                    ? part.grandparent_category.substring(0, 12) + '...'
+                  {part.grandparent_category.length > 8
+                    ? part.grandparent_category.substring(0, 8) + '…'
                     : part.grandparent_category}
                 </Badge>
               )}
@@ -317,9 +318,10 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   colorScheme="gray"
                   alignSelf="flex-start"
                   borderRadius="full"
-                  px={2}
-                  py={0.5}
+                  px={1.5}
+                  py={0.25}
                   fontSize="xs"
+                  fontWeight="normal"
                   onClick={(e) => handleCategoryClick(e, part.parent_cat_id)}
                   cursor="pointer"
                   _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
@@ -338,9 +340,10 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   colorScheme="green"
                   alignSelf="flex-start"
                   borderRadius="full"
-                  px={2}
-                  py={0.5}
+                  px={1.5}
+                  py={0.25}
                   fontSize="xs"
+                  fontWeight="normal"
                   onClick={(e) => handleCategoryClick(e, part.ba_cat_id)}
                   cursor="pointer"
                   _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
@@ -368,7 +371,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
         </Flex>
 
         {/* Label download link area */}
-        <Box mt={2} pt={2} borderTop="1px" borderColor={useColorModeValue('gray.100', 'gray.600')}>
+        <Box borderTop="1px" borderColor={useColorModeValue('gray.100', 'gray.600')}>
           {labelExists === false ? (
             <Text fontSize="xs" color="gray.500" textAlign="center">
               No label available
@@ -384,6 +387,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                 isLoading={isDownloading}
                 loadingText="Downloading..."
                 p={1}
+                pb={0}
+                mb={-1}
               >
                 <Icon as={DownloadIcon} mr={1} /> LBX 12mm
               </Button>
@@ -396,6 +401,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                 isLoading={isConverting}
                 loadingText="Converting..."
                 p={1}
+                pb={0}
+                mb={-1}
               >
                 <Icon as={DownloadIcon} mr={1} /> LBX 24mm
               </Button>
