@@ -38,6 +38,7 @@ export default function Home() {
     const fetchResults = async () => {
       // Only search if router is ready and we have query params
       if (!router.isReady || (!q && !category)) {
+        setHasSearched(false)
         return
       }
 

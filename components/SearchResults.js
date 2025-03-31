@@ -280,18 +280,15 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
         <Heading as="h3" size="md" color="gray.500" mb={4}>
           No results found
         </Heading>
-        {router.query.category && (
+        {(router.query.category || router.query.q) && (
           <Button
             colorScheme="blue"
             size="md"
             onClick={() => {
-              // Only reset the category filter while preserving search query
-              const currentQuery = router.query.q || ''
-              const newQuery = currentQuery ? `?q=${encodeURIComponent(currentQuery)}` : ''
-              router.push(`/${newQuery}`)
+              router.push('/')
             }}
           >
-            Reset Category Filter
+            Reset Search
           </Button>
         )}
       </Box>

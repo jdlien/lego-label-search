@@ -163,6 +163,12 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
 
   // Perform search
   const handleSearch = () => {
+    // If both query and category are empty, reset to default state
+    if (!query && !category) {
+      router.push('/')
+      return
+    }
+
     const params = new URLSearchParams()
     if (query) params.append('q', query)
     if (category) params.append('category', category)
