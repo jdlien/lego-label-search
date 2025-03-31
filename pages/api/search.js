@@ -153,24 +153,19 @@ export default async function handler(req, res) {
 
 // Function to get a category and all its subcategories recursively
 async function getAllSubcategories(db, categoryId) {
-  // Start with the requested category
-  const result = [categoryId]
+  // Using a single efficient query with recursive Common Table Expression (CTE)
+  // This gets the category itself and all of its subcategories at any level of depth
+  const results = await db.all(
+    `
+    WITH RECURSIVE subcategories AS (
+      SELECT id FROM ba_categories WHERE id = ?
+      UNION ALL
+      SELECT c.id FROM ba_categories c JOIN subcategories sc ON c.parent_id = sc.id
+    )
+    SELECT id FROM subcategories
+  `,
+    categoryId
+  )
 
-  // Helper function to recursively collect subcategories
-  async function collectSubcategories(parentId) {
-    // Find all direct subcategories of the parent
-    const subcategories = await db.all('SELECT id FROM ba_categories WHERE parent_id = ?', parentId)
-
-    // Process each subcategory
-    for (const cat of subcategories) {
-      result.push(cat.id)
-      // Recursively collect subcategories of this category
-      await collectSubcategories(cat.id)
-    }
-  }
-
-  // Start the recursive collection
-  await collectSubcategories(categoryId)
-
-  return result
+  return results.map((row) => row.id)
 }
