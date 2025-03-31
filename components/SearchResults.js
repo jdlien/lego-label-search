@@ -159,6 +159,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   borderRadius="full"
                   px={2}
                   py={0.5}
+                  fontSize="xs"
                   onClick={(e) => handleCategoryClick(e, part.grandparent_cat_id, part.grandparent_category)}
                   cursor="pointer"
                   _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
@@ -177,6 +178,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   borderRadius="full"
                   px={2}
                   py={0.5}
+                  fontSize="xs"
                   onClick={(e) => handleCategoryClick(e, part.parent_cat_id, part.parent_category)}
                   cursor="pointer"
                   _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
@@ -194,6 +196,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                 borderRadius="full"
                 px={2}
                 py={0.5}
+                fontSize="xs"
                 onClick={(e) => handleCategoryClick(e, part.ba_cat_id, part.ba_category_name)}
                 cursor="pointer"
                 _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
@@ -203,6 +206,13 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                 {part.ba_category_name || part.category_name}
               </Badge>
             </Flex>
+
+            {/* Original part category information */}
+            {part.category_name && (
+              <Text color="gray.500" fontSize="xs" mt={1}>
+                {part.category_name}
+              </Text>
+            )}
           </Stack>
         </Flex>
       </CardBody>
