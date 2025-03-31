@@ -90,3 +90,4 @@ logs/
 
 # Exclude part images (for now) to keep the repo size down
 data/images/*
+public/data/*

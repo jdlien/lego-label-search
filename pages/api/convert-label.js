@@ -35,25 +35,71 @@ export default async function handler(req, res) {
 
     // Check if the original label exists
     if (!fs.existsSync(inputFile)) {
+      console.error(`Original label not found at ${inputFile}`)
       return res.status(404).json({ success: false, message: 'Original label not found' })
+    }
+
+    // Check that the file is not empty
+    try {
+      const stats = fs.statSync(inputFile)
+      if (stats.size === 0) {
+        console.error(`Original label file is empty: ${inputFile}`)
+        return res.status(500).json({
+          success: false,
+          message: 'Original label file exists but is empty or incomplete. Please try again.',
+        })
+      }
+    } catch (statError) {
+      console.error(`Error checking file stats: ${statError}`)
+      return res.status(500).json({
+        success: false,
+        message: 'Error verifying original label file integrity.',
+      })
     }
 
     // Get the path to the change-lbx.py script
     const scriptPath = path.join(process.cwd(), '..', 'lbx-utils', 'change-lbx.py')
 
-    // Run the conversion script
-    const { stdout, stderr } = await execAsync(
-      `python3 "${scriptPath}" "${inputFile}" "${outputFile}" -f 14 -b 20 -l 24 -c -s 1.5 -m 0.5`
-    )
-
-    if (stderr) {
-      console.error('Script error:', stderr)
-      return res.status(500).json({ success: false, message: 'Failed to convert label' })
+    // Check if the script exists
+    if (!fs.existsSync(scriptPath)) {
+      console.error(`Conversion script not found at ${scriptPath}`)
+      return res.status(500).json({
+        success: false,
+        message: 'Conversion script not found. Please ensure lbx-utils is properly installed.',
+      })
     }
 
+    // Run the conversion script
+    const command = `python3 -W ignore "${scriptPath}" "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
+    console.log(`Executing: ${command}`)
+
+    const { stdout, stderr } = await execAsync(command)
+
+    // Check if the output file was created despite warnings
+    if (fs.existsSync(outputFile)) {
+      const stats = fs.statSync(outputFile)
+      if (stats.size > 0) {
+        // If the file exists and has content, consider it a success even if there were warnings
+        console.log(`Conversion successful with warnings. Output file created: ${outputFile} (${stats.size} bytes)`)
+        if (stderr && stderr.trim()) {
+          console.warn('Script warnings (ignored):', stderr)
+        }
+        return res.status(200).json({ success: true })
+      }
+    }
+
+    if (stderr && stderr.trim()) {
+      console.error('Script error:', stderr)
+      return res.status(500).json({ success: false, message: 'Failed to convert label: ' + stderr.trim() })
+    }
+
+    console.log('Conversion successful:', stdout)
     return res.status(200).json({ success: true })
   } catch (error) {
     console.error('Error converting label:', error)
-    return res.status(500).json({ success: false, message: 'Failed to convert label' })
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to convert label: ' + (error.message || 'Unknown error'),
+    })
   }
 }

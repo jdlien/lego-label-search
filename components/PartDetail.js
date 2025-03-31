@@ -83,7 +83,7 @@ const PartDetail = ({ part, isLoading, error }) => {
   const normalizedPartId = part?.id ? part.id.replace(/^0+/, '') : ''
 
   // Image path
-  const imagePath = `/data/images/${normalizedPartId}.png`
+  const imagePath = `/api/images/${normalizedPartId}.png`
 
   // Handle category click for navigation
   const handleCategoryClick = (catId) => {
