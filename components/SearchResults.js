@@ -37,6 +37,10 @@ const BrickIcon = (props) => (
 
 const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const router = useRouter()
+  const toast = useToast()
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [isConverting, setIsConverting] = useState(false)
+  const [labelExists, setLabelExists] = useState(null)
 
   // Colors for light/dark mode
   const cardBg = useColorModeValue('white', 'gray.700')
@@ -50,6 +54,9 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const parentBadgeBg = useColorModeValue('gray.100', 'gray.600')
   const categoryBadgeBg = useColorModeValue('green.100', 'green.800')
   const badgeTextColor = useColorModeValue('gray.700', 'white')
+  const linkColor = useColorModeValue('blue.500', 'blue.300')
+  const linkHoverColor = useColorModeValue('blue.600', 'blue.200')
+  const linkSpacing = useColorModeValue('gray.200', 'gray.600')
 
   // Strip leading zeros for image filename
   const normalizedPartId = part.id.replace(/^0+/, '')
@@ -61,12 +68,87 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const handleCategoryClick = (e, categoryId) => {
     e.preventDefault()
     e.stopPropagation()
-    // Only include the category parameter to clear the search query
-    // By not including 'q' parameter, SearchBar will clear the input field
     router.push({
       pathname: '/',
       query: { category: categoryId },
     })
+  }
+
+  // Handler for label download
+  const handleLabelDownload = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (isDownloading) return
+
+    setIsDownloading(true)
+    try {
+      const response = await fetch(`/api/download-label?part_num=${part.id}`)
+      const data = await response.json()
+
+      if (data.success) {
+        // Start the download
+        window.location.href = `/data/labels/${part.id}.lbx`
+      } else {
+        setLabelExists(false)
+        toast({
+          title: 'Label not available',
+          description: 'This part does not have a label available on Brick Architect.',
+          status: 'warning',
+          duration: 3000,
+          isClosable: true,
+        })
+      }
+    } catch (error) {
+      console.error('Error downloading label:', error)
+      toast({
+        title: 'Download failed',
+        description: 'There was an error downloading the label.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
+  // Handler for 24mm label download
+  const handle24mmLabelDownload = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (isConverting) return
+
+    setIsConverting(true)
+    try {
+      const response = await fetch(`/api/convert-label?part_num=${part.id}`)
+      const data = await response.json()
+
+      if (data.success) {
+        // Start the download
+        window.location.href = `/data/labels/${part.id}-24mm.lbx`
+      } else {
+        toast({
+          title: 'Conversion failed',
+          description: 'There was an error converting the label to 24mm format.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+      }
+    } catch (error) {
+      console.error('Error converting label:', error)
+      toast({
+        title: 'Conversion failed',
+        description: 'There was an error converting the label.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    } finally {
+      setIsConverting(false)
+    }
   }
 
   return (
@@ -96,8 +178,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
         />
       </Box>
 
-      <CardBody padding="3" height="100%" display="flex" alignItems="center">
-        <Flex direction="row" gap={3} width="100%">
+      <CardBody padding="3" height="100%" display="flex" flexDirection="column">
+        <Flex direction="row" gap={3} width="100%" flex="1">
           {/* Image container */}
           <Flex
             minWidth="84px"
@@ -217,6 +299,44 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
             )}
           </Stack>
         </Flex>
+
+        {/* Label download link area */}
+        <Box mt={2} pt={2} borderTop="1px" borderColor={useColorModeValue('gray.100', 'gray.600')}>
+          {labelExists === false ? (
+            <Text fontSize="xs" color="gray.500" textAlign="center">
+              No label available
+            </Text>
+          ) : (
+            <Flex direction="row" gap={2} justify="center" align="center">
+              <Text
+                as="a"
+                href={`/api/download-label?part_num=${part.id}`}
+                onClick={handleLabelDownload}
+                fontSize="xs"
+                color={linkColor}
+                textAlign="center"
+                _hover={{ color: linkHoverColor }}
+                cursor="pointer"
+                display="block"
+              >
+                {isDownloading ? 'Downloading...' : 'Download LBX'}
+              </Text>
+              <Text
+                as="a"
+                href={`/api/convert-label?part_num=${part.id}`}
+                onClick={handle24mmLabelDownload}
+                fontSize="xs"
+                color={linkColor}
+                textAlign="center"
+                _hover={{ color: linkHoverColor }}
+                cursor="pointer"
+                display="block"
+              >
+                {isConverting ? 'Converting...' : 'Download LBX 24mm'}
+              </Text>
+            </Flex>
+          )}
+        </Box>
       </CardBody>
     </LinkBox>
   )
