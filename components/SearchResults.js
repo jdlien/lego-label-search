@@ -35,6 +35,15 @@ const BrickIcon = (props) => (
   </svg>
 )
 
+// Simple download icon
+const DownloadIcon = (props) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M12 16L12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <path d="M7 12L12 17L17 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M4 20H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+)
+
 const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const router = useRouter()
   const toast = useToast()
@@ -68,6 +77,9 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const handleCategoryClick = (e, categoryId) => {
     e.preventDefault()
     e.stopPropagation()
+
+    // Navigate to homepage with only the category parameter
+    // This will clear any existing search query
     router.push({
       pathname: '/',
       query: { category: categoryId },
@@ -188,8 +200,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   }
 
   return (
-    <LinkBox
-      as={Card}
+    <Card
       borderWidth="1px"
       borderColor={cardBorderColor}
       bg={isSelected ? cardSelectedBg : cardBg}
@@ -199,7 +210,6 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
       _hover={{ boxShadow: 'md', transform: 'translateY(-2px)' }}
       position="relative"
       overflow="hidden"
-      cursor="pointer"
       width="100%"
       minHeight="180px"
     >
@@ -216,48 +226,69 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
 
       <CardBody padding="3" height="100%" display="flex" flexDirection="column">
         <Flex direction="row" gap={3} width="100%" flex="1">
-          {/* Image container */}
-          <Flex
-            minWidth="84px"
-            width="144px"
-            height="84px"
-            borderRadius="md"
-            overflow="hidden"
-            alignItems="center"
-            justifyContent="center"
-            position="relative"
-            flexShrink={0}
-            bg="white"
-            border="1px solid"
-            borderColor={useColorModeValue('gray.100', 'gray.600')}
-          >
-            <Image
-              src={pngPath}
-              alt={part.name}
-              maxHeight="100%"
-              maxWidth="100%"
-              objectFit="contain"
-              padding="4px"
+          {/* Image container - clickable to part details */}
+          <NextLink href={`/part?id=${part.id}`} passHref>
+            <Flex
+              as="a"
+              minWidth="84px"
+              width="144px"
+              height="84px"
+              borderRadius="md"
+              overflow="hidden"
+              alignItems="center"
+              justifyContent="center"
+              position="relative"
+              flexShrink={0}
               bg="white"
-              fallback={<Icon as={BrickIcon} boxSize="48px" color={placeholderIconColor} />}
-            />
-          </Flex>
+              border="1px solid"
+              borderColor={useColorModeValue('gray.100', 'gray.600')}
+              cursor="pointer"
+            >
+              <Image
+                src={pngPath}
+                alt={part.name}
+                maxHeight="100%"
+                maxWidth="100%"
+                objectFit="contain"
+                padding="4px"
+                bg="white"
+                fallback={<Icon as={BrickIcon} boxSize="48px" color={placeholderIconColor} />}
+              />
+            </Flex>
+          </NextLink>
 
           {/* Part details */}
           <Stack spacing={1} flex="1" overflow="hidden">
             <Flex align="center" justify="space-between">
-              <NextLink href={`/part?id=${part.id}`} passHref legacyBehavior>
-                <LinkOverlay>
-                  <Heading size="md" fontFamily="mono" color={headingColor} noOfLines={1}>
-                    {part.id}
-                  </Heading>
-                </LinkOverlay>
+              <NextLink href={`/part?id=${part.id}`} passHref>
+                <Heading
+                  as="a"
+                  size="md"
+                  fontFamily="mono"
+                  color={headingColor}
+                  noOfLines={1}
+                  cursor="pointer"
+                  _hover={{ textDecoration: 'underline' }}
+                >
+                  {part.id}
+                </Heading>
               </NextLink>
             </Flex>
 
-            <Text fontSize="md" fontWeight="medium" noOfLines={1} textOverflow="ellipsis" color={textColor}>
-              {part.ba_name && part.ba_name.trim() !== '' ? part.ba_name : part.name}
-            </Text>
+            <NextLink href={`/part?id=${part.id}`} passHref>
+              <Text
+                as="a"
+                fontSize="md"
+                fontWeight="medium"
+                noOfLines={1}
+                textOverflow="ellipsis"
+                color={textColor}
+                cursor="pointer"
+                _hover={{ textDecoration: 'underline' }}
+              >
+                {part.ba_name && part.ba_name.trim() !== '' ? part.ba_name : part.name}
+              </Text>
+            </NextLink>
 
             <Flex gap={2} flexWrap="wrap">
               {part.grandparent_category && part.grandparent_cat_id && (
@@ -354,7 +385,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                 loadingText="Downloading..."
                 p={1}
               >
-                Download LBX
+                <Icon as={DownloadIcon} mr={1} /> LBX 12mm
               </Button>
               <Button
                 size="xs"
@@ -366,13 +397,13 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                 loadingText="Converting..."
                 p={1}
               >
-                Download LBX 24mm
+                <Icon as={DownloadIcon} mr={1} /> LBX 24mm
               </Button>
             </Flex>
           )}
         </Box>
       </CardBody>
-    </LinkBox>
+    </Card>
   )
 }
 
