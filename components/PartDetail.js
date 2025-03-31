@@ -79,6 +79,12 @@ const PartDetail = ({ part, isLoading, error }) => {
   // Get the category name (prioritize ba_category_name, fall back to category_name)
   const displayCategory = part.ba_category_name || part.category_name
 
+  // Strip leading zeros for image filename (needed for image path)
+  const normalizedPartId = part?.id ? part.id.replace(/^0+/, '') : ''
+
+  // Image path
+  const imagePath = `/data/images/${normalizedPartId}.png`
+
   // Handle category click for navigation
   const handleCategoryClick = (catId) => {
     router.push(`/?category=${catId}`)
@@ -105,26 +111,43 @@ const PartDetail = ({ part, isLoading, error }) => {
       </Flex>
 
       <Flex direction={{ base: 'column', md: 'row' }} gap={6}>
-        <Box minW={{ base: 'full', md: '200px' }}>
-          {/* Placeholder for part image - could be replaced with actual image if available */}
+        <Box minW={{ base: 'full', md: '300px' }}>
+          {/* Part image container - 50% larger and white background */}
           <Box
             borderWidth="1px"
             borderRadius="md"
-            bg="gray.100"
-            height="200px"
+            bg="white"
+            height="300px"
             display="flex"
             alignItems="center"
             justifyContent="center"
+            overflow="hidden"
           >
-            {/* If no image is available, show part number */}
-            <Text fontSize="xl" color="gray.500">
-              {part.id}
-            </Text>
+            <Image
+              src={imagePath}
+              alt={displayName}
+              maxHeight="100%"
+              maxWidth="100%"
+              objectFit="contain"
+              padding="8px"
+              fallback={
+                <Text fontSize="xl" color="gray.500">
+                  {part.id}
+                </Text>
+              }
+            />
           </Box>
         </Box>
 
         <VStack align="stretch" spacing={4} flex="1">
-          <Heading size="lg">{displayName}</Heading>
+          <Box>
+            <Heading size="lg">{part.ba_name || part.name}</Heading>
+            {part.ba_name && part.name && part.ba_name !== part.name && (
+              <Text color="gray.600" fontSize="md" mt={1}>
+                ({part.name})
+              </Text>
+            )}
+          </Box>
 
           <HStack>
             <Badge colorScheme="blue" fontSize="md" px={2} borderRadius="md">
@@ -141,43 +164,63 @@ const PartDetail = ({ part, isLoading, error }) => {
 
           <Box>
             <Heading size="sm" mb={2}>
-              Categories
+              Category
             </Heading>
             <VStack align="stretch" spacing={2}>
+              {/* Display both category types */}
+              {part.category_name && (
+                <Flex alignItems="center" mb={1}>
+                  <Text fontWeight="medium" mr={2}></Text>
+                  <Badge colorScheme="purple" fontSize="md" px={2} py={1} borderRadius="md">
+                    {part.category_name}
+                  </Badge>
+                </Flex>
+              )}
+
               {/* Breadcrumb-style category path */}
               {categoryPath.length > 0 ? (
-                <Flex flexWrap="wrap" gap={2}>
-                  {categoryPath.map((cat, index) => (
-                    <React.Fragment key={cat.id}>
-                      {index > 0 && <Text color="gray.500">›</Text>}
-                      <Badge
-                        colorScheme={index === categoryPath.length - 1 ? 'blue' : 'gray'}
-                        cursor="pointer"
-                        onClick={() => handleCategoryClick(cat.id)}
-                        p={2}
-                        borderRadius="md"
-                        _hover={{ bg: index === categoryPath.length - 1 ? 'blue.100' : 'gray.100' }}
-                      >
-                        {cat.name}
-                      </Badge>
-                    </React.Fragment>
-                  ))}
+                <Flex flexDirection="column">
+                  <Text fontWeight="medium" mb={1}>
+                    BrickArchitect Category:
+                  </Text>
+                  <Flex flexWrap="wrap" gap={2}>
+                    {categoryPath.map((cat, index) => (
+                      <React.Fragment key={cat.id}>
+                        {index > 0 && <Text color="gray.500">›</Text>}
+                        <Badge
+                          colorScheme={index === categoryPath.length - 1 ? 'blue' : 'gray'}
+                          cursor="pointer"
+                          onClick={() => handleCategoryClick(cat.id)}
+                          p={2}
+                          borderRadius="md"
+                          _hover={{ bg: index === categoryPath.length - 1 ? 'blue.100' : 'gray.100' }}
+                        >
+                          {cat.name}
+                        </Badge>
+                      </React.Fragment>
+                    ))}
+                  </Flex>
                 </Flex>
               ) : (
                 part.ba_cat_id && (
-                  <Badge
-                    colorScheme="blue"
-                    cursor="pointer"
-                    onClick={() => handleCategoryClick(part.ba_cat_id)}
-                    p={2}
-                    borderRadius="md"
-                  >
-                    {displayCategory || 'Unknown Category'}
-                  </Badge>
+                  <Flex alignItems="center">
+                    <Text fontWeight="medium" mr={2}>
+                      BrickArk Category:
+                    </Text>
+                    <Badge
+                      colorScheme="blue"
+                      cursor="pointer"
+                      onClick={() => handleCategoryClick(part.ba_cat_id)}
+                      p={2}
+                      borderRadius="md"
+                    >
+                      {displayCategory || 'Unknown Category'}
+                    </Badge>
+                  </Flex>
                 )
               )}
 
-              {!part.ba_cat_id && (
+              {!part.category_name && !part.ba_cat_id && (
                 <Text fontSize="sm" color="gray.500">
                   No categories assigned
                 </Text>

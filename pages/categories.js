@@ -29,12 +29,15 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  useColorModeValue,
 } from '@chakra-ui/react'
 import Header from '../components/Header'
 
 export default function Categories() {
   const router = useRouter()
   const { id: categoryId } = router.query
+  const pageBg = useColorModeValue('gray.50', 'gray.900')
+  const textColor = useColorModeValue('gray.600', 'gray.300')
 
   const [allCategories, setAllCategories] = useState([])
   const [categoryTree, setCategoryTree] = useState({})
@@ -174,7 +177,7 @@ export default function Categories() {
 
           {hasChildren && (
             <>
-              <Text fontSize="xs" color="gray.500" mb={3}>
+              <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} mb={3}>
                 Parts view includes all subcategories
               </Text>
 
@@ -208,7 +211,7 @@ export default function Categories() {
   const childCategories = getChildCategories()
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box minH="100vh" bg={pageBg}>
       <Header />
 
       <Container maxW="container.xl" py={8}>
@@ -224,7 +227,11 @@ export default function Categories() {
                   <BreadcrumbLink
                     as={NextLink}
                     href={crumb.id ? `/categories?id=${crumb.id}` : '/categories'}
-                    color={index === breadcrumbs.length - 1 ? 'blue.500' : 'gray.500'}
+                    color={
+                      index === breadcrumbs.length - 1
+                        ? useColorModeValue('blue.500', 'blue.300')
+                        : useColorModeValue('gray.500', 'gray.400')
+                    }
                     fontWeight={index === breadcrumbs.length - 1 ? 'semibold' : 'normal'}
                   >
                     {crumb.name}
@@ -243,7 +250,14 @@ export default function Categories() {
 
           {/* Error State */}
           {error && (
-            <Box bg="red.50" color="red.500" p={4} borderRadius="md" borderWidth="1px" borderColor="red.200">
+            <Box
+              bg={useColorModeValue('red.50', 'red.900')}
+              color={useColorModeValue('red.500', 'red.200')}
+              p={4}
+              borderRadius="md"
+              borderWidth="1px"
+              borderColor={useColorModeValue('red.200', 'red.700')}
+            >
               <Heading as="h3" size="md" mb={2}>
                 Error Loading Categories
               </Heading>
@@ -253,7 +267,7 @@ export default function Categories() {
 
           {/* Current Category Info */}
           {currentCategory && !isLoading && (
-            <Box bg="blue.50" p={4} borderRadius="md" mb={4}>
+            <Box bg={useColorModeValue('blue.50', 'blue.900')} p={4} borderRadius="md" mb={4}>
               <Heading as="h2" size="lg" mb={2}>
                 {currentCategory.name}
               </Heading>
@@ -263,7 +277,7 @@ export default function Categories() {
                     View All Parts
                   </Button>
                 </NextLink>
-                <Text fontSize="sm" mt={1} color="gray.600">
+                <Text fontSize="sm" mt={1} color={textColor}>
                   (includes all subcategories)
                 </Text>
               </Flex>
@@ -288,17 +302,17 @@ export default function Categories() {
                           transition="all 0.2s"
                           _hover={{ boxShadow: 'md' }}
                         >
-                          <CardHeader bg="blue.50" py={3}>
+                          <CardHeader bg={useColorModeValue('blue.50', 'blue.900')} py={3}>
                             <Heading size="sm">{category.name}</Heading>
                           </CardHeader>
 
                           <CardBody>
                             <Flex direction="column" height="100%">
-                              <Text fontSize="sm" color="gray.600" mb={4}>
+                              <Text fontSize="sm" color={textColor} mb={4}>
                                 Category ID: {category.id}
                               </Text>
                               {category.children && category.children.length > 0 && (
-                                <Text fontSize="sm" color="gray.600">
+                                <Text fontSize="sm" color={textColor}>
                                   {category.children.length} subcategories
                                 </Text>
                               )}
@@ -322,7 +336,7 @@ export default function Categories() {
                               </NextLink>
                             </Flex>
                             {category.children && category.children.length > 0 && (
-                              <Text fontSize="xs" color="gray.500" mt={1}>
+                              <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} mt={1}>
                                 Parts view includes all subcategories
                               </Text>
                             )}
@@ -331,8 +345,8 @@ export default function Categories() {
                       ))}
                   </SimpleGrid>
                 ) : (
-                  <Box bg="gray.50" p={8} borderRadius="md" textAlign="center">
-                    <Heading as="h3" size="md" color="gray.500" mb={4}>
+                  <Box bg={useColorModeValue('gray.50', 'gray.800')} p={8} borderRadius="md" textAlign="center">
+                    <Heading as="h3" size="md" color={useColorModeValue('gray.500', 'gray.400')} mb={4}>
                       No subcategories found
                     </Heading>
                     <NextLink href={`/?category=${categoryId}`} passHref legacyBehavior>
@@ -345,7 +359,7 @@ export default function Categories() {
               ) : (
                 /* Show the full category tree view */
                 <Box>
-                  <Heading as="h2" size="md" mb={4}>
+                  <Heading as="h2" size="md" mb={4} color={useColorModeValue('gray.800', 'gray.200')}>
                     Category Tree
                   </Heading>
                   <Accordion allowMultiple>

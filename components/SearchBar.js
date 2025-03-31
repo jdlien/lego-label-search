@@ -1,8 +1,14 @@
 /** @format */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Box, Input, InputGroup, InputLeftElement, Select, Flex, Icon, Button } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
+
+// Natural sort function
+const naturalSort = (a, b) => {
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+  return collator.compare(a, b)
+}
 
 const SearchIcon = (props) => (
   <svg
@@ -22,6 +28,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
   const [category, setCategory] = useState(initialCategory)
   const [categoriesForDropdown, setCategoriesForDropdown] = useState([])
   const router = useRouter()
+  const searchTimeout = useRef(null)
 
   // Fetch categories when component mounts
   useEffect(() => {
@@ -30,59 +37,41 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
         const response = await fetch('/api/categories')
         const data = await response.json()
 
-        // Build hierarchical structure for dropdown
-        const categoryTree = {}
-        const topLevel = []
+        // Split categories into parent and child categories
+        const parentCategories = data.categories
+          .filter((cat) => !cat.parent_id || cat.parent_id === '')
+          .map((cat) => ({
+            id: cat.id,
+            name: cat.name,
+            isParent: true,
+          }))
 
-        // First map all categories for easy reference
-        data.categories.forEach((cat) => {
-          categoryTree[cat.id] = { ...cat, children: [] }
-        })
+        const childCategories = data.categories
+          .filter((cat) => cat.parent_id && cat.parent_id !== '')
+          .map((cat) => ({
+            id: cat.id,
+            name: cat.name,
+            isParent: false,
+          }))
 
-        // Build tree structure
-        data.categories.forEach((cat) => {
-          const id = String(cat.id)
-          const parentId = cat.parent_id ? String(cat.parent_id) : ''
+        // Sort both groups using natural sort
+        parentCategories.sort((a, b) => naturalSort(a.name, b.name))
+        childCategories.sort((a, b) => naturalSort(a.name, b.name))
 
-          if (parentId && categoryTree[parentId]) {
-            categoryTree[parentId].children.push(categoryTree[id])
-          } else if (!parentId || parentId === '') {
-            topLevel.push(categoryTree[id])
-          }
-        })
+        // Add separator between parent and child categories if we have both
+        let combinedCategories = [...parentCategories]
 
-        // Sort top level categories by ID
-        topLevel.sort((a, b) => {
-          const aId = parseInt(a.id)
-          const bId = parseInt(b.id)
-          return aId - bId
-        })
-
-        // Create flat list with indentation for the dropdown
-        const flattenedCategories = []
-
-        // Recursive function to flatten the tree with proper indentation
-        const flattenCategory = (category, level = 0) => {
-          // Add the current category with indentation
-          flattenedCategories.push({
-            id: category.id,
-            name: '  '.repeat(level) + category.name,
-            level: level,
+        if (parentCategories.length > 0 && childCategories.length > 0) {
+          combinedCategories.push({
+            id: 'separator',
+            name: '──── Sub Categories ────',
+            isParent: false,
           })
-
-          // Add all children recursively with increased indentation
-          if (category.children && category.children.length > 0) {
-            // Sort children by name
-            category.children
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .forEach((child) => flattenCategory(child, level + 1))
-          }
         }
 
-        // Process all top level categories
-        topLevel.forEach((category) => flattenCategory(category))
+        combinedCategories = [...combinedCategories, ...childCategories]
 
-        setCategoriesForDropdown(flattenedCategories)
+        setCategoriesForDropdown(combinedCategories)
       } catch (error) {
         console.error('Error fetching categories:', error)
       }
@@ -102,24 +91,52 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
     }
   }, [router.isReady, router.query])
 
-  // Perform search
-  const handleSearch = () => {
-    const params = new URLSearchParams()
-    if (query) params.append('q', query)
-    if (category) params.append('category', category)
+  // Handle input change with simple timeout
+  const handleInputChange = (e) => {
+    const newQuery = e.target.value
+    setQuery(newQuery)
 
-    router.push(`/?${params.toString()}`)
+    // Clear any existing timeout
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current)
+    }
+
+    // Set a new timeout
+    searchTimeout.current = setTimeout(() => {
+      const params = new URLSearchParams()
+      if (newQuery) params.append('q', newQuery)
+      if (category) params.append('category', category)
+
+      router.push(`/?${params.toString()}`)
+    }, 500)
   }
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current)
+      }
+    }
+  }, [])
 
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault()
+    // Clear any pending timeout
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current)
+    }
     handleSearch()
   }
 
   // Handle "Enter" key in search input
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
+      // Clear any pending timeout
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current)
+      }
       handleSearch()
     }
   }
@@ -129,10 +146,24 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
     const newCategory = e.target.value
     setCategory(newCategory)
 
+    // Clear any pending timeout
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current)
+    }
+
     // Automatically trigger search when category changes
     const params = new URLSearchParams()
     if (query) params.append('q', query)
     if (newCategory) params.append('category', newCategory)
+
+    router.push(`/?${params.toString()}`)
+  }
+
+  // Perform search
+  const handleSearch = () => {
+    const params = new URLSearchParams()
+    if (query) params.append('q', query)
+    if (category) params.append('category', category)
 
     router.push(`/?${params.toString()}`)
   }
@@ -149,7 +180,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
               <Input
                 placeholder="Search for part number or name..."
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 size="lg"
                 borderRadius="md"
@@ -165,11 +196,17 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
               size="lg"
               borderRadius="md"
             >
-              {categoriesForDropdown.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
+              {categoriesForDropdown.map((cat, index) =>
+                cat.id === 'separator' ? (
+                  <option key="separator" disabled style={{ fontWeight: 'bold', color: 'gray' }}>
+                    ──── Sub Categories ────
+                  </option>
+                ) : (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                )
+              )}
             </Select>
           </Box>
 
