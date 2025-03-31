@@ -89,7 +89,7 @@ export default function Home() {
     <Box minH="100vh" bg={pageBg}>
       <Header />
 
-      <Container maxW="container.xl" py={8}>
+      <Container maxW="container.2xl" py={8}>
         <VStack spacing={8} align="stretch">
           <Box textAlign="center" mb={4}>
             <Heading as="h1" size="xl" mb={2}>
