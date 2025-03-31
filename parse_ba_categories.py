@@ -26,7 +26,7 @@ urls = [
 ]
 
 categories = []
-parts = []
+parts_data = []  # Temporary storage for all parts with their categories
 
 # Helper function to get clean category name text
 def clean_category_name(element):
@@ -144,11 +144,12 @@ for url in urls_to_process:
             part_name = part_name_elem.text.strip()
             part_num = part_num_elem.text.strip()
 
-            # Add part to parts list
-            parts.append({
+            # Add to temporary parts data with category level 2
+            parts_data.append({
                 'part_num': part_num,
                 'ba_name': part_name,
-                'ba_cat_id': subcategory_id
+                'ba_cat_id': subcategory_id,
+                'category_level': 2  # Level 2 = subcategory
             })
 
         # Also check for subcategories (h3 elements with class partcategoryname)
@@ -234,31 +235,66 @@ for url in urls_to_process:
                 part_name = part_name_elem.text.strip()
                 part_num = part_num_elem.text.strip()
 
-                # Add part to parts list
-                parts.append({
+                # Add to temporary parts data with category level 3
+                parts_data.append({
                     'part_num': part_num,
                     'ba_name': part_name,
-                    'ba_cat_id': subsubcategory_id
+                    'ba_cat_id': subsubcategory_id,
+                    'category_level': 3  # Level 3 = subsubcategory
                 })
+
+# Build a hierarchical map of categories
+category_hierarchy = {}
+for cat in categories:
+    category_hierarchy[cat['id']] = {
+        'name': cat['name'],
+        'parent_id': cat['parent_id']
+    }
+
+# Create a clean list of parts, keeping only the most specific category for each part
+unique_parts = {}  # Dictionary to store unique parts with their most specific category
+
+for part in parts_data:
+    part_key = (part['part_num'], part['ba_name'])
+
+    # If we haven't seen this part before, or it has a more specific (higher level) category, update it
+    if (part_key not in unique_parts) or (part['category_level'] > unique_parts[part_key]['category_level']):
+        unique_parts[part_key] = {
+            'part_num': part['part_num'],
+            'ba_name': part['ba_name'],
+            'ba_cat_id': part['ba_cat_id'],
+            'category_level': part['category_level']
+        }
+
+# Convert the dictionary back to a list for output
+final_parts = [
+    {
+        'part_num': part_data['part_num'],
+        'ba_name': part_data['ba_name'],
+        'ba_cat_id': part_data['ba_cat_id']
+    }
+    for part_data in unique_parts.values()
+]
 
 # Clean up parts data for correct category assignment
 # First, collect all the unique part category IDs from our categories list
 valid_category_ids = [cat['id'] for cat in categories]
 
 # Filter out parts with invalid category IDs - these might be malformed from the HTML parsing
-parts = [part for part in parts if part['ba_cat_id'] in valid_category_ids]
+final_parts = [part for part in final_parts if part['ba_cat_id'] in valid_category_ids]
 
-# Write categories to CSV with proper quoting
+# Write categories to CSV with proper quoting - always quote all fields
 with open("data/ba_categories.csv", "w", newline='') as f:
-    writer = csv.DictWriter(f, fieldnames=['id', 'name', 'parent_id'], quoting=csv.QUOTE_NONNUMERIC)
+    writer = csv.DictWriter(f, fieldnames=['id', 'name', 'parent_id'], quoting=csv.QUOTE_ALL)
     writer.writeheader()
     writer.writerows(categories)
 
-# Write parts to CSV with proper quoting
+# Write parts to CSV with proper quoting - always quote all fields
 with open("data/ba_parts.csv", "w", newline='') as f:
-    writer = csv.DictWriter(f, fieldnames=['part_num', 'ba_name', 'ba_cat_id'], quoting=csv.QUOTE_NONNUMERIC)
+    writer = csv.DictWriter(f, fieldnames=['part_num', 'ba_name', 'ba_cat_id'], quoting=csv.QUOTE_ALL)
     writer.writeheader()
-    writer.writerows(parts)
+    writer.writerows(final_parts)
 
-print(f"Processed {len(categories)} categories and {len(parts)} parts")
+print(f"Processed {len(categories)} categories and {len(parts_data)} raw parts")
+print(f"After removing duplicates: {len(final_parts)} unique parts")
 print("Files saved to data/ba_categories.csv and data/ba_parts.csv")
