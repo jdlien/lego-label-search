@@ -47,13 +47,27 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const webpPath = `/data/images/${normalizedPartId}.webp`
   const pngPath = `/data/images/${normalizedPartId}.png`
 
+  // Preload image without displaying it
+  useEffect(() => {
+    const img = new window.Image()
+    img.onload = () => setImageLoaded(true)
+    img.onerror = () => setImageError(true)
+    img.src = pngPath
+
+    return () => {
+      // Clean up by removing event listeners when component unmounts
+      img.onload = null
+      img.onerror = null
+    }
+  }, [pngPath])
+
   // Handler for category badge clicks
   const handleCategoryClick = (e, categoryId, categoryName) => {
     e.preventDefault() // Prevent the card link from activating
     e.stopPropagation() // Prevent event bubbling
 
-    // Use category_id for search with cat: prefix
-    router.push(`/?q=cat:${encodeURIComponent(categoryId)}`)
+    // Navigate to category search without query parameter
+    router.push(`/?category=${encodeURIComponent(categoryId)}`)
   }
 
   return (
@@ -71,7 +85,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
       cursor="pointer"
       backgroundSize="20px 20px"
       width="100%"
-      height="150px"
+      height="auto"
+      minHeight="160px"
     >
       <Box position="absolute" top="0.5rem" right="0.5rem" zIndex="10">
         <Checkbox
@@ -98,8 +113,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
             position="relative"
             flexShrink={0}
           >
-            {/* Image with error handling */}
-            {!imageError ? (
+            {/* Only show image when it's successfully loaded */}
+            {imageLoaded ? (
               <picture style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                 <source srcSet={webpPath} type="image/webp" />
                 <Image
@@ -108,18 +123,20 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   maxHeight="100%"
                   maxWidth="100%"
                   objectFit="contain"
-                  onLoad={() => setImageLoaded(true)}
-                  onError={() => setImageError(true)}
                   padding="4px" // Add slight padding to prevent touching the edges
                 />
               </picture>
-            ) : (
+            ) : imageError ? (
               <Icon as={BrickIcon} boxSize="40px" color="gray.400" />
+            ) : (
+              <Box display="flex" alignItems="center" justifyContent="center" height="100%" width="100%">
+                <Icon as={BrickIcon} boxSize="40px" color="gray.200" />
+              </Box>
             )}
           </Flex>
 
           {/* Part details */}
-          <Stack spacing={2} flex="1" overflow="hidden">
+          <Stack spacing={1} flex="1" overflow="hidden">
             <Flex align="center" justify="space-between">
               <NextLink href={`/part?id=${part.id}`} passHref>
                 <LinkOverlay>
@@ -135,9 +152,27 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
             </Text>
 
             <Flex gap={2} flexWrap="wrap">
+              {part.grandparent_category && part.grandparent_cat_id && (
+                <Badge
+                  colorScheme="gray"
+                  alignSelf="flex-start"
+                  borderRadius="full"
+                  px={2}
+                  py={0.5}
+                  onClick={(e) => handleCategoryClick(e, part.grandparent_cat_id, part.grandparent_category)}
+                  cursor="pointer"
+                  _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
+                  transition="all 0.2s"
+                  role="button"
+                >
+                  {part.grandparent_category.length > 12
+                    ? part.grandparent_category.substring(0, 12) + '...'
+                    : part.grandparent_category}
+                </Badge>
+              )}
               {part.parent_category && part.parent_cat_id && (
                 <Badge
-                  colorScheme="purple"
+                  colorScheme="gray"
                   alignSelf="flex-start"
                   borderRadius="full"
                   px={2}
@@ -159,13 +194,13 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                 borderRadius="full"
                 px={2}
                 py={0.5}
-                onClick={(e) => handleCategoryClick(e, part.ba_cat_id, part.category_name)}
+                onClick={(e) => handleCategoryClick(e, part.ba_cat_id, part.ba_category_name)}
                 cursor="pointer"
                 _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
                 transition="all 0.2s"
                 role="button"
               >
-                {part.category_name}
+                {part.ba_category_name || part.category_name}
               </Badge>
             </Flex>
           </Stack>
