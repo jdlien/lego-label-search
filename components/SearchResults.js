@@ -18,6 +18,7 @@ import {
   LinkOverlay,
   Image,
   Icon,
+  useColorModeValue,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
@@ -39,6 +40,20 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
   const router = useRouter()
+
+  // Dark mode values
+  const cardBg = useColorModeValue('white', 'gray.700')
+  const cardBorderColor = useColorModeValue(isSelected ? 'blue.400' : 'gray.200', isSelected ? 'blue.400' : 'gray.600')
+  const cardSelectedBg = useColorModeValue('blue.50', 'blue.900')
+  const headingColor = useColorModeValue('blue.700', 'blue.200')
+  const textColor = useColorModeValue('gray.800', 'gray.100')
+  const categoryTextColor = useColorModeValue('gray.500', 'gray.300')
+  const placeholderIconColor = useColorModeValue('gray.400', 'gray.500')
+  const loadingIconColor = useColorModeValue('gray.200', 'gray.600')
+  const grandparentBadgeBg = useColorModeValue('gray.100', 'gray.600')
+  const parentBadgeBg = useColorModeValue('gray.100', 'gray.600')
+  const categoryBadgeBg = useColorModeValue('green.100', 'green.800')
+  const badgeTextColor = useColorModeValue('gray.700', 'white')
 
   // Strip leading zeros for image filename (as mentioned, images aren't zero-padded)
   const normalizedPartId = part.id.replace(/^0+/, '')
@@ -74,8 +89,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
     <LinkBox
       as={Card}
       borderWidth="1px"
-      borderColor={isSelected ? 'blue.400' : 'gray.200'}
-      bg={isSelected ? 'blue.50' : 'white'}
+      borderColor={cardBorderColor}
+      bg={isSelected ? cardSelectedBg : cardBg}
       boxShadow="sm"
       borderRadius="md"
       transition="all 0.2s"
@@ -112,10 +127,22 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
             justifyContent="center"
             position="relative"
             flexShrink={0}
+            bg="white"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.100', 'gray.600')}
           >
             {/* Only show image when it's successfully loaded */}
             {imageLoaded ? (
-              <picture style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <picture
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  width: '100%',
+                  backgroundColor: 'white',
+                }}
+              >
                 <source srcSet={webpPath} type="image/webp" />
                 <Image
                   src={pngPath}
@@ -123,14 +150,15 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   maxHeight="100%"
                   maxWidth="100%"
                   objectFit="contain"
-                  padding="4px" // Add slight padding to prevent touching the edges
+                  padding="4px"
+                  bg="white"
                 />
               </picture>
             ) : imageError ? (
-              <Icon as={BrickIcon} boxSize="40px" color="gray.400" />
+              <Icon as={BrickIcon} boxSize="40px" color={placeholderIconColor} />
             ) : (
               <Box display="flex" alignItems="center" justifyContent="center" height="100%" width="100%">
-                <Icon as={BrickIcon} boxSize="40px" color="gray.200" />
+                <Icon as={BrickIcon} boxSize="40px" color={loadingIconColor} />
               </Box>
             )}
           </Flex>
@@ -140,14 +168,14 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
             <Flex align="center" justify="space-between">
               <NextLink href={`/part?id=${part.id}`} passHref>
                 <LinkOverlay>
-                  <Heading size="md" fontFamily="mono" color="blue.700" noOfLines={1}>
+                  <Heading size="md" fontFamily="mono" color={headingColor} noOfLines={1}>
                     {part.id}
                   </Heading>
                 </LinkOverlay>
               </NextLink>
             </Flex>
 
-            <Text fontSize="md" fontWeight="medium" noOfLines={1} textOverflow="ellipsis">
+            <Text fontSize="md" fontWeight="medium" noOfLines={1} textOverflow="ellipsis" color={textColor}>
               {part.name}
             </Text>
 
@@ -165,6 +193,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
                   transition="all 0.2s"
                   role="button"
+                  bg={grandparentBadgeBg}
+                  color={badgeTextColor}
                 >
                   {part.grandparent_category.length > 12
                     ? part.grandparent_category.substring(0, 12) + '...'
@@ -184,6 +214,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
                   transition="all 0.2s"
                   role="button"
+                  bg={parentBadgeBg}
+                  color={badgeTextColor}
                 >
                   {part.parent_category.length > 12
                     ? part.parent_category.substring(0, 12) + '...'
@@ -202,6 +234,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                 _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
                 transition="all 0.2s"
                 role="button"
+                bg={categoryBadgeBg}
+                color={badgeTextColor}
               >
                 {part.ba_category_name || part.category_name}
               </Badge>
@@ -209,7 +243,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
 
             {/* Original part category information */}
             {part.category_name && (
-              <Text color="gray.500" fontSize="xs" mt={1}>
+              <Text color={categoryTextColor} fontSize="xs" mt={1}>
                 {part.category_name}
               </Text>
             )}
@@ -224,6 +258,10 @@ const SearchResults = ({ results = [], totalResults = 0 }) => {
   const [selectedParts, setSelectedParts] = useState({})
   const toast = useToast()
   const router = useRouter()
+
+  const textColor = useColorModeValue('gray.600', 'gray.300')
+  const buttonBorderColor = useColorModeValue('gray.200', 'gray.600')
+  const buttonHoverBg = useColorModeValue('gray.50', 'gray.700')
 
   const handleToggleSelect = (partId) => {
     setSelectedParts((prev) => {
@@ -282,15 +320,28 @@ const SearchResults = ({ results = [], totalResults = 0 }) => {
   return (
     <Box>
       <Flex justify="space-between" align="center" mb={4}>
-        <Text color="gray.600">
+        <Text color={textColor}>
           {totalResults} result{totalResults !== 1 ? 's' : ''} found
         </Text>
 
         <Flex gap={2}>
-          <Button size="sm" variant="outline" onClick={handleSelectAll}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleSelectAll}
+            borderColor={buttonBorderColor}
+            _hover={{ bg: buttonHoverBg }}
+          >
             Select All
           </Button>
-          <Button size="sm" variant="outline" onClick={handleClearSelection} isDisabled={selectedCount === 0}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleClearSelection}
+            isDisabled={selectedCount === 0}
+            borderColor={buttonBorderColor}
+            _hover={{ bg: buttonHoverBg }}
+          >
             Clear
           </Button>
           <Button size="sm" colorScheme="blue" onClick={handlePrint} isDisabled={selectedCount === 0}>
