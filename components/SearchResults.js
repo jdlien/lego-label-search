@@ -26,7 +26,6 @@ import { useRouter } from 'next/router'
 // Simple brick icon for placeholders
 const BrickIcon = (props) => (
   <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <rect x="1" y="1" width="38" height="22" rx="2" stroke="currentColor" strokeWidth="2" />
     <circle cx="10" cy="8" r="3" fill="currentColor" />
     <circle cx="20" cy="8" r="3" fill="currentColor" />
     <circle cx="30" cy="8" r="3" fill="currentColor" />
@@ -62,7 +61,12 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const handleCategoryClick = (e, categoryId) => {
     e.preventDefault()
     e.stopPropagation()
-    router.push(`/?category=${encodeURIComponent(categoryId)}`)
+    // Only include the category parameter to clear the search query
+    // By not including 'q' parameter, SearchBar will clear the input field
+    router.push({
+      pathname: '/',
+      query: { category: categoryId },
+    })
   }
 
   return (
@@ -79,7 +83,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
       overflow="hidden"
       cursor="pointer"
       width="100%"
-      minHeight="160px"
+      minHeight="180px"
     >
       <Box position="absolute" top="0.5rem" right="0.5rem" zIndex="10">
         <Checkbox
@@ -96,9 +100,9 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
         <Flex direction="row" gap={3} width="100%">
           {/* Image container */}
           <Flex
-            minWidth="70px"
-            width="120px"
-            height="70px"
+            minWidth="84px"
+            width="144px"
+            height="84px"
             borderRadius="md"
             overflow="hidden"
             alignItems="center"
@@ -117,7 +121,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
               objectFit="contain"
               padding="4px"
               bg="white"
-              fallback={<Icon as={BrickIcon} boxSize="40px" color={placeholderIconColor} />}
+              fallback={<Icon as={BrickIcon} boxSize="48px" color={placeholderIconColor} />}
             />
           </Flex>
 
@@ -218,7 +222,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   )
 }
 
-const SearchResults = ({ results = [], totalResults = 0 }) => {
+const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 }) => {
   const [selectedParts, setSelectedParts] = useState({})
   const toast = useToast()
   const router = useRouter()
@@ -226,6 +230,7 @@ const SearchResults = ({ results = [], totalResults = 0 }) => {
   const textColor = useColorModeValue('gray.600', 'gray.300')
   const buttonBorderColor = useColorModeValue('gray.200', 'gray.600')
   const buttonHoverBg = useColorModeValue('gray.50', 'gray.700')
+  const infoTextColor = useColorModeValue('blue.600', 'blue.300')
 
   const handleToggleSelect = (partId) => {
     setSelectedParts((prev) => {
@@ -272,9 +277,23 @@ const SearchResults = ({ results = [], totalResults = 0 }) => {
   if (results.length === 0) {
     return (
       <Box textAlign="center" py={10}>
-        <Heading as="h3" size="md" color="gray.500">
+        <Heading as="h3" size="md" color="gray.500" mb={4}>
           No results found
         </Heading>
+        {router.query.category && (
+          <Button
+            colorScheme="blue"
+            size="md"
+            onClick={() => {
+              // Only reset the category filter while preserving search query
+              const currentQuery = router.query.q || ''
+              const newQuery = currentQuery ? `?q=${encodeURIComponent(currentQuery)}` : ''
+              router.push(`/${newQuery}`)
+            }}
+          >
+            Reset Category Filter
+          </Button>
+        )}
       </Box>
     )
   }
@@ -284,9 +303,16 @@ const SearchResults = ({ results = [], totalResults = 0 }) => {
   return (
     <Box>
       <Flex justify="space-between" align="center" mb={4}>
-        <Text color={textColor}>
-          {totalResults} result{totalResults !== 1 ? 's' : ''} found
-        </Text>
+        <Flex direction="column" gap={1}>
+          <Text color={textColor}>
+            {totalResults} result{totalResults !== 1 ? 's' : ''} found
+          </Text>
+          {subcategoryCount > 0 && (
+            <Text fontSize="xs" color={infoTextColor}>
+              Searching across {subcategoryCount + 1} categor{subcategoryCount === 0 ? 'y' : 'ies'}
+            </Text>
+          )}
+        </Flex>
 
         <Flex gap={2}>
           <Button
