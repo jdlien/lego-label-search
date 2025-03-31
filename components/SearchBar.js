@@ -1,6 +1,6 @@
 /** @format */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Box, Input, InputGroup, InputLeftElement, Select, Flex, Icon } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 
@@ -20,12 +20,10 @@ const SearchIcon = (props) => (
 const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
   const [query, setQuery] = useState(initialQuery)
   const [category, setCategory] = useState(initialCategory)
-  const [allCategories, setAllCategories] = useState([])
   const [categoriesForDropdown, setCategoriesForDropdown] = useState([])
-  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery)
-  const [debouncedCategory, setDebouncedCategory] = useState(initialCategory)
   const router = useRouter()
-  const isUrlUpdate = useRef(false)
+  const isInitialMount = useRef(true)
+  const debounceTimerRef = useRef(null)
 
   // Fetch categories when component mounts
   useEffect(() => {
@@ -33,8 +31,6 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
       try {
         const response = await fetch('/api/categories')
         const data = await response.json()
-
-        setAllCategories(data.categories)
 
         // Build hierarchical structure for dropdown
         const categoryTree = {}
@@ -97,51 +93,66 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
     fetchCategories()
   }, [])
 
-  // Debounce search query
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      setDebouncedQuery(query)
-    }, 300) // 300ms delay
+  // Handle user input changes with debounce
+  const handleSearchChange = (newQuery) => {
+    setQuery(newQuery)
 
-    return () => clearTimeout(timerId)
-  }, [query])
-
-  // Debounce category change
-  useEffect(() => {
-    setDebouncedCategory(category)
-  }, [category])
-
-  // Trigger search when debounced values change
-  useEffect(() => {
-    if (router.isReady && !isUrlUpdate.current) {
-      const params = new URLSearchParams()
-      if (debouncedQuery) params.append('q', debouncedQuery)
-      if (debouncedCategory) params.append('category', debouncedCategory)
-
-      const url = `/?${params.toString()}`
-
-      // Only update URL if it's different from current
-      if (url !== router.asPath) {
-        router.push(url, undefined, { shallow: true })
-      }
+    // Clear any existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
     }
-    isUrlUpdate.current = false
-  }, [debouncedQuery, debouncedCategory, router.isReady])
 
-  // Sync state with URL when router changes
+    // Set a new timer to update the URL after debounce
+    debounceTimerRef.current = setTimeout(() => {
+      updateSearchParams(newQuery, category)
+    }, 300)
+  }
+
+  // Handle category changes
+  const handleCategoryChange = (newCategory) => {
+    setCategory(newCategory)
+
+    // Category changes don't need debounce
+    updateSearchParams(query, newCategory)
+  }
+
+  // Update URL with search parameters
+  const updateSearchParams = (q, cat) => {
+    if (!router.isReady) return
+
+    const params = new URLSearchParams()
+    if (q) params.append('q', q)
+    if (cat) params.append('category', cat)
+
+    const url = `/?${params.toString()}`
+
+    // Only update URL if it's different from current
+    if (url !== router.asPath) {
+      router.push(url, undefined, { shallow: true })
+    }
+  }
+
+  // Sync state with URL on initial load and when URL changes
   useEffect(() => {
-    if (router.isReady) {
-      // Get query and category from URL
-      const { q, category } = router.query
+    if (!router.isReady) return
 
-      // Mark that we're updating from URL to prevent triggering the URL update effect above
-      isUrlUpdate.current = true
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
 
-      // Update state with URL values
+    const { q, category: urlCategory } = router.query
+
+    // Only update state if it differs from current state
+    // This prevents loops and double-changes
+    if (q !== query) {
       setQuery(q || '')
-      setCategory(category || '')
     }
-  }, [router.isReady, router.asPath])
+
+    if (urlCategory !== category) {
+      setCategory(urlCategory || '')
+    }
+  }, [router.isReady, router.asPath, query, category])
 
   return (
     <Box width="100%">
@@ -154,7 +165,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
             <Input
               placeholder="Search for part number or name..."
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               size="lg"
               borderRadius="md"
             />
@@ -165,7 +176,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
           <Select
             placeholder="All Categories"
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => handleCategoryChange(e.target.value)}
             size="lg"
             borderRadius="md"
           >

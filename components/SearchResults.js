@@ -1,6 +1,6 @@
 /** @format */
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   Box,
   Grid,
@@ -37,11 +37,9 @@ const BrickIcon = (props) => (
 )
 
 const PartCard = ({ part, isSelected, onToggleSelect }) => {
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
   const router = useRouter()
 
-  // Dark mode values
+  // Colors for light/dark mode
   const cardBg = useColorModeValue('white', 'gray.700')
   const cardBorderColor = useColorModeValue(isSelected ? 'blue.400' : 'gray.200', isSelected ? 'blue.400' : 'gray.600')
   const cardSelectedBg = useColorModeValue('blue.50', 'blue.900')
@@ -49,39 +47,21 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const textColor = useColorModeValue('gray.800', 'gray.100')
   const categoryTextColor = useColorModeValue('gray.500', 'gray.300')
   const placeholderIconColor = useColorModeValue('gray.400', 'gray.500')
-  const loadingIconColor = useColorModeValue('gray.200', 'gray.600')
   const grandparentBadgeBg = useColorModeValue('gray.100', 'gray.600')
   const parentBadgeBg = useColorModeValue('gray.100', 'gray.600')
   const categoryBadgeBg = useColorModeValue('green.100', 'green.800')
   const badgeTextColor = useColorModeValue('gray.700', 'white')
 
-  // Strip leading zeros for image filename (as mentioned, images aren't zero-padded)
+  // Strip leading zeros for image filename
   const normalizedPartId = part.id.replace(/^0+/, '')
 
-  // Image paths for webp and png fallback
-  const webpPath = `/data/images/${normalizedPartId}.webp`
+  // Image paths
   const pngPath = `/data/images/${normalizedPartId}.png`
 
-  // Preload image without displaying it
-  useEffect(() => {
-    const img = new window.Image()
-    img.onload = () => setImageLoaded(true)
-    img.onerror = () => setImageError(true)
-    img.src = pngPath
-
-    return () => {
-      // Clean up by removing event listeners when component unmounts
-      img.onload = null
-      img.onerror = null
-    }
-  }, [pngPath])
-
   // Handler for category badge clicks
-  const handleCategoryClick = (e, categoryId, categoryName) => {
-    e.preventDefault() // Prevent the card link from activating
-    e.stopPropagation() // Prevent event bubbling
-
-    // Navigate to category search without query parameter
+  const handleCategoryClick = (e, categoryId) => {
+    e.preventDefault()
+    e.stopPropagation()
     router.push(`/?category=${encodeURIComponent(categoryId)}`)
   }
 
@@ -98,16 +78,14 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
       position="relative"
       overflow="hidden"
       cursor="pointer"
-      backgroundSize="20px 20px"
       width="100%"
-      height="auto"
       minHeight="160px"
     >
       <Box position="absolute" top="0.5rem" right="0.5rem" zIndex="10">
         <Checkbox
           isChecked={isSelected}
           onChange={(e) => {
-            e.preventDefault() // Prevent link navigation when clicking checkbox
+            e.preventDefault()
             onToggleSelect(part.id)
           }}
           colorScheme="blue"
@@ -116,7 +94,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
 
       <CardBody padding="3" height="100%" display="flex" alignItems="center">
         <Flex direction="row" gap={3} width="100%">
-          {/* Image container - fixed dimensions but preserving aspect ratio */}
+          {/* Image container */}
           <Flex
             minWidth="70px"
             width="120px"
@@ -131,36 +109,16 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
             border="1px solid"
             borderColor={useColorModeValue('gray.100', 'gray.600')}
           >
-            {/* Only show image when it's successfully loaded */}
-            {imageLoaded ? (
-              <picture
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: '100%',
-                  width: '100%',
-                  backgroundColor: 'white',
-                }}
-              >
-                <source srcSet={webpPath} type="image/webp" />
-                <Image
-                  src={pngPath}
-                  alt={part.name}
-                  maxHeight="100%"
-                  maxWidth="100%"
-                  objectFit="contain"
-                  padding="4px"
-                  bg="white"
-                />
-              </picture>
-            ) : imageError ? (
-              <Icon as={BrickIcon} boxSize="40px" color={placeholderIconColor} />
-            ) : (
-              <Box display="flex" alignItems="center" justifyContent="center" height="100%" width="100%">
-                <Icon as={BrickIcon} boxSize="40px" color={loadingIconColor} />
-              </Box>
-            )}
+            <Image
+              src={pngPath}
+              alt={part.name}
+              maxHeight="100%"
+              maxWidth="100%"
+              objectFit="contain"
+              padding="4px"
+              bg="white"
+              fallback={<Icon as={BrickIcon} boxSize="40px" color={placeholderIconColor} />}
+            />
           </Flex>
 
           {/* Part details */}
@@ -188,7 +146,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   px={2}
                   py={0.5}
                   fontSize="xs"
-                  onClick={(e) => handleCategoryClick(e, part.grandparent_cat_id, part.grandparent_category)}
+                  onClick={(e) => handleCategoryClick(e, part.grandparent_cat_id)}
                   cursor="pointer"
                   _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
                   transition="all 0.2s"
@@ -209,7 +167,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                   px={2}
                   py={0.5}
                   fontSize="xs"
-                  onClick={(e) => handleCategoryClick(e, part.parent_cat_id, part.parent_category)}
+                  onClick={(e) => handleCategoryClick(e, part.parent_cat_id)}
                   cursor="pointer"
                   _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
                   transition="all 0.2s"
@@ -222,23 +180,25 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                     : part.parent_category}
                 </Badge>
               )}
-              <Badge
-                colorScheme="green"
-                alignSelf="flex-start"
-                borderRadius="full"
-                px={2}
-                py={0.5}
-                fontSize="xs"
-                onClick={(e) => handleCategoryClick(e, part.ba_cat_id, part.ba_category_name)}
-                cursor="pointer"
-                _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
-                transition="all 0.2s"
-                role="button"
-                bg={categoryBadgeBg}
-                color={badgeTextColor}
-              >
-                {part.ba_category_name || part.category_name}
-              </Badge>
+              {part.ba_category_name && (
+                <Badge
+                  colorScheme="green"
+                  alignSelf="flex-start"
+                  borderRadius="full"
+                  px={2}
+                  py={0.5}
+                  fontSize="xs"
+                  onClick={(e) => handleCategoryClick(e, part.ba_cat_id)}
+                  cursor="pointer"
+                  _hover={{ opacity: 0.8, transform: 'translateY(-1px)' }}
+                  transition="all 0.2s"
+                  role="button"
+                  bg={categoryBadgeBg}
+                  color={badgeTextColor}
+                >
+                  {part.ba_category_name}
+                </Badge>
+              )}
             </Flex>
 
             {/* Original part category information */}
@@ -359,12 +319,14 @@ const SearchResults = ({ results = [], totalResults = 0 }) => {
           xl: 'repeat(3, 1fr)',
         }}
         gap={4}
-        mx="auto"
       >
         {results.map((part) => (
-          <Box key={part.id} width="100%" maxWidth="450px" minWidth={{ md: '380px' }} mx="auto">
-            <PartCard part={part} isSelected={!!selectedParts[part.id]} onToggleSelect={handleToggleSelect} />
-          </Box>
+          <PartCard
+            key={part.id}
+            part={part}
+            isSelected={!!selectedParts[part.id]}
+            onToggleSelect={handleToggleSelect}
+          />
         ))}
       </Grid>
     </Box>
