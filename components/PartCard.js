@@ -15,6 +15,7 @@ import {
   Button,
   useToast,
   useColorModeValue,
+  useTheme,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
@@ -44,6 +45,7 @@ const DownloadIcon = (props) => (
 const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const router = useRouter()
   const toast = useToast()
+  const { colors } = useTheme()
   const [isDownloading, setIsDownloading] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState(null)
@@ -178,6 +180,39 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
     }
   }
 
+  // Handler for category badge clicks
+  const handleCategoryClick = (categoryId) => (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    // Navigate to homepage with only the category parameter
+    // This will clear any existing search query
+    router.push({
+      pathname: '/',
+      query: { category: categoryId },
+      replace: true, // This replaces the current history entry instead of adding a new one
+    })
+  }
+
+  // Create pill objects with text and click handlers
+  const categoryPills = [
+    part.grandparent_category && {
+      text: part.grandparent_category,
+      value: part.grandparent_cat_id,
+      onClick: handleCategoryClick(part.grandparent_cat_id),
+    },
+    part.parent_category && {
+      text: part.parent_category,
+      value: part.parent_cat_id,
+      onClick: handleCategoryClick(part.parent_cat_id),
+    },
+    part.ba_category_name && {
+      text: part.ba_category_name,
+      value: part.ba_cat_id,
+      onClick: handleCategoryClick(part.ba_cat_id),
+    },
+  ].filter(Boolean) // Remove any undefined/null entries
+
   return (
     <Card
       borderWidth="1px"
@@ -280,7 +315,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
 
         {/* Pills container - now below the image */}
         <Box my={2} width="100%">
-          <PillContainer size={20} pills={[part.grandparent_category, part.parent_category, part.ba_category_name]} />
+          <PillContainer pills={categoryPills} size={21} color={colors.brand[700]} />
         </Box>
 
         {/* Label download link area */}
