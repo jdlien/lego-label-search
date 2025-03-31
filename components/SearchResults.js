@@ -134,7 +134,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
             </Flex>
 
             <Text fontSize="md" fontWeight="medium" noOfLines={1} textOverflow="ellipsis" color={textColor}>
-              {part.name}
+              {part.ba_name && part.ba_name.trim() !== '' ? part.ba_name : part.name}
             </Text>
 
             <Flex gap={2} flexWrap="wrap">
@@ -198,6 +198,10 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
                 >
                   {part.ba_category_name}
                 </Badge>
+              )}
+              {/* Add placeholder badge if no categories are available */}
+              {!part.grandparent_category && !part.parent_category && !part.ba_category_name && (
+                <Box height="22px" width="1px" />
               )}
             </Flex>
 

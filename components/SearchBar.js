@@ -1,7 +1,7 @@
 /** @format */
 
-import { useState, useEffect, useRef } from 'react'
-import { Box, Input, InputGroup, InputLeftElement, Select, Flex, Icon } from '@chakra-ui/react'
+import { useState, useEffect } from 'react'
+import { Box, Input, InputGroup, InputLeftElement, Select, Flex, Icon, Button } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 
 const SearchIcon = (props) => (
@@ -22,8 +22,6 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
   const [category, setCategory] = useState(initialCategory)
   const [categoriesForDropdown, setCategoriesForDropdown] = useState([])
   const router = useRouter()
-  const isInitialMount = useRef(true)
-  const debounceTimerRef = useRef(null)
 
   // Fetch categories when component mounts
   useEffect(() => {
@@ -93,101 +91,78 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
     fetchCategories()
   }, [])
 
-  // Handle user input changes with debounce
-  const handleSearchChange = (newQuery) => {
-    setQuery(newQuery)
-
-    // Clear any existing timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-
-    // Set a new timer to update the URL after debounce
-    debounceTimerRef.current = setTimeout(() => {
-      updateSearchParams(newQuery, category)
-    }, 300)
-  }
-
-  // Handle category changes
-  const handleCategoryChange = (newCategory) => {
-    setCategory(newCategory)
-
-    // Category changes don't need debounce
-    updateSearchParams(query, newCategory)
-  }
-
-  // Update URL with search parameters
-  const updateSearchParams = (q, cat) => {
-    if (!router.isReady) return
-
-    const params = new URLSearchParams()
-    if (q) params.append('q', q)
-    if (cat) params.append('category', cat)
-
-    const url = `/?${params.toString()}`
-
-    // Only update URL if it's different from current
-    if (url !== router.asPath) {
-      router.push(url, undefined, { shallow: true })
-    }
-  }
-
-  // Sync state with URL on initial load and when URL changes
+  // Initialize from URL on component mount
   useEffect(() => {
-    if (!router.isReady) return
-
-    if (isInitialMount.current) {
-      isInitialMount.current = false
-      return
+    if (router.isReady) {
+      const { q, category } = router.query
+      if (q !== undefined) setQuery(q)
+      if (category !== undefined) setCategory(category)
     }
+  }, [router.isReady])
 
-    const { q, category: urlCategory } = router.query
+  // Perform search
+  const handleSearch = () => {
+    const params = new URLSearchParams()
+    if (query) params.append('q', query)
+    if (category) params.append('category', category)
 
-    // Only update state if it differs from current state
-    // This prevents loops and double-changes
-    if (q !== query) {
-      setQuery(q || '')
+    router.push(`/?${params.toString()}`)
+  }
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    handleSearch()
+  }
+
+  // Handle "Enter" key in search input
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch()
     }
-
-    if (urlCategory !== category) {
-      setCategory(urlCategory || '')
-    }
-  }, [router.isReady, router.asPath, query, category])
+  }
 
   return (
     <Box width="100%">
-      <Flex direction={{ base: 'column', md: 'row' }} gap={4} align="flex-end">
-        <Box flex="1">
-          <InputGroup>
-            <InputLeftElement pointerEvents="none">
-              <Icon as={SearchIcon} color="gray.300" />
-            </InputLeftElement>
-            <Input
-              placeholder="Search for part number or name..."
-              value={query}
-              onChange={(e) => handleSearchChange(e.target.value)}
+      <form onSubmit={handleSubmit}>
+        <Flex direction={{ base: 'column', md: 'row' }} gap={4} align="flex-end">
+          <Box flex="1">
+            <InputGroup>
+              <InputLeftElement pointerEvents="none">
+                <Icon as={SearchIcon} color="gray.300" />
+              </InputLeftElement>
+              <Input
+                placeholder="Search for part number or name..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
+                size="lg"
+                borderRadius="md"
+              />
+            </InputGroup>
+          </Box>
+
+          <Box width={{ base: '100%', md: '300px' }}>
+            <Select
+              placeholder="All Categories"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
               size="lg"
               borderRadius="md"
-            />
-          </InputGroup>
-        </Box>
+            >
+              {categoriesForDropdown.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </Select>
+          </Box>
 
-        <Box width={{ base: '100%', md: '300px' }}>
-          <Select
-            placeholder="All Categories"
-            value={category}
-            onChange={(e) => handleCategoryChange(e.target.value)}
-            size="lg"
-            borderRadius="md"
-          >
-            {categoriesForDropdown.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </Select>
-        </Box>
-      </Flex>
+          <Button type="submit" colorScheme="blue" size="lg" onClick={handleSearch}>
+            Search
+          </Button>
+        </Flex>
+      </form>
     </Box>
   )
 }

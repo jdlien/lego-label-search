@@ -35,11 +35,8 @@ export default function Home() {
   // Fetch search results when query parameters change
   useEffect(() => {
     const fetchResults = async () => {
-      // Only search if we have a query or category
-      if (!q && !category) {
-        setResults([])
-        setTotalResults(0)
-        setHasSearched(false)
+      // Only search if router is ready and we have query params
+      if (!router.isReady || (!q && !category)) {
         return
       }
 
@@ -74,10 +71,7 @@ export default function Home() {
       }
     }
 
-    // Only fetch if router is ready
-    if (router.isReady) {
-      fetchResults()
-    }
+    fetchResults()
   }, [q, category, router.isReady])
 
   return (
@@ -114,11 +108,11 @@ export default function Home() {
           {/* Results */}
           {!isLoading && !error && hasSearched && <SearchResults results={results} totalResults={totalResults} />}
 
-          {/* Initial state - no search yet */}
+          {/* Initial state - show welcome message */}
           {!isLoading && !error && !hasSearched && (
             <Box textAlign="center" py={10}>
               <Text color={textColor} fontSize="lg">
-                Start typing to search for LEGO parts
+                Enter a search term and click the Search button
               </Text>
             </Box>
           )}
