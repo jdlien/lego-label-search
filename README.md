@@ -1,14 +1,88 @@
 <!-- @format -->
 
-# Lego Label Search
+# LEGO Part Label Maker
 
-A simple GUI application to search for Lego parts in a local SQLite database.
+An application for searching LEGO parts and creating printable labels to organize your collection.
 
 ## Features
 
-- Real-time search as you type
-- Search by part number or name
-- Display part details in a table view
+- Search for LEGO parts by number or name
+- Browse parts by category
+- Select parts to print labels
+- Data includes 2,423 unique parts across 191 categories
+- Responsive design that works on desktop and mobile
+
+## Data Source
+
+The data for this application comes from the Brick Architect website, which provides a comprehensive classification system for LEGO parts. The data was extracted and processed using Python scripts included in this repository.
+
+## Technologies Used
+
+- Next.js React framework
+- Chakra UI for the component library
+- Fuse.js for fuzzy search functionality
+- Python for data processing
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 14.6.0 or newer
+- Python 3.6 or newer (for data processing scripts)
+
+### Installation
+
+1. Clone the repository:
+
+   ```
+   git clone https://github.com/jdlien/lego-label-search.git
+   cd lego-label-search
+   ```
+
+2. Install dependencies:
+
+   ```
+   npm install
+   ```
+
+3. Start the development server:
+
+   ```
+   npm run dev
+   ```
+
+4. Open your browser and navigate to `http://localhost:3000`
+
+### Data Processing
+
+If you want to update the data from the source:
+
+1. Run the data extraction script:
+
+   ```
+   python parse_ba_categories.py
+   ```
+
+2. Generate the search index:
+   ```
+   python create_search_index.py
+   ```
+
+## Build for Production
+
+```
+npm run build
+npm start
+```
+
+## License
+
+This project is for educational and personal use only. The LEGO part data is sourced from Brick Architect and is used with permission for educational purposes.
+
+## Acknowledgments
+
+- Brick Architect for the comprehensive LEGO part classification system
+- The LEGO Group for creating the amazing building blocks we all love
 
 ## Requirements
 
