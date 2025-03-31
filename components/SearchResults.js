@@ -62,7 +62,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   const normalizedPartId = part.id.replace(/^0+/, '')
 
   // Image paths
-  const pngPath = `/data/images/${normalizedPartId}.png`
+  const pngPath = `/api/images/${normalizedPartId}.png`
 
   // Handler for category badge clicks
   const handleCategoryClick = (e, categoryId) => {
@@ -122,6 +122,27 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
 
     setIsConverting(true)
     try {
+      // First, ensure the original label exists
+      const downloadResponse = await fetch(`/api/download-label?part_num=${part.id}`)
+      const downloadData = await downloadResponse.json()
+
+      if (!downloadData.success) {
+        setLabelExists(false)
+        toast({
+          title: 'Label not available',
+          description: 'The original label is not available for conversion.',
+          status: 'warning',
+          duration: 3000,
+          isClosable: true,
+        })
+        setIsConverting(false)
+        return
+      }
+
+      // Add a small delay to ensure the file is fully written to disk
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      // Now try to convert the label
       const response = await fetch(`/api/convert-label?part_num=${part.id}`)
       const data = await response.json()
 
@@ -129,13 +150,28 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
         // Start the download
         window.location.href = `/data/labels/${part.id}-24mm.lbx`
       } else {
-        toast({
-          title: 'Conversion failed',
-          description: 'There was an error converting the label to 24mm format.',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        })
+        // Check if the error message contains a SyntaxWarning about escape sequences
+        const isEscapeSequenceWarning = data.message && data.message.includes('SyntaxWarning: invalid escape sequence')
+
+        if (isEscapeSequenceWarning) {
+          // Try one more time - the script might have executed properly despite the warning
+          window.location.href = `/data/labels/${part.id}-24mm.lbx`
+          toast({
+            title: 'Conversion completed with warnings',
+            description: 'There were some warnings during conversion, but your file should be ready.',
+            status: 'warning',
+            duration: 5000,
+            isClosable: true,
+          })
+        } else {
+          toast({
+            title: 'Conversion failed',
+            description: data.message || 'There was an error converting the label to 24mm format.',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          })
+        }
       }
     } catch (error) {
       console.error('Error converting label:', error)
@@ -210,7 +246,7 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
           {/* Part details */}
           <Stack spacing={1} flex="1" overflow="hidden">
             <Flex align="center" justify="space-between">
-              <NextLink href={`/part?id=${part.id}`} passHref>
+              <NextLink href={`/part?id=${part.id}`} passHref legacyBehavior>
                 <LinkOverlay>
                   <Heading size="md" fontFamily="mono" color={headingColor} noOfLines={1}>
                     {part.id}
@@ -308,32 +344,30 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
             </Text>
           ) : (
             <Flex direction="row" gap={2} justify="center" align="center">
-              <Text
-                as="a"
-                href={`/api/download-label?part_num=${part.id}`}
+              <Button
+                size="xs"
+                variant="ghost"
                 onClick={handleLabelDownload}
-                fontSize="xs"
                 color={linkColor}
-                textAlign="center"
                 _hover={{ color: linkHoverColor }}
-                cursor="pointer"
-                display="block"
+                isLoading={isDownloading}
+                loadingText="Downloading..."
+                p={1}
               >
-                {isDownloading ? 'Downloading...' : 'Download LBX'}
-              </Text>
-              <Text
-                as="a"
-                href={`/api/convert-label?part_num=${part.id}`}
+                Download LBX
+              </Button>
+              <Button
+                size="xs"
+                variant="ghost"
                 onClick={handle24mmLabelDownload}
-                fontSize="xs"
                 color={linkColor}
-                textAlign="center"
                 _hover={{ color: linkHoverColor }}
-                cursor="pointer"
-                display="block"
+                isLoading={isConverting}
+                loadingText="Converting..."
+                p={1}
               >
-                {isConverting ? 'Converting...' : 'Download LBX 24mm'}
-              </Text>
+                Download LBX 24mm
+              </Button>
             </Flex>
           )}
         </Box>

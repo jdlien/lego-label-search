@@ -24,13 +24,27 @@ export default async function handler(req, res) {
 
     const labelPath = path.join(labelsDir, `${part_num}.lbx`)
 
-    // If label already exists, return success
+    // If label already exists, verify it's not empty and return success
     if (fs.existsSync(labelPath)) {
-      return res.status(200).json({ success: true })
+      try {
+        const stats = fs.statSync(labelPath)
+        if (stats.size === 0) {
+          // If file exists but is empty, delete it and re-download
+          fs.unlinkSync(labelPath)
+          console.log(`Deleted empty label file: ${labelPath}`)
+        } else {
+          // File exists and has content
+          return res.status(200).json({ success: true })
+        }
+      } catch (statError) {
+        console.error(`Error checking existing file: ${statError}`)
+        // Continue with download attempt
+      }
     }
 
     // Try to download the label from Brick Architect
     const url = `https://brickarchitect.com/label/${part_num}.lbx`
+    console.log(`Downloading label from: ${url}`)
 
     const response = await new Promise((resolve, reject) => {
       https
@@ -60,9 +74,28 @@ export default async function handler(req, res) {
       fileStream.on('error', reject)
     })
 
+    // Verify the downloaded file is not empty
+    try {
+      const stats = fs.statSync(labelPath)
+      if (stats.size === 0) {
+        fs.unlinkSync(labelPath)
+        throw new Error('Downloaded file is empty')
+      }
+      console.log(`Successfully downloaded label: ${labelPath} (${stats.size} bytes)`)
+    } catch (verifyError) {
+      console.error(`Error verifying downloaded file: ${verifyError}`)
+      return res.status(500).json({
+        success: false,
+        message: 'Downloaded file could not be verified',
+      })
+    }
+
     return res.status(200).json({ success: true })
   } catch (error) {
     console.error('Error downloading label:', error)
-    return res.status(500).json({ success: false, message: 'Failed to download label' })
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to download label: ' + (error.message || 'Unknown error'),
+    })
   }
 }
