@@ -44,6 +44,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
             id: cat.id,
             name: cat.name,
             isParent: true,
+            parts_count: cat.parts_count || 0,
           }))
 
         const childCategories = data.categories
@@ -52,6 +53,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
             id: cat.id,
             name: cat.name,
             isParent: false,
+            parts_count: cat.parts_count || 0,
           }))
 
         // Sort both groups using natural sort
@@ -204,6 +206,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
                 ) : (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
+                    {cat.parts_count > 0 ? ` (${cat.parts_count.toLocaleString()} parts)` : ''}
                   </option>
                 )
               )}

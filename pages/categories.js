@@ -99,12 +99,10 @@ export default function Categories() {
           }
         })
 
-        // Sort top level categories by ID
+        // Sort top level categories by sort_order
         topLevel.sort((a, b) => {
-          // Try to convert to numbers first for proper numeric sorting
-          const aId = parseInt(a.id)
-          const bId = parseInt(b.id)
-          return aId - bId
+          // Use sort_order if available
+          return (a.sort_order || 999) - (b.sort_order || 999)
         })
 
         console.log(`Found ${topLevel.length} top-level categories`)
@@ -157,24 +155,21 @@ export default function Categories() {
           <AccordionButton>
             <Box flex="1" textAlign="left">
               {category.name}
+              <Text as="span" fontSize="xs" color="gray.500" ml={2}>
+                (ID: {category.id})
+              </Text>
+              {category.parts_count > 0 && (
+                <NextLink href={`/?category=${category.id}`} passHref legacyBehavior>
+                  <Badge as="a" colorScheme="green" ml={2} fontSize="xs" cursor="pointer">
+                    {category.parts_count.toLocaleString()} parts
+                  </Badge>
+                </NextLink>
+              )}
             </Box>
             {hasChildren && <AccordionIcon />}
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4}>
-          <Flex gap={2} mb={3}>
-            <NextLink href={`/categories?id=${category.id}`} passHref legacyBehavior>
-              <Button as="a" variant="outline" colorScheme="blue" size="sm">
-                View Category
-              </Button>
-            </NextLink>
-            <NextLink href={`/?category=${category.id}`} passHref legacyBehavior>
-              <Button as="a" colorScheme="blue" size="sm">
-                View Parts
-              </Button>
-            </NextLink>
-          </Flex>
-
           {hasChildren && (
             <>
               <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} mb={3}>
@@ -183,7 +178,14 @@ export default function Categories() {
 
               <Accordion allowMultiple>
                 {category.children
-                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .sort((a, b) => {
+                    // First compare by sort_order if available
+                    if (a.sort_order && b.sort_order) {
+                      return a.sort_order - b.sort_order
+                    }
+                    // Fall back to name comparison
+                    return a.name.localeCompare(b.name)
+                  })
                   .map((child) => (
                     <CategoryItem key={child.id} category={child} />
                   ))}
@@ -270,6 +272,16 @@ export default function Categories() {
             <Box bg={useColorModeValue('blue.50', 'blue.900')} p={4} borderRadius="md" mb={4}>
               <Heading as="h2" size="lg" mb={2}>
                 {currentCategory.name}
+                <Text as="span" fontSize="md" fontWeight="normal" ml={2} color={textColor}>
+                  (ID: {currentCategory.id})
+                </Text>
+                {currentCategory.parts_count > 0 && (
+                  <NextLink href={`/?category=${currentCategory.id}`} passHref legacyBehavior>
+                    <Badge as="a" colorScheme="green" ml={2} fontSize="sm" cursor="pointer">
+                      {currentCategory.parts_count.toLocaleString()} parts
+                    </Badge>
+                  </NextLink>
+                )}
               </Heading>
               <Flex gap={2}>
                 <NextLink href={`/?category=${currentCategory.id}`} passHref legacyBehavior>
@@ -292,7 +304,14 @@ export default function Categories() {
                 childCategories.length > 0 ? (
                   <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
                     {childCategories
-                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .sort((a, b) => {
+                        // First compare by sort_order if available
+                        if (a.sort_order && b.sort_order) {
+                          return a.sort_order - b.sort_order
+                        }
+                        // Fall back to name comparison
+                        return a.name.localeCompare(b.name)
+                      })
                       .map((category) => (
                         <Card
                           key={category.id}
@@ -303,7 +322,19 @@ export default function Categories() {
                           _hover={{ boxShadow: 'md' }}
                         >
                           <CardHeader bg={useColorModeValue('blue.50', 'blue.900')} py={3}>
-                            <Heading size="sm">{category.name}</Heading>
+                            <Heading size="sm">
+                              {category.name}
+                              <Text as="span" fontSize="xs" color="gray.500" ml={2}>
+                                (ID: {category.id})
+                              </Text>
+                              {category.parts_count > 0 && (
+                                <NextLink href={`/?category=${category.id}`} passHref legacyBehavior>
+                                  <Badge as="a" colorScheme="green" mt={1} fontSize="xs" cursor="pointer">
+                                    {category.parts_count.toLocaleString()} parts
+                                  </Badge>
+                                </NextLink>
+                              )}
+                            </Heading>
                           </CardHeader>
 
                           <CardBody>
@@ -360,9 +391,15 @@ export default function Categories() {
                 /* Show the full category tree view */
                 <Box>
                   <Heading as="h2" size="md" mb={4} color={useColorModeValue('gray.800', 'gray.200')}>
-                    Category Tree
+                    Category Tree (Properly Ordered)
                   </Heading>
-                  <Accordion allowMultiple>
+                  <Text fontSize="sm" color={textColor} mb={4}>
+                    Categories are displayed in a logical order matching their numbering system
+                  </Text>
+                  <Accordion
+                    allowMultiple
+                    defaultIndex={Array.from({ length: topLevelCategories.length }, (_, i) => i)}
+                  >
                     {topLevelCategories.map((category) => (
                       <CategoryItem key={category.id} category={category} />
                     ))}

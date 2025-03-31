@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     console.log('Database connection opened')
 
     // Get all categories from the ba_categories table
-    // Cast parent_id to TEXT to handle empty values properly
+    // Use the cached parts_count column that's updated by our background script
     console.log('Fetching categories from ba_categories table...')
     const categories = await db.all(`
       SELECT
@@ -38,9 +38,11 @@ export default async function handler(req, res) {
         CASE
           WHEN parent_id = 0 OR parent_id IS NULL THEN ''
           ELSE CAST(parent_id AS TEXT)
-        END AS parent_id
+        END AS parent_id,
+        sort_order,
+        parts_count
       FROM ba_categories
-      ORDER BY name
+      ORDER BY sort_order, name
     `)
     console.log(`Fetched ${categories.length} categories`)
 
