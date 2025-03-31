@@ -1,0 +1,56 @@
+/**
+ * components/PillContainer.css
+ *
+ * @format
+ */
+
+.pillContainer {
+  --pill-height: 24px; /* Default size */
+  --pill-padding-x: calc(var(--pill-height) / 2.5);
+  --pill-gap: 1px;
+  --notch-radius: calc(var(--pill-height) / 2 + var(--pill-gap) * 2);
+  display: flex;
+  align-items: center;
+  font-size: calc(var(--pill-height) * 0.66);
+  filter: drop-shadow(-1px 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: var(--pill-height);
+  padding: 0 var(--pill-padding-x);
+  border-radius: 999em;
+  background-color: oklch(60% 0.3 300);
+  color: white;
+  filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.25));
+  position: relative;
+  text-shadow: 0.5px 0.5px 2px rgba(0, 0, 0, 0.75);
+  white-space: nowrap;
+}
+
+.pill:not(:last-child) {
+  margin-right: var(--pill-gap);
+}
+
+.left,
+.middle {
+  padding-right: calc(var(--pill-padding-x) + var(--notch-radius));
+  mask: radial-gradient(
+    circle var(--notch-radius) at calc(100% - var(--notch-radius) / 2) 50%,
+    transparent calc(var(--notch-radius) - 1px),
+    black var(--notch-radius)
+  );
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.middle {
+  background-color: oklch(45% 0.3 300);
+  margin-left: calc(-1.5 * var(--notch-radius) + var(--pill-gap));
+}
+
+.right {
+  background-color: oklch(30% 0.3 300);
+  margin-left: calc(-1.5 * var(--notch-radius) + var(--pill-gap));
+}
