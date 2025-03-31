@@ -28,6 +28,7 @@ export default function Home() {
 
   const [results, setResults] = useState([])
   const [totalResults, setTotalResults] = useState(0)
+  const [subcategoryCount, setSubcategoryCount] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [hasSearched, setHasSearched] = useState(false)
@@ -61,11 +62,20 @@ export default function Home() {
         const data = await response.json()
         setResults(data.results)
         setTotalResults(data.total)
+
+        // Calculate subcategory count if categories info is provided
+        if (data.categories && Array.isArray(data.categories)) {
+          // Subtract 1 because one of the categories is the main selected category
+          setSubcategoryCount(Math.max(0, data.categories.length - 1))
+        } else {
+          setSubcategoryCount(0)
+        }
       } catch (err) {
         console.error('Search error:', err)
         setError(err.message)
         setResults([])
         setTotalResults(0)
+        setSubcategoryCount(0)
       } finally {
         setIsLoading(false)
       }
@@ -106,7 +116,9 @@ export default function Home() {
           )}
 
           {/* Results */}
-          {!isLoading && !error && hasSearched && <SearchResults results={results} totalResults={totalResults} />}
+          {!isLoading && !error && hasSearched && (
+            <SearchResults results={results} totalResults={totalResults} subcategoryCount={subcategoryCount} />
+          )}
 
           {/* Initial state - show welcome message */}
           {!isLoading && !error && !hasSearched && (

@@ -95,10 +95,12 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
   useEffect(() => {
     if (router.isReady) {
       const { q, category } = router.query
-      if (q !== undefined) setQuery(q)
-      if (category !== undefined) setCategory(category)
+      // Clear query if not present in URL (important for category-only searches)
+      setQuery(q || '')
+      // Clear category selection if not in URL
+      setCategory(category || '')
     }
-  }, [router.isReady])
+  }, [router.isReady, router.query])
 
   // Perform search
   const handleSearch = () => {
@@ -120,6 +122,19 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
     if (e.key === 'Enter') {
       handleSearch()
     }
+  }
+
+  // Handle category change
+  const handleCategoryChange = (e) => {
+    const newCategory = e.target.value
+    setCategory(newCategory)
+
+    // Automatically trigger search when category changes
+    const params = new URLSearchParams()
+    if (query) params.append('q', query)
+    if (newCategory) params.append('category', newCategory)
+
+    router.push(`/?${params.toString()}`)
   }
 
   return (
@@ -146,7 +161,7 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
             <Select
               placeholder="All Categories"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={handleCategoryChange}
               size="lg"
               borderRadius="md"
             >
