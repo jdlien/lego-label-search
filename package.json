@@ -4,9 +4,9 @@
   "description": "<!-- @format -->",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production node server.js",
     "lint": "next lint"
   },
   "repository": {
@@ -29,6 +29,7 @@
     "fuse.js": "^7.0.0",
     "jotai": "^2.6.4",
     "next": "^14.1.0",
+    "node-cron": "^3.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sqlite": "^5.1.1",

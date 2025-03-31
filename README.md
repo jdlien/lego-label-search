@@ -172,6 +172,21 @@ CREATE TABLE IF NOT EXISTS "parts" (
 CREATE INDEX idx_parts_label_file ON parts(label_file);
 ```
 
+## Performance Optimizations
+
+### Category Counts Caching
+
+The API caches the count of parts for each category and its subcategories in a `parts_count` column in the `ba_categories` table. This avoids expensive recursive queries when retrieving categories.
+
+The counts are updated:
+
+- Automatically when parts are added, updated, or deleted via the API
+- On server startup (configurable with `UPDATE_COUNTS_ON_STARTUP` environment variable)
+- On a scheduled basis using a cron job (default: daily at 2 AM, configurable with `CATEGORY_COUNT_CRON` environment variable)
+- Manually by calling the `/api/categories/update-counts` endpoint
+
+The caching system ensures fast API responses while keeping count data up-to-date.
+
 ## To Do
 
 - Scrape each of the https://brickarchitect.com/parts/category-<number> pages and extract the list of parts by getting the list of PNG images
