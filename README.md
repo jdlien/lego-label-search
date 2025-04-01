@@ -190,3 +190,5 @@ The caching system ensures fast API responses while keeping count data up-to-dat
 ## To Do
 
 - Update the next.js app to allow either generating or downloading the labels (e.g. from brickarchitect.com or just generate them from scratch to suit my preferences)
+
+- check off "printed" and log the date this was done
