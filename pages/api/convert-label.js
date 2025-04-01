@@ -57,8 +57,8 @@ export default async function handler(req, res) {
       })
     }
 
-    // Get the path to the change-lbx.py script
-    const scriptPath = path.join(process.cwd(), '..', 'lbx-utils', 'change-lbx.py')
+    // Get the path to the lbx_change.py script
+    const scriptPath = path.join(process.cwd(), '..', 'lbx-utils/src/lbx_utils', 'lbx_change.py')
 
     // Check if the script exists
     if (!fs.existsSync(scriptPath)) {
@@ -69,8 +69,9 @@ export default async function handler(req, res) {
       })
     }
 
-    // Run the conversion script
-    const command = `python3 -W ignore "${scriptPath}" "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
+    // Run the conversion script as a module instead of directly
+    const packageDir = path.join(process.cwd(), '..', 'lbx-utils')
+    const command = `cd "${packageDir}" && python3 -W ignore -m lbx_utils.lbx_change "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
     console.log(`Executing: ${command}`)
 
     const { stdout, stderr } = await execAsync(command)
