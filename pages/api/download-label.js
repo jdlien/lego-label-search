@@ -4,6 +4,15 @@ import fs from 'fs'
 import path from 'path'
 import https from 'https'
 
+// Simple check for LBX file signature/magic bytes
+function isValidLbxFile(buffer) {
+  // LBX files should be a ZIP file format starting with PK\x03\x04
+  if (buffer.length < 4) return false
+
+  // Check for ZIP file signature/magic bytes
+  return buffer[0] === 0x50 && buffer[1] === 0x4b && buffer[2] === 0x03 && buffer[3] === 0x04
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' })
@@ -34,11 +43,28 @@ export default async function handler(req, res) {
           console.log(`Deleted empty label file: ${labelPath}`)
         } else {
           // Check if the file contains an error message
-          const fileContent = fs.readFileSync(labelPath, 'utf8').trim()
-          if (fileContent.startsWith('ERROR:') || fileContent.includes('Part image not found')) {
-            // Delete file with error message and re-download
+          const fileBuffer = fs.readFileSync(labelPath)
+
+          // Check if it's a text file with error message
+          if (fileBuffer.length < 1000) {
+            // Only check small files
+            const fileContent = fileBuffer.toString('utf8').trim()
+            if (fileContent.startsWith('ERROR:') || fileContent.includes('Part image not found')) {
+              // Delete file with error message and re-download
+              fs.unlinkSync(labelPath)
+              console.log(`Deleted label file with error message: ${labelPath}`)
+            } else if (!isValidLbxFile(fileBuffer)) {
+              // Not a valid LBX/ZIP file
+              fs.unlinkSync(labelPath)
+              console.log(`Deleted invalid LBX file: ${labelPath}`)
+            } else {
+              // File exists and has valid content
+              return res.status(200).json({ success: true })
+            }
+          } else if (!isValidLbxFile(fileBuffer)) {
+            // Not a valid LBX/ZIP file
             fs.unlinkSync(labelPath)
-            console.log(`Deleted label file with error message: ${labelPath}`)
+            console.log(`Deleted invalid LBX file: ${labelPath}`)
           } else {
             // File exists and has valid content
             return res.status(200).json({ success: true })
@@ -55,8 +81,8 @@ export default async function handler(req, res) {
     console.log(`Downloading label from: ${url}`)
 
     // Download the entire response content first to check its validity
-    const responseData = await new Promise((resolve, reject) => {
-      let data = ''
+    const responseBuffer = await new Promise((resolve, reject) => {
+      const chunks = []
       const request = https.get(url, (response) => {
         // Even if status is 200, we'll check content
         if (response.statusCode !== 200) {
@@ -64,11 +90,11 @@ export default async function handler(req, res) {
         }
 
         response.on('data', (chunk) => {
-          data += chunk
+          chunks.push(chunk)
         })
 
         response.on('end', () => {
-          resolve(data)
+          resolve(Buffer.concat(chunks))
         })
       })
 
@@ -78,21 +104,33 @@ export default async function handler(req, res) {
     })
 
     // Check if the response contains an error message
+    const responseStart = responseBuffer.slice(0, Math.min(1000, responseBuffer.length))
+    const responseStartText = responseStart.toString('utf8')
+
     if (
-      responseData.startsWith('ERROR:') ||
-      responseData.includes('Part image not found') ||
-      responseData.includes('<html') ||
-      responseData.includes('<!DOCTYPE')
+      responseStartText.startsWith('ERROR:') ||
+      responseStartText.includes('Part image not found') ||
+      responseStartText.includes('<html') ||
+      responseStartText.includes('<!DOCTYPE')
     ) {
-      console.log(`Invalid label response for part ${part_num}: "${responseData.substring(0, 100)}..."`)
+      console.log(`Invalid label response for part ${part_num}: "${responseStartText.substring(0, 100)}..."`)
       return res.status(200).json({
         success: false,
         message: 'Label not found',
       })
     }
 
+    // Check if the file appears to be a valid LBX file (ZIP format)
+    if (!isValidLbxFile(responseBuffer)) {
+      console.log(`Downloaded file for part ${part_num} is not a valid LBX/ZIP file`)
+      return res.status(200).json({
+        success: false,
+        message: 'Downloaded file is not a valid LBX file',
+      })
+    }
+
     // If we got here, the response is valid, so save it to file
-    fs.writeFileSync(labelPath, responseData)
+    fs.writeFileSync(labelPath, responseBuffer)
 
     // Verify the file was written correctly
     const stats = fs.statSync(labelPath)
