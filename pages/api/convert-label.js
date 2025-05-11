@@ -7,6 +7,9 @@ import { promisify } from 'util'
 
 const execAsync = promisify(exec)
 
+// Get LBX_UTILS_PATH from environment variable with fallback
+const LBX_UTILS_PATH = process.env.LBX_UTILS_PATH || '../lbx-utils'
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' })
@@ -57,20 +60,20 @@ export default async function handler(req, res) {
       })
     }
 
-    // Get the path to the lbx_change.py script
-    const scriptPath = path.join(process.cwd(), '..', 'lbx-utils/src/lbx_utils', 'lbx_change.py')
+    // Get the path to the lbx_change.py script using environment variable
+    const scriptPath = path.join(LBX_UTILS_PATH, 'src/lbx_utils', 'lbx_change.py')
 
     // Check if the script exists
     if (!fs.existsSync(scriptPath)) {
       console.error(`Conversion script not found at ${scriptPath}`)
       return res.status(500).json({
         success: false,
-        message: 'Conversion script not found. Please ensure lbx-utils is properly installed.',
+        message: `Conversion script not found at ${scriptPath}. Please check LBX_UTILS_PATH environment variable.`,
       })
     }
 
-    // Run the conversion script as a module instead of directly
-    const packageDir = path.join(process.cwd(), '..', 'lbx-utils')
+    // Run the conversion script as a module
+    const packageDir = LBX_UTILS_PATH
     const command = `cd "${packageDir}" && python3 -W ignore -m lbx_utils.lbx_change "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
     console.log(`Executing: ${command}`)
 
