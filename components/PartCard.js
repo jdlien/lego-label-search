@@ -315,9 +315,11 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
         {/* Label download link area */}
         <Box borderTop="1px" borderColor={useColorModeValue('gray.100', 'gray.600')} mt="auto">
           {labelExists === false ? (
-            <Text fontSize="xs" color="gray.500" textAlign="center">
-              No label available
-            </Text>
+            <Flex direction="row" gap={2} justify="center" align="center" height="24px" p={1} pb={0} mb={-1}>
+              <Text fontSize="xs" color="gray.500" lineHeight="16px">
+                No label available
+              </Text>
+            </Flex>
           ) : (
             <Flex direction="row" gap={2} justify="center" align="center">
               <Button
