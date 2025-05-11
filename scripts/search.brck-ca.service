@@ -1,0 +1,29 @@
+[Unit]
+Description=Search BRCK CA Next.js Application
+After=network.target
+
+[Service]
+Type=simple
+User=jdlien
+WorkingDirectory=/var/www/search.brck.ca
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+# Standard streams for logging
+StandardOutput=journal
+StandardError=journal
+
+# Graceful shutdown
+KillSignal=SIGINT
+KillMode=control-group # Send signal to all processes in the cgroup
+TimeoutStopSec=30s     # Increased timeout for graceful shutdown
+
+Restart=always
+RestartSec=10
+
+ExecStart=/usr/bin/node server.js
+# ExecStop is removed as KillSignal and KillMode handle this.
+# ExecStopPost is removed; systemd will SIGKILL if TimeoutStopSec is reached.
+
+[Install]
+WantedBy=multi-user.target
