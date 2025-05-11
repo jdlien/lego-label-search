@@ -96,18 +96,6 @@ const PartDetail = ({ part, isLoading, error }) => {
         <Button leftIcon={<ArrowBackIcon />} variant="outline" size="sm" onClick={() => router.back()}>
           Back
         </Button>
-        <Spacer />
-        <Button
-          rightIcon={<DownloadIcon />}
-          colorScheme="blue"
-          size="sm"
-          onClick={() => {
-            // Logic to add to print queue could be added here
-            alert(`Added ${displayName} to print queue`)
-          }}
-        >
-          Print Label
-        </Button>
       </Flex>
 
       <Flex direction={{ base: 'column', md: 'row' }} gap={6}>
