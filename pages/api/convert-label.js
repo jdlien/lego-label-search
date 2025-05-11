@@ -39,7 +39,8 @@ export default async function handler(req, res) {
 
     // Check if the 24mm version already exists
     if (fs.existsSync(outputFile)) {
-      return res.status(200).json({ success: true })
+      console.log(`Output file ${outputFile} already exists. Skipping conversion.`)
+      return res.status(200).json({ success: true, message: 'Converted file already exists.' })
     }
 
     // Check if the original label exists
@@ -59,56 +60,100 @@ export default async function handler(req, res) {
         })
       }
     } catch (statError) {
-      console.error(`Error checking file stats: ${statError}`)
+      console.error(`Error checking file stats for ${inputFile}: ${statError}`)
       return res.status(500).json({
         success: false,
         message: 'Error verifying original label file integrity.',
       })
     }
 
-    // Get the path to the lbx_change.py script using environment variable
-    const scriptPath = path.join(LBX_UTILS_PATH, 'src/lbx_utils', 'lbx_change.py')
+    // Assuming lbx_utils package is inside an 'src' directory within LBX_UTILS_PATH
+    const pythonPathForModule = path.join(LBX_UTILS_PATH, 'src')
 
-    // Check if the script exists
-    if (!fs.existsSync(scriptPath)) {
-      console.error(`Conversion script not found at ${scriptPath}`)
+    // Get the path to the lbx_change.py script using environment variable (for reference, not directly used in -m command)
+    // const scriptPath = path.join(LBX_UTILS_PATH, 'src/lbx_utils', 'lbx_change.py') // Expected location
+
+    // Check if the assumed 'src' directory for PYTHONPATH exists
+    if (!fs.existsSync(pythonPathForModule)) {
+      console.error(
+        `PYTHONPATH directory not found: ${pythonPathForModule}. Check LBX_UTILS_PATH and project structure.`
+      )
       return res.status(500).json({
         success: false,
-        message: `Conversion script not found at ${scriptPath}. Please check LBX_UTILS_PATH environment variable.`,
+        message: `Configuration error: Python package path not found at ${pythonPathForModule}.`,
       })
     }
 
     // Run the conversion script as a module
-    const command = `cd "${LBX_UTILS_PATH}" && PYTHONPATH="${LBX_UTILS_PATH}" ${LBX_PYTHON_ENV} -W ignore -m lbx_utils.lbx_change "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
-    console.log(`Executing: ${command}`)
+    const command = `cd "${LBX_UTILS_PATH}" && PYTHONPATH="${pythonPathForModule}" ${LBX_PYTHON_ENV} -W ignore -m lbx_utils.lbx_change "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
+    console.log(`Executing conversion command: ${command}`)
 
-    const { stdout, stderr } = await execAsync(command)
+    try {
+      const { stdout, stderr } = await execAsync(command)
 
-    // Check if the output file was created despite warnings
-    if (fs.existsSync(outputFile)) {
-      const stats = fs.statSync(outputFile)
-      if (stats.size > 0) {
-        // If the file exists and has content, consider it a success even if there were warnings
-        console.log(`Conversion successful with warnings. Output file created: ${outputFile} (${stats.size} bytes)`)
-        if (stderr && stderr.trim()) {
-          console.warn('Script warnings (ignored):', stderr)
-        }
-        return res.status(200).json({ success: true })
+      // Always log stdout and stderr for debugging purposes
+      if (stdout && stdout.trim()) {
+        console.log('Python script stdout:', stdout)
       }
-    }
+      // stderr might contain warnings even on success, or actual errors
+      if (stderr && stderr.trim()) {
+        console.warn('Python script stderr:', stderr)
+      }
 
-    if (stderr && stderr.trim()) {
-      console.error('Script error:', stderr)
-      return res.status(500).json({ success: false, message: 'Failed to convert label: ' + stderr.trim() })
-    }
+      // Check if the output file was created and has content
+      if (fs.existsSync(outputFile)) {
+        const stats = fs.statSync(outputFile)
+        if (stats.size > 0) {
+          console.log(`Conversion successful. Output file: ${outputFile} (${stats.size} bytes)`)
+          return res.status(200).json({ success: true, warnings: stderr && stderr.trim() ? stderr.trim() : null })
+        } else {
+          console.error(`Output file ${outputFile} was created but is empty.`)
+          return res.status(500).json({
+            success: false,
+            message: 'Conversion resulted in an empty file. ' + (stderr || 'Script error details unavailable.'),
+          })
+        }
+      } else {
+        // If output file does not exist, it's a failure. stderr should have the error.
+        console.error('Output file not created by the script.')
+        return res.status(500).json({
+          success: false,
+          message:
+            'Failed to convert label: Output file not generated. ' + (stderr || 'Script error details unavailable.'),
+        })
+      }
+    } catch (execError) {
+      // Catch errors from execAsync (e.g., command fails, non-zero exit)
+      console.error('Error executing Python script via execAsync:', execError.message)
+      if (execError.stdout) {
+        console.error('execAsync stdout on error:', execError.stdout)
+      }
+      if (execError.stderr) {
+        console.error('execAsync stderr on error:', execError.stderr) // This will contain the ModuleNotFoundError
+      }
+      // For more detailed diagnostics, log the command that was attempted if available on the error object
+      if (execError.cmd) {
+        console.error('Failed command (from execError.cmd):', execError.cmd)
+      }
+      console.error('Full execAsync error object:', execError) // Log the whole error object for more details
 
-    console.log('Conversion successful:', stdout)
-    return res.status(200).json({ success: true })
+      return res.status(500).json({
+        success: false,
+        message: 'Execution of conversion script failed: ' + (execError.stderr || execError.message || 'Unknown error'),
+        details: {
+          // Provide some non-sensitive details back if helpful
+          stdout: execError.stdout || null,
+          stderr: execError.stderr || null,
+          exitCode: execError.code || null,
+        },
+      })
+    }
   } catch (error) {
-    console.error('Error converting label:', error)
+    // Catch other synchronous errors in the handler logic
+    console.error('Unhandled error in /api/convert-label handler:', error)
     return res.status(500).json({
       success: false,
-      message: 'Failed to convert label: ' + (error.message || 'Unknown error'),
+      message: 'An unexpected server error occurred: ' + (error.message || 'Unknown error'),
     })
   }
 }
