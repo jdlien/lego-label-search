@@ -191,4 +191,6 @@ The caching system ensures fast API responses while keeping count data up-to-dat
 
 - Update the next.js app to allow either generating or downloading the labels (e.g. from brickarchitect.com or just generate them from scratch to suit my preferences)
 
-- check off "printed" and log the date this was done
+- Currently, if I have an image, I assume brickarchitect.com also has one, but that is not necessarily the case. This results in a file that just contains "ERROR: Part image not found.". Fix this.
+
+I suppose I could also flag the parts that do not have labels in the db somehow.
