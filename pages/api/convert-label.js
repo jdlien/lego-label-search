@@ -9,6 +9,12 @@ const execAsync = promisify(exec)
 
 // Get LBX_UTILS_PATH from environment variable with fallback
 const LBX_UTILS_PATH = process.env.LBX_UTILS_PATH || '../lbx-utils'
+// Path to Python virtual environment
+// Setup: (run as root or with sudo)
+// 1. python3 -m venv /opt/lbx
+// 2. /opt/lbx/bin/pip install -e /path/to/lbx-utils
+// 3. chown -R www-data:www-data /opt/lbx  # adjust user as needed
+const LBX_PYTHON_ENV = process.env.LBX_PYTHON_ENV || '/opt/lbx/bin/python3'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -74,7 +80,7 @@ export default async function handler(req, res) {
 
     // Run the conversion script as a module
     const packageDir = LBX_UTILS_PATH
-    const command = `cd "${packageDir}" && python3 -W ignore -m lbx_utils.lbx_change "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
+    const command = `${LBX_PYTHON_ENV} -W ignore -m lbx_utils.lbx_change "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
     console.log(`Executing: ${command}`)
 
     const { stdout, stderr } = await execAsync(command)
