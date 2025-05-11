@@ -79,8 +79,7 @@ export default async function handler(req, res) {
     }
 
     // Run the conversion script as a module
-    const packageDir = LBX_UTILS_PATH
-    const command = `${LBX_PYTHON_ENV} -W ignore -m lbx_utils.lbx_change "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
+    const command = `cd "${LBX_UTILS_PATH}" && PYTHONPATH="${LBX_UTILS_PATH}" ${LBX_PYTHON_ENV} -W ignore -m lbx_utils.lbx_change "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
     console.log(`Executing: ${command}`)
 
     const { stdout, stderr } = await execAsync(command)
