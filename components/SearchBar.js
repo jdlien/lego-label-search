@@ -17,6 +17,8 @@ const SearchIcon = (props) => (
     strokeWidth="2"
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
+    width="20px"
+    height="20px"
     {...props}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -182,8 +184,8 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
         <Flex direction={{ base: 'column', md: 'row' }} gap={4} align="flex-end">
           <Box flex="1">
             <InputGroup>
-              <InputLeftElement pointerEvents="none">
-                <Icon as={SearchIcon} color="gray.300" />
+              <InputLeftElement pointerEvents="none" height="100%" display="flex" alignItems="center" pl="3">
+                <Icon as={SearchIcon} color="gray.300" boxSize="20px" />
               </InputLeftElement>
               <Input
                 placeholder="Search for part number or name..."
