@@ -82,8 +82,8 @@ const PartDetail = ({ part, isLoading, error }) => {
   // Strip leading zeros for image filename (needed for image path)
   const normalizedPartId = part?.id ? part.id.replace(/^0+/, '') : ''
 
-  // Image path
-  const imagePath = `/api/images/${normalizedPartId}.png`
+  // Image path - updated to use public directory
+  const imagePath = `/data/images/${normalizedPartId}.png`
 
   // Handle category click for navigation
   const handleCategoryClick = (catId) => {

@@ -64,8 +64,8 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
   // Strip leading zeros for image filename
   const normalizedPartId = part.id.replace(/^0+/, '')
 
-  // Image paths
-  const pngPath = `/api/images/${normalizedPartId}.png`
+  // Image paths - updated to use public directory
+  const pngPath = `/data/images/${normalizedPartId}.png`
 
   // Handler for label download
   const handleLabelDownload = async (e) => {
