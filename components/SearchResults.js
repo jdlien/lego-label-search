@@ -39,24 +39,6 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
     setSelectedParts({})
   }
 
-  const handlePrint = () => {
-    const selectedCount = Object.keys(selectedParts).length
-    if (selectedCount === 0) {
-      toast({
-        title: 'No parts selected',
-        description: 'Please select at least one part to print.',
-        status: 'warning',
-        duration: 3000,
-        isClosable: true,
-      })
-      return
-    }
-
-    // Navigate to print page with selected part IDs
-    const selectedPartIds = Object.keys(selectedParts)
-    router.push(`/print?ids=${selectedPartIds.join(',')}`)
-  }
-
   if (results.length === 0) {
     return (
       <Box textAlign="center" py={10}>
@@ -113,9 +95,6 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
             _hover={{ bg: buttonHoverBg }}
           >
             Clear
-          </Button>
-          <Button size="sm" colorScheme="blue" onClick={handlePrint} isDisabled={selectedCount === 0}>
-            Print {selectedCount > 0 && `(${selectedCount})`}
           </Button>
         </Flex>
       </Flex>

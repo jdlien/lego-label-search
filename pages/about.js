@@ -68,7 +68,9 @@ export default function About() {
             <UnorderedList spacing={2} pl={5} color={textColor}>
               <ListItem>Search for LEGO parts by name or part number</ListItem>
               <ListItem>Browse parts by category using the hierarchical classification system</ListItem>
-              <ListItem>Select parts to generate printable labels</ListItem>
+              <ListItem>
+                For many parts, you can download a printable label in 12mm or 24mm size (courtesy of BrickArchitect.com)
+              </ListItem>
               <ListItem>Organize your LEGO collection efficiently with clear labeling</ListItem>
             </UnorderedList>
           </Box>

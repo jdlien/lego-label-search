@@ -232,17 +232,6 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
       width="100%"
       minHeight="150px"
     >
-      <Box position="absolute" top="0.5rem" right="0.5rem" zIndex="10">
-        <Checkbox
-          isChecked={isSelected}
-          onChange={(e) => {
-            e.preventDefault()
-            onToggleSelect(part.id)
-          }}
-          colorScheme="blue"
-        />
-      </Box>
-
       <CardBody padding="2" height="100%" display="flex" flexDirection="column">
         <Flex direction="row" gap={3} width="100%" flex="1">
           {/* Image container - clickable to part details */}
