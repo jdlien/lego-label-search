@@ -140,15 +140,20 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
       const data = await response.json()
 
       if (data.success) {
-        // Start the download
-        window.location.href = `/data/labels/${part.id}-24mm.lbx`
+        // Add a small delay to allow the server to recognize the new file
+        await new Promise((resolve) => setTimeout(resolve, 300)) // 300ms delay
+        // Start the download with a cache-busting query parameter
+        window.location.href = `/data/labels/${part.id}-24mm.lbx?v=${new Date().getTime()}`
       } else {
         // Check if the error message contains a SyntaxWarning about escape sequences
         const isEscapeSequenceWarning = data.message && data.message.includes('SyntaxWarning: invalid escape sequence')
 
         if (isEscapeSequenceWarning) {
+          // Add a small delay here as well if attempting retry on warning
+          await new Promise((resolve) => setTimeout(resolve, 300)) // 300ms delay
           // Try one more time - the script might have executed properly despite the warning
-          window.location.href = `/data/labels/${part.id}-24mm.lbx`
+          // Add cache-busting here as well
+          window.location.href = `/data/labels/${part.id}-24mm.lbx?v=${new Date().getTime()}`
           toast({
             title: 'Conversion completed with warnings',
             description: 'There were some warnings during conversion, but your file should be ready.',
