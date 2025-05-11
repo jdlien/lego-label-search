@@ -10,15 +10,7 @@ const nextConfig = {
   output: 'export',
   images: { unoptimized: true },
   */
-  // Configure static file serving from data/images directory
-  async rewrites() {
-    return [
-      {
-        source: '/data/images/:path*',
-        destination: '/api/images/:path*', // We'll create this API route to serve images
-      },
-    ]
-  },
+  // Public directory files are automatically served by Next.js
 }
 
 module.exports = nextConfig
