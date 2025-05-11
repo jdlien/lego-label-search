@@ -33,8 +33,16 @@ export default async function handler(req, res) {
           fs.unlinkSync(labelPath)
           console.log(`Deleted empty label file: ${labelPath}`)
         } else {
-          // File exists and has content
-          return res.status(200).json({ success: true })
+          // Check if the file contains an error message
+          const fileContent = fs.readFileSync(labelPath, 'utf8').trim()
+          if (fileContent.startsWith('ERROR:') || fileContent.includes('Part image not found')) {
+            // Delete file with error message and re-download
+            fs.unlinkSync(labelPath)
+            console.log(`Deleted label file with error message: ${labelPath}`)
+          } else {
+            // File exists and has valid content
+            return res.status(200).json({ success: true })
+          }
         }
       } catch (statError) {
         console.error(`Error checking existing file: ${statError}`)
@@ -46,56 +54,72 @@ export default async function handler(req, res) {
     const url = `https://brickarchitect.com/label/${part_num}.lbx`
     console.log(`Downloading label from: ${url}`)
 
-    const response = await new Promise((resolve, reject) => {
-      https
-        .get(url, (res) => {
-          resolve(res)
+    // Download the entire response content first to check its validity
+    const responseData = await new Promise((resolve, reject) => {
+      let data = ''
+      const request = https.get(url, (response) => {
+        // Even if status is 200, we'll check content
+        if (response.statusCode !== 200) {
+          return reject(new Error(`HTTP status ${response.statusCode}`))
+        }
+
+        response.on('data', (chunk) => {
+          data += chunk
         })
-        .on('error', (err) => {
-          reject(err)
+
+        response.on('end', () => {
+          resolve(data)
         })
+      })
+
+      request.on('error', (err) => {
+        reject(err)
+      })
     })
 
-    // Check if the label exists
-    if (response.statusCode === 404) {
-      return res.status(200).json({ success: false, message: 'Label not found' })
-    }
-
-    if (response.statusCode !== 200) {
-      throw new Error(`Failed to download label: ${response.statusCode}`)
-    }
-
-    // Save the label file
-    const fileStream = fs.createWriteStream(labelPath)
-    response.pipe(fileStream)
-
-    await new Promise((resolve, reject) => {
-      fileStream.on('finish', resolve)
-      fileStream.on('error', reject)
-    })
-
-    // Verify the downloaded file is not empty
-    try {
-      const stats = fs.statSync(labelPath)
-      if (stats.size === 0) {
-        fs.unlinkSync(labelPath)
-        throw new Error('Downloaded file is empty')
-      }
-      console.log(`Successfully downloaded label: ${labelPath} (${stats.size} bytes)`)
-    } catch (verifyError) {
-      console.error(`Error verifying downloaded file: ${verifyError}`)
-      return res.status(500).json({
+    // Check if the response contains an error message
+    if (
+      responseData.startsWith('ERROR:') ||
+      responseData.includes('Part image not found') ||
+      responseData.includes('<html') ||
+      responseData.includes('<!DOCTYPE')
+    ) {
+      console.log(`Invalid label response for part ${part_num}: "${responseData.substring(0, 100)}..."`)
+      return res.status(200).json({
         success: false,
-        message: 'Downloaded file could not be verified',
+        message: 'Label not found',
       })
     }
 
+    // If we got here, the response is valid, so save it to file
+    fs.writeFileSync(labelPath, responseData)
+
+    // Verify the file was written correctly
+    const stats = fs.statSync(labelPath)
+    if (stats.size === 0) {
+      fs.unlinkSync(labelPath)
+      throw new Error('Written file is empty')
+    }
+
+    console.log(`Successfully downloaded label: ${labelPath} (${stats.size} bytes)`)
     return res.status(200).json({ success: true })
   } catch (error) {
     console.error('Error downloading label:', error)
-    return res.status(500).json({
+
+    // Remove any partial or invalid files
+    try {
+      const labelPath = path.join(process.cwd(), 'public', 'data', 'labels', `${part_num}.lbx`)
+      if (fs.existsSync(labelPath)) {
+        fs.unlinkSync(labelPath)
+        console.log(`Removed invalid label file: ${labelPath}`)
+      }
+    } catch (cleanupError) {
+      console.error('Error during cleanup:', cleanupError)
+    }
+
+    return res.status(200).json({
       success: false,
-      message: 'Failed to download label: ' + (error.message || 'Unknown error'),
+      message: 'Label not available: ' + (error.message || 'Unknown error'),
     })
   }
 }
