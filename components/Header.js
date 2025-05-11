@@ -14,7 +14,7 @@ const Header = () => {
       <Flex align="center" maxW="1200px" mx="auto">
         <Heading as="h1" size="lg">
           <NextLink href="/" passHref legacyBehavior>
-            <Link _hover={{ textDecoration: 'none' }}>LEGO Part Label Maker</Link>
+            <Link _hover={{ textDecoration: 'none' }}>LEGO Part Label Search</Link>
           </NextLink>
         </Heading>
         <Spacer />
