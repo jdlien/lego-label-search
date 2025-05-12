@@ -12,12 +12,15 @@ import {
   DrawerBody,
   useDisclosure,
 } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode()
   const bgColor = useColorModeValue('brand.700', 'gray.800')
   const buttonHoverBg = useColorModeValue('brand.600', 'gray.700')
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const router = useRouter()
+  const currentPath = router.pathname
 
   return (
     <Box as="header" bg={bgColor} color="white" px={4} py={2} boxShadow="md">
@@ -45,17 +48,32 @@ const Header = () => {
         {/* Desktop Nav */}
         <Flex gap={4} align="center" display={{ base: 'none', md: 'flex' }}>
           <NextLink href="/" passHref legacyBehavior>
-            <Button as="a" variant="ghost" _hover={{ bg: buttonHoverBg }}>
+            <Button
+              as="a"
+              variant="ghost"
+              _hover={{ bg: buttonHoverBg }}
+              sx={currentPath === '/' ? { bg: 'whiteAlpha.300' } : {}}
+            >
               Search
             </Button>
           </NextLink>
           <NextLink href="/categories" passHref legacyBehavior>
-            <Button as="a" variant="ghost" _hover={{ bg: buttonHoverBg }}>
+            <Button
+              as="a"
+              variant="ghost"
+              _hover={{ bg: buttonHoverBg }}
+              sx={currentPath === '/categories' ? { bg: 'whiteAlpha.300' } : {}}
+            >
               Categories
             </Button>
           </NextLink>
           <NextLink href="/about" passHref legacyBehavior>
-            <Button as="a" variant="ghost" _hover={{ bg: buttonHoverBg }}>
+            <Button
+              as="a"
+              variant="ghost"
+              _hover={{ bg: buttonHoverBg }}
+              sx={currentPath === '/about' ? { bg: 'whiteAlpha.300' } : {}}
+            >
               About
             </Button>
           </NextLink>
@@ -85,17 +103,35 @@ const Header = () => {
               <DrawerBody>
                 <Flex direction="column" gap={4}>
                   <NextLink href="/" passHref legacyBehavior>
-                    <Button as="a" variant="ghost" onClick={onClose} _hover={{ bg: buttonHoverBg }}>
+                    <Button
+                      as="a"
+                      variant="ghost"
+                      onClick={onClose}
+                      _hover={{ bg: buttonHoverBg }}
+                      sx={currentPath === '/' ? { bg: 'whiteAlpha.300' } : {}}
+                    >
                       Search
                     </Button>
                   </NextLink>
                   <NextLink href="/categories" passHref legacyBehavior>
-                    <Button as="a" variant="ghost" onClick={onClose} _hover={{ bg: buttonHoverBg }}>
+                    <Button
+                      as="a"
+                      variant="ghost"
+                      onClick={onClose}
+                      _hover={{ bg: buttonHoverBg }}
+                      sx={currentPath === '/categories' ? { bg: 'whiteAlpha.300' } : {}}
+                    >
                       Categories
                     </Button>
                   </NextLink>
                   <NextLink href="/about" passHref legacyBehavior>
-                    <Button as="a" variant="ghost" onClick={onClose} _hover={{ bg: buttonHoverBg }}>
+                    <Button
+                      as="a"
+                      variant="ghost"
+                      onClick={onClose}
+                      _hover={{ bg: buttonHoverBg }}
+                      sx={currentPath === '/about' ? { bg: 'whiteAlpha.300' } : {}}
+                    >
                       About
                     </Button>
                   </NextLink>
