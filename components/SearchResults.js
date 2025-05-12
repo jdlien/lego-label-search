@@ -64,7 +64,7 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
 
   return (
     <Box>
-      <Flex justify="space-between" align="center" mb={4}>
+      <Flex justify="center" align="center" mt={2} mb={4}>
         <Flex direction="column" gap={1}>
           <Text color={textColor}>
             {totalResults} result{totalResults !== 1 ? 's' : ''} found
@@ -74,28 +74,6 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
               Searching across {subcategoryCount + 1} categor{subcategoryCount === 0 ? 'y' : 'ies'}
             </Text>
           )}
-        </Flex>
-
-        <Flex gap={2}>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleSelectAll}
-            borderColor={buttonBorderColor}
-            _hover={{ bg: buttonHoverBg }}
-          >
-            Select All
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleClearSelection}
-            isDisabled={selectedCount === 0}
-            borderColor={buttonBorderColor}
-            _hover={{ bg: buttonHoverBg }}
-          >
-            Clear
-          </Button>
         </Flex>
       </Flex>
 
