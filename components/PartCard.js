@@ -64,8 +64,17 @@ const PartCard = ({ part, isSelected, onToggleSelect, onPartClick }) => {
   // Strip leading zeros for image filename
   const normalizedPartId = part.id.replace(/^0+/, '')
 
-  // Image paths - updated to use public directory
+  // Image paths - with WebP as primary and PNG as fallback
+  const webpPath = `/data/images/${normalizedPartId}.webp`
   const pngPath = `/data/images/${normalizedPartId}.png`
+  const [imageSrc, setImageSrc] = useState(webpPath)
+
+  // Handle image error by switching to PNG
+  const handleImageError = () => {
+    if (imageSrc === webpPath) {
+      setImageSrc(pngPath)
+    }
+  }
 
   // Handler for label download
   const handleLabelDownload = async (e) => {
@@ -262,13 +271,14 @@ const PartCard = ({ part, isSelected, onToggleSelect, onPartClick }) => {
             onClick={handlePartClick}
           >
             <Image
-              src={pngPath}
+              src={imageSrc}
               alt={part.name}
               maxHeight="100%"
               maxWidth="100%"
               objectFit="contain"
               padding="4px"
               bg="white"
+              onError={handleImageError}
               fallback={<Icon as={BrickIcon} boxSize="48px" color={placeholderIconColor} />}
             />
           </Flex>

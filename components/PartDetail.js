@@ -24,6 +24,19 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
   const borderColor = useColorModeValue('gray.200', 'gray.700')
   const [categoryPath, setCategoryPath] = useState([])
 
+  // Image state with WebP and PNG fallback
+  const normalizedPartId = part?.id ? part.id.replace(/^0+/, '') : ''
+  const webpPath = `/data/images/${normalizedPartId}.webp`
+  const pngPath = `/data/images/${normalizedPartId}.png`
+  const [imageSrc, setImageSrc] = useState(webpPath)
+
+  // Handle image error by switching to PNG
+  const handleImageError = () => {
+    if (imageSrc === webpPath) {
+      setImageSrc(pngPath)
+    }
+  }
+
   // Fetch category path when part data is available
   useEffect(() => {
     if (part?.ba_cat_id) {
@@ -76,12 +89,6 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
   // Get the category name (prioritize ba_category_name, fall back to category_name)
   const displayCategory = part.ba_category_name || part.category_name
 
-  // Strip leading zeros for image filename (needed for image path)
-  const normalizedPartId = part?.id ? part.id.replace(/^0+/, '') : ''
-
-  // Image path - updated to use public directory
-  const imagePath = `/data/images/${normalizedPartId}.png`
-
   // Handle category click for navigation
   const handleCategoryClick = (catId) => {
     if (isInModal) {
@@ -119,12 +126,13 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
             mx={isInModal ? 'auto' : '0'}
           >
             <Image
-              src={imagePath}
+              src={imageSrc}
               alt={displayName}
               maxHeight="100%"
               maxWidth="100%"
               objectFit="contain"
               padding="8px"
+              onError={handleImageError}
               fallback={
                 <Text fontSize="xl" color="gray.500">
                   {part.id}
