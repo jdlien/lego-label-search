@@ -42,7 +42,7 @@ const DownloadIcon = (props) => (
   </svg>
 )
 
-const PartCard = ({ part, isSelected, onToggleSelect }) => {
+const PartCard = ({ part, isSelected, onToggleSelect, onPartClick }) => {
   const router = useRouter()
   const toast = useToast()
   const { colors } = useTheme()
@@ -218,6 +218,15 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
     },
   ].filter(Boolean) // Remove any undefined/null entries
 
+  // Handle click on part image or name - open modal instead of navigating
+  const handlePartClick = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (onPartClick) {
+      onPartClick(part.id)
+    }
+  }
+
   return (
     <Card
       borderWidth="1px"
@@ -235,68 +244,65 @@ const PartCard = ({ part, isSelected, onToggleSelect }) => {
       <CardBody padding="2" height="100%" display="flex" flexDirection="column">
         <Flex direction="row" gap={3} width="100%" flex="1">
           {/* Image container - clickable to part details */}
-          <NextLink href={`/part?id=${part.id}`} passHref>
-            <Flex
-              as="a"
-              minWidth="84px"
-              width="160px"
-              height="84px"
-              borderRadius="md"
-              overflow="hidden"
-              alignItems="center"
-              justifyContent="center"
-              position="relative"
-              flexShrink={0}
+          <Flex
+            as="a"
+            minWidth="84px"
+            width="160px"
+            height="84px"
+            borderRadius="md"
+            overflow="hidden"
+            alignItems="center"
+            justifyContent="center"
+            position="relative"
+            flexShrink={0}
+            bg="white"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.100', 'gray.600')}
+            cursor="pointer"
+            onClick={handlePartClick}
+          >
+            <Image
+              src={pngPath}
+              alt={part.name}
+              maxHeight="100%"
+              maxWidth="100%"
+              objectFit="contain"
+              padding="4px"
               bg="white"
-              border="1px solid"
-              borderColor={useColorModeValue('gray.100', 'gray.600')}
-              cursor="pointer"
-            >
-              <Image
-                src={pngPath}
-                alt={part.name}
-                maxHeight="100%"
-                maxWidth="100%"
-                objectFit="contain"
-                padding="4px"
-                bg="white"
-                fallback={<Icon as={BrickIcon} boxSize="48px" color={placeholderIconColor} />}
-              />
-            </Flex>
-          </NextLink>
+              fallback={<Icon as={BrickIcon} boxSize="48px" color={placeholderIconColor} />}
+            />
+          </Flex>
 
           {/* Part details */}
           <Stack spacing={1} flex="1" overflow="hidden">
             <Flex align="center" justify="space-between">
-              <NextLink href={`/part?id=${part.id}`} passHref>
-                <Heading
-                  as="a"
-                  size="md"
-                  fontFamily="mono"
-                  color={headingColor}
-                  noOfLines={1}
-                  cursor="pointer"
-                  _hover={{ textDecoration: 'underline' }}
-                >
-                  {part.id}
-                </Heading>
-              </NextLink>
-            </Flex>
-
-            <NextLink href={`/part?id=${part.id}`} passHref>
-              <Text
+              <Heading
                 as="a"
-                fontSize="md"
-                fontWeight="medium"
-                noOfLines={2}
-                textOverflow="ellipsis"
-                color={textColor}
+                size="md"
+                fontFamily="mono"
+                color={headingColor}
+                noOfLines={1}
                 cursor="pointer"
                 _hover={{ textDecoration: 'underline' }}
+                onClick={handlePartClick}
               >
-                {part.ba_name && part.ba_name.trim() !== '' ? part.ba_name : part.name}
-              </Text>
-            </NextLink>
+                {part.id}
+              </Heading>
+            </Flex>
+
+            <Text
+              as="a"
+              fontSize="md"
+              fontWeight="medium"
+              noOfLines={2}
+              textOverflow="ellipsis"
+              color={textColor}
+              cursor="pointer"
+              _hover={{ textDecoration: 'underline' }}
+              onClick={handlePartClick}
+            >
+              {part.ba_name && part.ba_name.trim() !== '' ? part.ba_name : part.name}
+            </Text>
 
             {/* Original part category information */}
             {part.category_name && (
