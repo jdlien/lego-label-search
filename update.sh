@@ -30,4 +30,5 @@ if ! sudo systemctl restart search-brck-ca; then
   exit 4
 fi
 
-echo "Update and restart completed successfully."
+# Print success message in green
+echo -e "\033[0;32mUpdate and restart completed successfully.\033[0m"
