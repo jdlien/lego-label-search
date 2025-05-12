@@ -89,12 +89,8 @@ export default function Home() {
     <Box minH="100vh" bg={pageBg}>
       <Header />
 
-      <Container maxW="container.2xl" py={3}>
+      <Container maxW="container.2xl" pt={4} pb={3}>
         <VStack spacing={2} align="stretch">
-          <Box textAlign="center" mb={2}>
-            <Text color={textColor}>Search by part number, name, or category find parts.</Text>
-          </Box>
-
           <SearchBar initialQuery={q || ''} initialCategory={category || ''} />
 
           {/* Loading state */}
