@@ -50,6 +50,7 @@ const Header = () => {
           <NextLink href="/" passHref legacyBehavior>
             <Button
               as="a"
+              color="white"
               variant="ghost"
               _hover={{ bg: buttonHoverBg }}
               sx={currentPath === '/' ? { bg: 'whiteAlpha.300' } : {}}
@@ -60,6 +61,7 @@ const Header = () => {
           <NextLink href="/categories" passHref legacyBehavior>
             <Button
               as="a"
+              color="white"
               variant="ghost"
               _hover={{ bg: buttonHoverBg }}
               sx={currentPath === '/categories' ? { bg: 'whiteAlpha.300' } : {}}
@@ -70,6 +72,7 @@ const Header = () => {
           <NextLink href="/about" passHref legacyBehavior>
             <Button
               as="a"
+              color="white"
               variant="ghost"
               _hover={{ bg: buttonHoverBg }}
               sx={currentPath === '/about' ? { bg: 'whiteAlpha.300' } : {}}
@@ -78,6 +81,7 @@ const Header = () => {
             </Button>
           </NextLink>
           <IconButton
+            color="white"
             aria-label={`Switch to ${colorMode === 'light' ? 'dark' : 'light'} mode`}
             icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
             onClick={toggleColorMode}
@@ -87,8 +91,16 @@ const Header = () => {
         </Flex>
         {/* Mobile Nav: Hamburger + Drawer */}
         <Flex align="center" display={{ base: 'flex', md: 'none' }}>
-          <IconButton aria-label="Open menu" icon={<HamburgerIcon />} variant="ghost" onClick={onOpen} mr={2} />
           <IconButton
+            color="white"
+            aria-label="Open menu"
+            icon={<HamburgerIcon />}
+            variant="ghost"
+            onClick={onOpen}
+            mr={2}
+          />
+          <IconButton
+            color="white"
             aria-label={`Switch to ${colorMode === 'light' ? 'dark' : 'light'} mode`}
             icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
             onClick={toggleColorMode}
@@ -104,6 +116,7 @@ const Header = () => {
                 <Flex direction="column" gap={4}>
                   <NextLink href="/" passHref legacyBehavior>
                     <Button
+                      color="white"
                       as="a"
                       variant="ghost"
                       onClick={onClose}
@@ -115,6 +128,7 @@ const Header = () => {
                   </NextLink>
                   <NextLink href="/categories" passHref legacyBehavior>
                     <Button
+                      color="white"
                       as="a"
                       variant="ghost"
                       onClick={onClose}
@@ -126,6 +140,7 @@ const Header = () => {
                   </NextLink>
                   <NextLink href="/about" passHref legacyBehavior>
                     <Button
+                      color="white"
                       as="a"
                       variant="ghost"
                       onClick={onClose}
