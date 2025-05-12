@@ -32,7 +32,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import Header from '../components/Header'
-
+import Footer from '../components/Footer'
 export default function Categories() {
   const router = useRouter()
   const { id: categoryId } = router.query
@@ -410,6 +410,7 @@ export default function Categories() {
           )}
         </VStack>
       </Container>
+      <Footer />
     </Box>
   )
 }
