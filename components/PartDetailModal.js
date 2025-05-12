@@ -72,7 +72,7 @@ const PartDetailModal = ({ isOpen, onClose, partId }) => {
         overflow="hidden"
       >
         <ModalHeader pb={3} pt={4} px={6} bg={headerBg} borderBottomWidth="1px" borderBottomColor={borderColor}>
-          {part ? `${displayName} (${part.id})` : 'Part Details'}
+          {`Part ${part.id} Details`}
         </ModalHeader>
         <ModalCloseButton size="lg" top={3} right={4} />
         <ModalBody p={{ base: 3, md: 5 }}>
