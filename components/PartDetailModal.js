@@ -62,7 +62,7 @@ const PartDetailModal = ({ isOpen, onClose, partId }) => {
       <ModalContent
         maxW={{ base: '95%', md: '85%', lg: '850px' }}
         mx="auto"
-        top={{ base: '40px', md: '110px' }}
+        top={{ base: '40px', lg: '110px' }}
         my={{ base: 3, md: 6 }}
         borderRadius="lg"
         boxShadow="xl"
