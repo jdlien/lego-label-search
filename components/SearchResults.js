@@ -4,9 +4,12 @@ import { useState } from 'react'
 import { Box, Grid, Heading, Text, Button, Flex, useToast, useColorModeValue } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import PartCard from './PartCard'
+import PartDetailModal from './PartDetailModal'
 
-const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 }) => {
+const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0, onPartClick }) => {
   const [selectedParts, setSelectedParts] = useState({})
+  const [selectedPartId, setSelectedPartId] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const toast = useToast()
   const router = useRouter()
 
@@ -37,6 +40,21 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
 
   const handleClearSelection = () => {
     setSelectedParts({})
+  }
+
+  const handlePartClick = (partId) => {
+    // If parent provided a click handler, use that
+    if (onPartClick) {
+      onPartClick(partId)
+    } else {
+      // Otherwise use local state
+      setSelectedPartId(partId)
+      setIsModalOpen(true)
+    }
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
   }
 
   if (results.length === 0) {
@@ -112,9 +130,13 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
             part={part}
             isSelected={!!selectedParts[part.id]}
             onToggleSelect={handleToggleSelect}
+            onPartClick={() => handlePartClick(part.id)}
           />
         ))}
       </Grid>
+
+      {/* Part Detail Modal - only render if we're not using the parent's modal */}
+      {!onPartClick && <PartDetailModal isOpen={isModalOpen} onClose={closeModal} partId={selectedPartId} />}
     </Box>
   )
 }

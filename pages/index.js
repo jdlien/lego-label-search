@@ -16,13 +16,15 @@ import {
   AlertDescription,
   useColorModeValue,
 } from '@chakra-ui/react'
+import Head from 'next/head'
 import Header from '../components/Header'
 import SearchBar from '../components/SearchBar'
 import SearchResults from '../components/SearchResults'
+import PartDetailModal from '../components/PartDetailModal'
 
 export default function Home() {
   const router = useRouter()
-  const { q, category } = router.query
+  const { q, category, part } = router.query
   const pageBg = useColorModeValue('gray.50', 'gray.900')
   const textColor = useColorModeValue('gray.600', 'gray.300')
 
@@ -32,6 +34,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [hasSearched, setHasSearched] = useState(false)
+  const [isPartModalOpen, setIsPartModalOpen] = useState(false)
+  const [selectedPartId, setSelectedPartId] = useState(null)
 
   // Fetch search results when query parameters change
   useEffect(() => {
@@ -85,8 +89,52 @@ export default function Home() {
     fetchResults()
   }, [q, category, router.isReady])
 
+  // Handle direct part access via URL
+  useEffect(() => {
+    if (router.isReady && part) {
+      setSelectedPartId(part)
+      setIsPartModalOpen(true)
+    }
+  }, [part, router.isReady])
+
+  const handlePartModalClose = () => {
+    setIsPartModalOpen(false)
+    // Remove the part parameter from the URL without refreshing the page
+    const { part, ...restQuery } = router.query
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: restQuery,
+      },
+      undefined,
+      { shallow: true }
+    )
+  }
+
+  // This function will be passed down to SearchResults
+  const handlePartClick = (partId) => {
+    setSelectedPartId(partId)
+    setIsPartModalOpen(true)
+
+    // Update URL to include part ID without page refresh
+    const newQuery = { ...router.query, part: partId }
+    router.push(
+      {
+        pathname: router.pathname,
+        query: newQuery,
+      },
+      undefined,
+      { shallow: true }
+    )
+  }
+
   return (
     <Box minH="100vh" bg={pageBg}>
+      <Head>
+        <title>LEGO Part Label Maker</title>
+        <meta name="description" content="Search and create labels for LEGO parts" />
+      </Head>
+
       <Header />
 
       <Container maxW="container.2xl" pt={4} pb={3}>
@@ -111,7 +159,12 @@ export default function Home() {
 
           {/* Results */}
           {!isLoading && !error && hasSearched && (
-            <SearchResults results={results} totalResults={totalResults} subcategoryCount={subcategoryCount} />
+            <SearchResults
+              results={results}
+              totalResults={totalResults}
+              subcategoryCount={subcategoryCount}
+              onPartClick={handlePartClick}
+            />
           )}
 
           {/* Initial state - show welcome message */}
@@ -124,6 +177,9 @@ export default function Home() {
           )}
         </VStack>
       </Container>
+
+      {/* Part Detail Modal for direct URL access */}
+      <PartDetailModal isOpen={isPartModalOpen} onClose={handlePartModalClose} partId={selectedPartId} />
     </Box>
   )
 }

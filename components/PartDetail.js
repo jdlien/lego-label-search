@@ -7,9 +7,7 @@ import {
   Text,
   Badge,
   Divider,
-  Button,
   Flex,
-  Spacer,
   VStack,
   useColorModeValue,
   Image,
@@ -18,10 +16,9 @@ import {
   Alert,
   AlertIcon,
 } from '@chakra-ui/react'
-import { ArrowBackIcon, StarIcon, DownloadIcon } from '@chakra-ui/icons'
 import { useRouter } from 'next/router'
 
-const PartDetail = ({ part, isLoading, error }) => {
+const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
   const router = useRouter()
   const bgColor = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
@@ -87,19 +84,28 @@ const PartDetail = ({ part, isLoading, error }) => {
 
   // Handle category click for navigation
   const handleCategoryClick = (catId) => {
-    router.push(`/?category=${catId}`)
+    if (isInModal) {
+      // In modal mode, we need to close the modal before navigation
+      // The router.push will be handled after the modal closes via useEffect
+      // We can't directly access onClose here, so we'll use the URL
+      router.push(`/?category=${catId}`)
+    } else {
+      router.push(`/?category=${catId}`)
+    }
   }
 
   return (
-    <Box bg={bgColor} borderRadius="lg" boxShadow="md" borderWidth="1px" borderColor={borderColor} p={5} mb={6}>
-      <Flex mb={4} align="center">
-        <Button leftIcon={<ArrowBackIcon />} variant="outline" size="sm" onClick={() => router.back()}>
-          Back
-        </Button>
-      </Flex>
-
-      <Flex direction={{ base: 'column', md: 'row' }} gap={6}>
-        <Box minW={{ base: 'full', md: '300px' }}>
+    <Box
+      bg={bgColor}
+      borderRadius={isInModal ? 'none' : 'lg'}
+      boxShadow={isInModal ? 'none' : 'md'}
+      borderWidth={isInModal ? '0' : '1px'}
+      borderColor={borderColor}
+      p={isInModal ? { base: 0, md: 4 } : 5}
+      mb={isInModal ? 0 : 6}
+    >
+      <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 4, md: 6 }} align="start">
+        <Box minW={{ base: 'full', md: '300px' }} maxW={{ base: 'full', md: '300px' }}>
           {/* Part image container - 50% larger and white background */}
           <Box
             borderWidth="1px"
@@ -110,6 +116,7 @@ const PartDetail = ({ part, isLoading, error }) => {
             alignItems="center"
             justifyContent="center"
             overflow="hidden"
+            mx={isInModal ? 'auto' : '0'}
           >
             <Image
               src={imagePath}
