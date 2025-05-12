@@ -15,6 +15,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import Header from '../components/Header'
+import Footer from '../components/Footer'
 
 export default function About() {
   const pageBg = useColorModeValue('gray.50', 'gray.900')
@@ -112,10 +113,9 @@ export default function About() {
               <ListItem>Python scripts for data processing and preparation</ListItem>
             </UnorderedList>
           </Box>
-
-          <Divider />
         </VStack>
       </Container>
+      <Footer />
     </Box>
   )
 }

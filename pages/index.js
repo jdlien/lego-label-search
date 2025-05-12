@@ -21,6 +21,7 @@ import Header from '../components/Header'
 import SearchBar from '../components/SearchBar'
 import SearchResults from '../components/SearchResults'
 import PartDetailModal from '../components/PartDetailModal'
+import Footer from '../components/Footer'
 
 export default function Home() {
   const router = useRouter()
@@ -169,7 +170,7 @@ export default function Home() {
 
           {/* Initial state - show welcome message */}
           {!isLoading && !error && !hasSearched && (
-            <Box textAlign="center" py={4}>
+            <Box textAlign="center" pt={4} pb={32}>
               <Text color={textColor} fontSize="lg">
                 Enter a search term or select a category
               </Text>
@@ -180,6 +181,7 @@ export default function Home() {
 
       {/* Part Detail Modal for direct URL access */}
       <PartDetailModal isOpen={isPartModalOpen} onClose={handlePartModalClose} partId={selectedPartId} />
+      <Footer />
     </Box>
   )
 }
