@@ -65,16 +65,14 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
   return (
     <Box>
       <Flex justify="center" align="center" mt={2} mb={4}>
-        <Flex direction="column" gap={1}>
+        <Text color={textColor}>
+          {totalResults} result{totalResults !== 1 ? 's' : ''} found
+        </Text>
+        {subcategoryCount > 0 && (
           <Text color={textColor}>
-            {totalResults} result{totalResults !== 1 ? 's' : ''} found
+            &nbsp;across {subcategoryCount + 1} categor{subcategoryCount === 0 ? 'y' : 'ies'}
           </Text>
-          {subcategoryCount > 0 && (
-            <Text fontSize="xs" color={infoTextColor}>
-              Searching across {subcategoryCount + 1} categor{subcategoryCount === 0 ? 'y' : 'ies'}
-            </Text>
-          )}
-        </Flex>
+        )}
       </Flex>
 
       <Grid
