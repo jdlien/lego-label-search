@@ -92,7 +92,7 @@ export default function Home() {
       <Container maxW="container.2xl" py={3}>
         <VStack spacing={2} align="stretch">
           <Box textAlign="center" mb={2}>
-            <Text color={textColor}>Search by part number, name, or category find LEGO parts.</Text>
+            <Text color={textColor}>Search by part number, name, or category find parts.</Text>
           </Box>
 
           <SearchBar initialQuery={q || ''} initialCategory={category || ''} />
