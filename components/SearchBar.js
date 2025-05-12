@@ -181,8 +181,8 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
   return (
     <Box width="100%">
       <form onSubmit={handleSubmit}>
-        <Flex direction={{ base: 'column', md: 'row' }} gap={4} align="flex-end">
-          <Box flex="1">
+        <Flex direction={{ base: 'column', md: 'row' }} gap={2} align="flex-end" wrap="wrap">
+          <Box width={{ base: '100%', md: 'auto' }} flex={{ md: 1 }} minW={0}>
             <InputGroup>
               <InputLeftElement pointerEvents="none" height="100%" display="flex" alignItems="center" pl="3">
                 <Icon as={SearchIcon} color="gray.300" boxSize="20px" />
@@ -198,32 +198,33 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
             </InputGroup>
           </Box>
 
-          <Box width={{ base: '100%', md: '300px' }}>
-            <Select
-              placeholder="All Categories"
-              value={category}
-              onChange={handleCategoryChange}
-              size="lg"
-              borderRadius="md"
-            >
-              {categoriesForDropdown.map((cat, index) =>
-                cat.id === 'separator' ? (
-                  <option key="separator" disabled style={{ fontWeight: 'bold', color: 'gray' }}>
-                    ──── Sub Categories ────
-                  </option>
-                ) : (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                    {cat.parts_count > 0 ? ` (${cat.parts_count.toLocaleString()} parts)` : ''}
-                  </option>
-                )
-              )}
-            </Select>
-          </Box>
-
-          <Button type="submit" colorScheme="blue" size="lg" onClick={handleSearch}>
-            Search
-          </Button>
+          <Flex direction="row" gap={2} width={{ base: '100%', md: 'auto' }}>
+            <Box flex={1} minW={0}>
+              <Select
+                placeholder="All Categories"
+                value={category}
+                onChange={handleCategoryChange}
+                size="lg"
+                borderRadius="md"
+              >
+                {categoriesForDropdown.map((cat, index) =>
+                  cat.id === 'separator' ? (
+                    <option key="separator" disabled style={{ fontWeight: 'bold', color: 'gray' }}>
+                      ──── Sub Categories ────
+                    </option>
+                  ) : (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                      {cat.parts_count > 0 ? ` (${cat.parts_count.toLocaleString()} parts)` : ''}
+                    </option>
+                  )
+                )}
+              </Select>
+            </Box>
+            <Button type="submit" colorScheme="blue" size="lg" onClick={handleSearch} minW="64px">
+              Go
+            </Button>
+          </Flex>
         </Flex>
       </form>
     </Box>

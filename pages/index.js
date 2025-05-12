@@ -89,13 +89,10 @@ export default function Home() {
     <Box minH="100vh" bg={pageBg}>
       <Header />
 
-      <Container maxW="container.2xl" py={8}>
-        <VStack spacing={8} align="stretch">
-          <Box textAlign="center" mb={4}>
-            <Heading as="h1" size="xl" mb={2}>
-              Find LEGO Parts
-            </Heading>
-            <Text color={textColor}>Search by part number, name, or category to create printable labels</Text>
+      <Container maxW="container.2xl" py={3}>
+        <VStack spacing={2} align="stretch">
+          <Box textAlign="center" mb={2}>
+            <Text color={textColor}>Search by part number, name, or category to print labels.</Text>
           </Box>
 
           <SearchBar initialQuery={q || ''} initialCategory={category || ''} />
@@ -123,9 +120,9 @@ export default function Home() {
 
           {/* Initial state - show welcome message */}
           {!isLoading && !error && !hasSearched && (
-            <Box textAlign="center" py={10}>
+            <Box textAlign="center" py={4}>
               <Text color={textColor} fontSize="lg">
-                Enter a search term and click the Search button
+                Enter a search term or select a category
               </Text>
             </Box>
           )}
