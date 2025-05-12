@@ -47,8 +47,9 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
         </Heading>
         {(router.query.category || router.query.q) && (
           <Button
+            variant="link"
             colorScheme="blue"
-            size="md"
+            size="sm"
             onClick={() => {
               router.push('/')
             }}
@@ -64,16 +65,36 @@ const SearchResults = ({ results = [], totalResults = 0, subcategoryCount = 0 })
 
   return (
     <Box>
-      <Flex justify="center" align="center" mt={2} mb={4}>
-        <Text color={textColor}>
-          {totalResults} result{totalResults !== 1 ? 's' : ''} found
-        </Text>
-        {subcategoryCount > 0 && (
+      <Box mt={2} mb={4}>
+        <Flex justify="center" align="center">
           <Text color={textColor}>
-            &nbsp;across {subcategoryCount + 1} categor{subcategoryCount === 0 ? 'y' : 'ies'}
+            {totalResults} result{totalResults !== 1 ? 's' : ''} found
           </Text>
-        )}
-      </Flex>
+          {subcategoryCount > 0 && (
+            <Text color={textColor}>
+              &nbsp;across {subcategoryCount + 1} categor{subcategoryCount === 0 ? 'y' : 'ies'}
+            </Text>
+          )}
+        </Flex>
+        <Flex justify="center" align="center" mt={0} mb={2}>
+          {router.query.category && (
+            <Button
+              variant="link"
+              colorScheme="blue"
+              size="sm"
+              ml={2}
+              onClick={() => {
+                // Remove only the category param, preserve q if present
+                const params = new URLSearchParams()
+                if (router.query.q) params.append('q', router.query.q)
+                router.push(`/?${params.toString()}`)
+              }}
+            >
+              Search All Categories
+            </Button>
+          )}
+        </Flex>
+      </Box>
 
       <Grid
         templateColumns={{

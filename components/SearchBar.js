@@ -1,7 +1,18 @@
 /** @format */
 
 import { useState, useEffect, useRef } from 'react'
-import { Box, Input, InputGroup, InputLeftElement, Select, Flex, Icon, Button } from '@chakra-ui/react'
+import {
+  Box,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+  Select,
+  Flex,
+  Icon,
+  Button,
+  IconButton,
+} from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 
 // Natural sort function
@@ -195,6 +206,35 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
                 size="lg"
                 borderRadius="md"
               />
+              {query && (
+                <InputRightElement height="100%" display="flex" alignItems="center" pr="3">
+                  <IconButton
+                    aria-label="Clear search"
+                    icon={
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    }
+                    size="sm"
+                    minH="30px"
+                    variant="ghost"
+                    onClick={() => {
+                      setQuery('')
+                      // Clear any pending timeout
+                      if (searchTimeout.current) {
+                        clearTimeout(searchTimeout.current)
+                      }
+                      // Update the URL to remove the query param
+                      const params = new URLSearchParams()
+                      if (category) params.append('category', category)
+                      router.push(`/?${params.toString()}`)
+                    }}
+                    tabIndex={-1}
+                    boxSize="20px"
+                    p={0}
+                  />
+                </InputRightElement>
+              )}
             </InputGroup>
           </Box>
 
