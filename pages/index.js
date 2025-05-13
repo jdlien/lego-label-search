@@ -132,7 +132,7 @@ export default function Home() {
   return (
     <Box minH="100vh" bg={pageBg}>
       <Head>
-        <title>LEGO Part Label Maker</title>
+        <title>LEGO Part Label Search</title>
         <meta name="description" content="Search and create labels for LEGO parts" />
       </Head>
 

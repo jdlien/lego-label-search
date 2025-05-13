@@ -1,7 +1,8 @@
 /** @format */
 
-import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react'
+import { ChakraProvider, extendTheme, ColorModeScript, useColorMode } from '@chakra-ui/react'
 import Head from 'next/head'
+import { useEffect } from 'react'
 
 // Extend the theme to customize the app
 const theme = extendTheme({
@@ -25,6 +26,21 @@ const theme = extendTheme({
   },
 })
 
+// Component to update theme-color meta tag based on color mode
+const ThemeColorMetaUpdater = () => {
+  const { colorMode } = useColorMode()
+
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) {
+      meta.setAttribute('content', colorMode === 'dark' ? '#1A202C' : '#2b6cb0')
+      console.log('Updated theme-color to match', colorMode, 'mode')
+    }
+  }, [colorMode])
+
+  return null
+}
+
 function MyApp({ Component, pageProps }) {
   return (
     <>
@@ -41,79 +57,14 @@ function MyApp({ Component, pageProps }) {
         {/* iOS status bar style */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        {/* Theme color - will be updated by JS */}
+        {/* Theme color - will be updated by React component */}
         <meta name="theme-color" content="#2b6cb0" />
         {/* PWA/Android support */}
         <link rel="manifest" href="/icons/manifest.json" />
-
-        {/* Single script to handle theme color */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-          (function() {
-            // Function to update the theme color
-            function updateThemeColor() {
-              // Get stored preference from localStorage
-              const storedMode = localStorage.getItem('chakra-ui-color-mode');
-
-              // Check system preference
-              const prefersDark = window.matchMedia &&
-                window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-              // Determine the current mode - DARK has priority
-              const isDarkMode = storedMode === 'dark' ||
-                (storedMode !== 'light' && prefersDark);
-
-              // Set color based on mode
-              const themeColor = isDarkMode ? '#1A202C' : '#2b6cb0';
-
-              // Update the meta tag
-              const metaTag = document.querySelector('meta[name="theme-color"]');
-              if (metaTag) {
-                metaTag.setAttribute('content', themeColor);
-                console.log('Theme color set to', themeColor, 'based on', isDarkMode ? 'dark' : 'light', 'mode');
-              }
-            }
-
-            // Run immediately
-            updateThemeColor();
-
-            // Run when color mode changes in localStorage
-            function handleStorageChange(e) {
-              if (e.key === 'chakra-ui-color-mode') {
-                updateThemeColor();
-              }
-            }
-
-            // Run on page load completion
-            window.addEventListener('load', updateThemeColor);
-
-            // Listen for changes to localStorage
-            window.addEventListener('storage', handleStorageChange);
-
-            // Check periodically for 5 seconds after page load
-            let checkCount = 0;
-            const maxChecks = 10;
-            const checkInterval = setInterval(() => {
-              updateThemeColor();
-              checkCount++;
-              if (checkCount >= maxChecks) {
-                clearInterval(checkInterval);
-              }
-            }, 500);
-
-            // Also listen for color scheme changes
-            if (window.matchMedia) {
-              window.matchMedia('(prefers-color-scheme: dark)')
-                .addEventListener('change', updateThemeColor);
-            }
-          })();
-        `,
-          }}
-        ></script>
       </Head>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ChakraProvider theme={theme}>
+        <ThemeColorMetaUpdater />
         <Component {...pageProps} />
       </ChakraProvider>
     </>

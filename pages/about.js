@@ -30,7 +30,7 @@ export default function About() {
         <VStack spacing={8} align="stretch">
           <Box>
             <Heading as="h1" size="xl" mb={4}>
-              About LEGO Part Label Maker
+              About LEGO Part Label Search
             </Heading>
             <Text fontSize="lg" color={textColor}>
               This application helps LEGO enthusiasts create and print labels for organizing their parts collection.
@@ -109,7 +109,6 @@ export default function About() {
             <UnorderedList spacing={2} pl={5} color={textColor}>
               <ListItem>Next.js for the React framework</ListItem>
               <ListItem>Chakra UI for the component library</ListItem>
-              <ListItem>Fuse.js for fuzzy search functionality</ListItem>
               <ListItem>Python scripts for data processing and preparation</ListItem>
             </UnorderedList>
           </Box>
