@@ -18,6 +18,8 @@ async function openDb() {
   return dbPromise
 }
 
+// =================== DIMENSION UTILITIES ===================
+
 // Function to normalize dimension format for searching
 // Handles formats like "2x2", "2 x 2", "2×2", "2 × 2", etc.
 function normalizeDimensions(searchTerm) {
@@ -72,6 +74,8 @@ function extractDimensionPatterns(searchTerm) {
 
   return dimensions.length > 0 ? dimensions : null
 }
+
+// =================== SEARCH TERM UTILITIES ===================
 
 // Function to prepare search terms for multi-word searches
 // This splits a search query into individual words and prepares them for AND search
@@ -134,383 +138,7 @@ function combineSearchWithDimensions(searchTerms, dimensionFormats) {
   }
 }
 
-export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method not allowed' })
-  }
-
-  // Change default limit to a large number (10000) to effectively remove the limit for most use cases
-  const { q, category, limit = 10000 } = req.query
-
-  try {
-    const db = await openDb()
-
-    // Handle empty query
-    if (!q && !category) {
-      return res.status(400).json({
-        message: 'Please provide a search query or category filter',
-      })
-    }
-
-    let results = []
-    let query = ''
-    let params = []
-    let countQuery = ''
-    let countParams = []
-    let categoryIds = []
-
-    // If category is provided, get all subcategories
-    if (category) {
-      categoryIds = await getAllSubcategories(db, category)
-    }
-
-    // Base query to select parts with category information
-    const baseQuery = `
-      SELECT p.part_num as id, p.name, p.part_cat_id as category_id,
-             p.part_material, p.label_file, p.ba_cat_id, p.ba_name,
-             c.name as category_name, b.name as ba_category_name,
-             parent.id as parent_cat_id, parent.name as parent_category,
-             grandparent.id as grandparent_cat_id, grandparent.name as grandparent_category
-      FROM parts p
-      LEFT JOIN part_categories c ON p.part_cat_id = c.id
-      LEFT JOIN ba_categories b ON p.ba_cat_id = b.id
-      LEFT JOIN ba_categories parent ON b.parent_id = parent.id
-      LEFT JOIN ba_categories grandparent ON parent.parent_id = grandparent.id
-    `
-
-    // Base query for count - use estimated count for faster performance
-    const baseCountQuery = `
-      SELECT COUNT(*) as total
-      FROM parts p
-    `
-
-    if (q) {
-      // First check for a perfect dimension pattern
-      const dimensionFormats = normalizeDimensions(q)
-      const isExactDimension = Array.isArray(dimensionFormats)
-
-      // Next look for dimension patterns within the search string
-      const extractedDimensions = extractDimensionPatterns(q)
-      const hasDimensionsWithin = extractedDimensions !== null
-
-      // Combine both approaches
-      const isMultipleFormats = isExactDimension || hasDimensionsWithin
-      const allDimensionFormats = isExactDimension ? dimensionFormats : hasDimensionsWithin ? extractedDimensions : null
-
-      // Check if we have a multi-word search
-      const multiWordSearch = prepareMultiWordSearch(q)
-      const isMultiWord = multiWordSearch.isMultiWord
-
-      // See if we need to combine regular search terms with dimension search
-      const combinedSearch =
-        isMultipleFormats && isMultiWord ? combineSearchWithDimensions(multiWordSearch, allDimensionFormats) : null
-      const hasCombinedSearch = combinedSearch && combinedSearch.hasBoth
-
-      // Basic search term (still needed for non-dimension searches and partial matching)
-      const searchTerm = `%${q}%`
-
-      // Build the query based on search type
-      if (!category) {
-        if (hasCombinedSearch) {
-          // Handle the case where we have both dimension patterns and regular search terms
-          // We need to AND them together
-
-          // First, build the dimension conditions
-          const dimensionConditions = combinedSearch.dimensions.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?')
-          const dimensionOrCondition = `(${dimensionConditions.join(' OR ')})`
-
-          // Next, build the regular term conditions
-          const termConditions = combinedSearch.terms.map(() => '(p.name LIKE ? OR p.ba_name LIKE ?)')
-          const termAndCondition = termConditions.join(' AND ')
-
-          // Combine both sets of conditions with AND
-          // This ensures results must match at least one dimension format AND all regular terms
-          const combinedCondition = `(${dimensionOrCondition}) AND (${termAndCondition})`
-
-          // Build the params array
-          const nameParams = []
-          // Add dimension params
-          combinedSearch.dimensions.forEach((format) => {
-            nameParams.push(`%${format}%`, `%${format}%`)
-          })
-          // Add term params
-          combinedSearch.terms.forEach((term) => {
-            nameParams.push(`%${term}%`, `%${term}%`)
-          })
-
-          query = `${baseQuery} WHERE p.part_num = ?
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE (${combinedCondition}) AND p.part_num NOT LIKE ?)
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
-                  `
-          params = [q, searchTerm, q, ...nameParams, searchTerm, searchTerm, q]
-
-          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?`
-          countParams = [searchTerm, ...nameParams, searchTerm]
-        } else if (isMultipleFormats) {
-          // Dimension search handling (only dimensions, no regular terms to AND with)
-          const nameLikeConditions = allDimensionFormats.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?').join(' OR ')
-          const nameParams = []
-          allDimensionFormats.forEach((format) => {
-            nameParams.push(`%${format}%`, `%${format}%`)
-          })
-
-          query = `${baseQuery} WHERE p.part_num = ?
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE (${nameLikeConditions}) AND p.part_num NOT LIKE ?)
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
-                  `
-          params = [q, searchTerm, q, ...nameParams, searchTerm, searchTerm, q]
-
-          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR ${nameLikeConditions} OR p.alt_part_ids LIKE ?`
-          countParams = [searchTerm, ...nameParams, searchTerm]
-        } else if (isMultiWord) {
-          // Handle multi-word search (words in any order)
-          const nameConditions = []
-          const nameParams = []
-
-          // For each word, we need both name and ba_name to contain it
-          multiWordSearch.terms.forEach((term) => {
-            // Add conditions for this word
-            nameConditions.push(`(p.name LIKE ? OR p.ba_name LIKE ?)`)
-            nameParams.push(`%${term}%`, `%${term}%`)
-          })
-
-          // Combine conditions with AND to require all words to be present
-          const combinedNameCondition = nameConditions.join(' AND ')
-
-          query = `${baseQuery} WHERE p.part_num = ?
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE (${combinedNameCondition}) AND p.part_num NOT LIKE ?)
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
-                  `
-          params = [q, searchTerm, q, ...nameParams, searchTerm, searchTerm, q]
-
-          // Count query needs to use the same logic
-          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?`
-          countParams = [searchTerm, ...nameParams, searchTerm]
-        } else {
-          // Original query for single-word searches
-          query = `${baseQuery} WHERE p.part_num = ?
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE (p.name LIKE ? OR p.ba_name LIKE ?) AND p.part_num NOT LIKE ?)
-                  UNION ALL
-                  SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
-                  `
-          params = [q, searchTerm, q, searchTerm, searchTerm, searchTerm, searchTerm, q]
-
-          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?`
-          countParams = [searchTerm, searchTerm, searchTerm, searchTerm]
-        }
-      } else {
-        // With category filter
-        if (categoryIds.length === 1) {
-          // Single category
-          if (hasCombinedSearch) {
-            // Both dimension patterns and regular search terms with single category
-
-            // First, build the dimension conditions
-            const dimensionConditions = combinedSearch.dimensions.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?')
-            const dimensionOrCondition = `(${dimensionConditions.join(' OR ')})`
-
-            // Next, build the regular term conditions
-            const termConditions = combinedSearch.terms.map(() => '(p.name LIKE ? OR p.ba_name LIKE ?)')
-            const termAndCondition = termConditions.join(' AND ')
-
-            // Combine both sets of conditions with AND
-            const combinedCondition = `(${dimensionOrCondition}) AND (${termAndCondition})`
-
-            // Build the params array
-            const nameParams = []
-            // Add dimension params
-            combinedSearch.dimensions.forEach((format) => {
-              nameParams.push(`%${format}%`, `%${format}%`)
-            })
-            // Add term params
-            combinedSearch.terms.forEach((term) => {
-              nameParams.push(`%${term}%`, `%${term}%`)
-            })
-
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
-            params = [q, searchTerm, ...nameParams, searchTerm, categoryIds[0]]
-
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
-            countParams = [searchTerm, ...nameParams, searchTerm, categoryIds[0]]
-          } else if (isMultipleFormats) {
-            // Dimension formats with category
-            const nameLikeConditions = allDimensionFormats.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?').join(' OR ')
-            const nameParams = []
-            allDimensionFormats.forEach((format) => {
-              nameParams.push(`%${format}%`, `%${format}%`)
-            })
-
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${nameLikeConditions}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
-            params = [q, searchTerm, ...nameParams, searchTerm, categoryIds[0]]
-
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR ${nameLikeConditions} OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
-            countParams = [searchTerm, ...nameParams, searchTerm, categoryIds[0]]
-          } else if (isMultiWord) {
-            // Multi-word search with single category
-            const nameConditions = []
-            const nameParams = []
-
-            // For each word, we need both name and ba_name to contain it
-            multiWordSearch.terms.forEach((term) => {
-              nameConditions.push(`(p.name LIKE ? OR p.ba_name LIKE ?)`)
-              nameParams.push(`%${term}%`, `%${term}%`)
-            })
-
-            // Combine with AND
-            const combinedNameCondition = nameConditions.join(' AND ')
-
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
-            params = [q, searchTerm, ...nameParams, searchTerm, categoryIds[0]]
-
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
-            countParams = [searchTerm, ...nameParams, searchTerm, categoryIds[0]]
-          } else {
-            // Original query with one category (unchanged)
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
-            params = [q, searchTerm, searchTerm, searchTerm, searchTerm, categoryIds[0]]
-
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
-            countParams = [searchTerm, searchTerm, searchTerm, searchTerm, categoryIds[0]]
-          }
-        } else {
-          // Multiple categories
-          const placeholders = categoryIds.map(() => '?').join(',')
-
-          if (hasCombinedSearch) {
-            // Both dimension patterns and regular search terms with multiple categories
-
-            // First, build the dimension conditions
-            const dimensionConditions = combinedSearch.dimensions.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?')
-            const dimensionOrCondition = `(${dimensionConditions.join(' OR ')})`
-
-            // Next, build the regular term conditions
-            const termConditions = combinedSearch.terms.map(() => '(p.name LIKE ? OR p.ba_name LIKE ?)')
-            const termAndCondition = termConditions.join(' AND ')
-
-            // Combine both sets of conditions with AND
-            const combinedCondition = `(${dimensionOrCondition}) AND (${termAndCondition})`
-
-            // Build the params array
-            const nameParams = []
-            // Add dimension params
-            combinedSearch.dimensions.forEach((format) => {
-              nameParams.push(`%${format}%`, `%${format}%`)
-            })
-            // Add term params
-            combinedSearch.terms.forEach((term) => {
-              nameParams.push(`%${term}%`, `%${term}%`)
-            })
-
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            params = [q, searchTerm, ...nameParams, searchTerm, ...categoryIds]
-
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            countParams = [searchTerm, ...nameParams, searchTerm, ...categoryIds]
-          } else if (isMultipleFormats) {
-            // Dimension formats with multiple categories
-            const nameLikeConditions = allDimensionFormats.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?').join(' OR ')
-            const nameParams = []
-            allDimensionFormats.forEach((format) => {
-              nameParams.push(`%${format}%`, `%${format}%`)
-            })
-
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${nameLikeConditions}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            params = [q, searchTerm, ...nameParams, searchTerm, ...categoryIds]
-
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR ${nameLikeConditions} OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            countParams = [searchTerm, ...nameParams, searchTerm, ...categoryIds]
-          } else if (isMultiWord) {
-            // Multi-word search with multiple categories
-            const nameConditions = []
-            const nameParams = []
-
-            // For each word, we need both name and ba_name to contain it
-            multiWordSearch.terms.forEach((term) => {
-              nameConditions.push(`(p.name LIKE ? OR p.ba_name LIKE ?)`)
-              nameParams.push(`%${term}%`, `%${term}%`)
-            })
-
-            // Combine with AND
-            const combinedNameCondition = nameConditions.join(' AND ')
-
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            params = [q, searchTerm, ...nameParams, searchTerm, ...categoryIds]
-
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            countParams = [searchTerm, ...nameParams, searchTerm, ...categoryIds]
-          } else {
-            // Original query with multiple categories (unchanged)
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            params = [q, searchTerm, searchTerm, searchTerm, searchTerm, ...categoryIds]
-
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            countParams = [searchTerm, searchTerm, searchTerm, searchTerm, ...categoryIds]
-          }
-        }
-      }
-    } else if (category) {
-      // Only filter by category and its subcategories
-      if (categoryIds.length === 1) {
-        // If only one category, use simple WHERE clause
-        query = `${baseQuery} WHERE p.ba_cat_id = ?`
-        params = [categoryIds[0]]
-
-        countQuery = `${baseCountQuery} WHERE p.ba_cat_id = ?`
-        countParams = [categoryIds[0]]
-      } else {
-        // If multiple categories (parent + children), use IN clause
-        const placeholders = categoryIds.map(() => '?').join(',')
-
-        query = `${baseQuery} WHERE p.ba_cat_id IN (${placeholders})`
-        params = [...categoryIds]
-
-        countQuery = `${baseCountQuery} WHERE p.ba_cat_id IN (${placeholders})`
-        countParams = [...categoryIds]
-      }
-    }
-
-    // Add limit if specified
-    if (limit) {
-      query += ` LIMIT ?`
-      params.push(parseInt(limit, 10))
-    }
-
-    // Execute query
-    results = await db.all(query, ...params)
-
-    // Get total count
-    const countResult = await db.get(countQuery, ...countParams)
-    const total = countResult ? countResult.total : 0
-
-    return res.status(200).json({
-      results,
-      total,
-      returned: results.length,
-      categories: categoryIds,
-    })
-  } catch (error) {
-    console.error('Search error:', error)
-    return res.status(500).json({
-      message: 'An error occurred during search',
-      error: error.message,
-    })
-  }
-}
+// =================== CATEGORY UTILITIES ===================
 
 // Function to get a category and all its subcategories recursively
 async function getAllSubcategories(db, categoryId) {
@@ -529,4 +157,365 @@ async function getAllSubcategories(db, categoryId) {
   )
 
   return results.map((row) => row.id)
+}
+
+// =================== QUERY BUILDER FUNCTIONS ===================
+
+// Get base queries for selecting parts
+function getBaseQueries() {
+  const baseQuery = `
+    SELECT p.part_num as id, p.name, p.part_cat_id as category_id,
+           p.part_material, p.label_file, p.ba_cat_id, p.ba_name,
+           c.name as category_name, b.name as ba_category_name,
+           parent.id as parent_cat_id, parent.name as parent_category,
+           grandparent.id as grandparent_cat_id, grandparent.name as grandparent_category,
+           p.alt_part_ids
+    FROM parts p
+    LEFT JOIN part_categories c ON p.part_cat_id = c.id
+    LEFT JOIN ba_categories b ON p.ba_cat_id = b.id
+    LEFT JOIN ba_categories parent ON b.parent_id = parent.id
+    LEFT JOIN ba_categories grandparent ON parent.parent_id = grandparent.id
+  `
+
+  const baseCountQuery = `
+    SELECT COUNT(*) as total
+    FROM parts p
+  `
+
+  return { baseQuery, baseCountQuery }
+}
+
+// Build query for single-term search (no dimensions or multi-word)
+function buildBasicSearch(baseQuery, searchTerm, q) {
+  const query = `${baseQuery} WHERE p.part_num = ?
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE (p.name LIKE ? OR p.ba_name LIKE ?) AND p.part_num NOT LIKE ?)
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
+                `
+  const params = [q, searchTerm, q, searchTerm, searchTerm, searchTerm, searchTerm, q]
+
+  const countQuery = `${
+    getBaseQueries().baseCountQuery
+  } WHERE p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?`
+  const countParams = [searchTerm, searchTerm, searchTerm, searchTerm]
+
+  return { query, params, countQuery, countParams }
+}
+
+// Build query for dimension search
+function buildDimensionSearch(baseQuery, searchTerm, q, dimensionFormats) {
+  const nameLikeConditions = dimensionFormats.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?').join(' OR ')
+  const nameParams = []
+  dimensionFormats.forEach((format) => {
+    nameParams.push(`%${format}%`, `%${format}%`)
+  })
+
+  const query = `${baseQuery} WHERE p.part_num = ?
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE (${nameLikeConditions}) AND p.part_num NOT LIKE ?)
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
+                `
+  const params = [q, searchTerm, q, ...nameParams, searchTerm, searchTerm, q]
+
+  const countQuery = `${
+    getBaseQueries().baseCountQuery
+  } WHERE p.part_num LIKE ? OR ${nameLikeConditions} OR p.alt_part_ids LIKE ?`
+  const countParams = [searchTerm, ...nameParams, searchTerm]
+
+  return { query, params, countQuery, countParams }
+}
+
+// Build query for multi-word search
+function buildMultiWordSearch(baseQuery, searchTerm, q, multiWordSearch) {
+  const nameConditions = []
+  const nameParams = []
+
+  // For each word, we need both name and ba_name to contain it
+  multiWordSearch.terms.forEach((term) => {
+    // Add conditions for this word - now also including part_num to allow finding parts where
+    // one of the terms is a part number and others are descriptive
+    nameConditions.push(`(p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?)`)
+    nameParams.push(`%${term}%`, `%${term}%`, `%${term}%`)
+  })
+
+  // Combine conditions with AND to require all words to be present
+  const combinedNameCondition = nameConditions.join(' AND ')
+
+  // Simplified query with less restrictive filtering - we'll handle duplicates with DISTINCT later
+  const query = `${baseQuery} WHERE p.part_num = ?
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ?)
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE (${combinedNameCondition}))
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ?)
+                `
+  const params = [q, searchTerm, ...nameParams, searchTerm]
+
+  // Count query needs to use the same logic
+  const countQuery = `${
+    getBaseQueries().baseCountQuery
+  } WHERE p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?`
+  const countParams = [searchTerm, ...nameParams, searchTerm]
+
+  return { query, params, countQuery, countParams }
+}
+
+// Build query for combined search (dimensions AND multi-word)
+function buildCombinedSearch(baseQuery, searchTerm, q, combinedSearch) {
+  // First, build the dimension conditions
+  const dimensionConditions = combinedSearch.dimensions.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?')
+  const dimensionOrCondition = `(${dimensionConditions.join(' OR ')})`
+
+  // Next, build the regular term conditions
+  const termConditions = combinedSearch.terms.map(() => '(p.name LIKE ? OR p.ba_name LIKE ?)')
+  const termAndCondition = termConditions.join(' AND ')
+
+  // Combine both sets of conditions with AND
+  // This ensures results must match at least one dimension format AND all regular terms
+  const combinedCondition = `(${dimensionOrCondition}) AND (${termAndCondition})`
+
+  // Build the params array
+  const nameParams = []
+  // Add dimension params
+  combinedSearch.dimensions.forEach((format) => {
+    nameParams.push(`%${format}%`, `%${format}%`)
+  })
+  // Add term params
+  combinedSearch.terms.forEach((term) => {
+    nameParams.push(`%${term}%`, `%${term}%`)
+  })
+
+  const query = `${baseQuery} WHERE p.part_num = ?
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE (${combinedCondition}) AND p.part_num NOT LIKE ?)
+                UNION ALL
+                SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
+                `
+  const params = [q, searchTerm, q, ...nameParams, searchTerm, searchTerm, q]
+
+  const countQuery = `${
+    getBaseQueries().baseCountQuery
+  } WHERE p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?`
+  const countParams = [searchTerm, ...nameParams, searchTerm]
+
+  return { query, params, countQuery, countParams }
+}
+
+// Add category filters to a query
+function addCategoryFilter(queryData, categoryIds) {
+  let { query, params, countQuery, countParams } = queryData
+
+  if (categoryIds.length === 1) {
+    // Single category filter
+    query = query.replace('WHERE', 'WHERE p.ba_cat_id = ? AND ')
+    params.unshift(categoryIds[0])
+
+    countQuery = countQuery.replace('WHERE', 'WHERE p.ba_cat_id = ? AND ')
+    countParams.unshift(categoryIds[0])
+  } else {
+    // Multiple categories filter
+    const placeholders = categoryIds.map(() => '?').join(',')
+    query = query.replace('WHERE', `WHERE p.ba_cat_id IN (${placeholders}) AND `)
+    params.unshift(...categoryIds)
+
+    countQuery = countQuery.replace('WHERE', `WHERE p.ba_cat_id IN (${placeholders}) AND `)
+    countParams.unshift(...categoryIds)
+  }
+
+  return { query, params, countQuery, countParams }
+}
+
+// Build category-only filter query (no search term)
+function buildCategoryOnlyQuery(baseQuery, categoryIds) {
+  let query, params, countQuery, countParams
+
+  if (categoryIds.length === 1) {
+    // If only one category, use simple WHERE clause
+    query = `${baseQuery} WHERE p.ba_cat_id = ?`
+    params = [categoryIds[0]]
+
+    countQuery = `${getBaseQueries().baseCountQuery} WHERE p.ba_cat_id = ?`
+    countParams = [categoryIds[0]]
+  } else {
+    // If multiple categories (parent + children), use IN clause
+    const placeholders = categoryIds.map(() => '?').join(',')
+
+    query = `${baseQuery} WHERE p.ba_cat_id IN (${placeholders})`
+    params = [...categoryIds]
+
+    countQuery = `${getBaseQueries().baseCountQuery} WHERE p.ba_cat_id IN (${placeholders})`
+    countParams = [...categoryIds]
+  }
+
+  return { query, params, countQuery, countParams }
+}
+
+// Apply sorting to query
+function applySorting(query, sort) {
+  if (sort === 'alt_ids_length') {
+    return (
+      query +
+      `
+    ORDER BY
+      CASE
+        WHEN alt_part_ids IS NULL THEN 0
+        WHEN LENGTH(TRIM(alt_part_ids)) = 0 THEN 0
+        WHEN INSTR(alt_part_ids, ',') = 0 THEN 1  -- If no commas but has content, count as 1 item
+        ELSE (
+          -- Count commas and add 1 to get the number of items
+          LENGTH(alt_part_ids) - LENGTH(REPLACE(alt_part_ids, ',', '')) + 1
+        )
+      END DESC,
+      id`
+    )
+  } else if (sort === 'id') {
+    return query + ` ORDER BY id`
+  } else if (sort === 'name') {
+    return query + ` ORDER BY name`
+  } else {
+    // Default fallback sorting
+    return query + ` ORDER BY id`
+  }
+}
+
+// Apply limit to query
+function applyLimit(query, params, limit) {
+  if (limit) {
+    return {
+      query: query + ` LIMIT ?`,
+      params: [...params, parseInt(limit, 10)],
+    }
+  }
+  return { query, params }
+}
+
+// Analyze a search term and determine what type of search to perform
+function analyzeSearchTerm(q) {
+  const searchTerm = `%${q}%`
+
+  // Check for exact dimension pattern
+  const dimensionFormats = normalizeDimensions(q)
+  const isExactDimension = Array.isArray(dimensionFormats)
+
+  // Check for dimensions within the search string
+  const extractedDimensions = extractDimensionPatterns(q)
+  const hasDimensionsWithin = extractedDimensions !== null
+
+  // Combine dimension formats
+  const isMultipleFormats = isExactDimension || hasDimensionsWithin
+  const allDimensionFormats = isExactDimension ? dimensionFormats : hasDimensionsWithin ? extractedDimensions : null
+
+  // Check if multi-word search
+  const multiWordSearch = prepareMultiWordSearch(q)
+  const isMultiWord = multiWordSearch.isMultiWord
+
+  // Check if combining regular terms with dimension search
+  const combinedSearch =
+    isMultipleFormats && isMultiWord ? combineSearchWithDimensions(multiWordSearch, allDimensionFormats) : null
+  const hasCombinedSearch = combinedSearch && combinedSearch.hasBoth
+
+  return {
+    searchTerm,
+    isExactDimension,
+    hasDimensionsWithin,
+    isMultipleFormats,
+    allDimensionFormats,
+    multiWordSearch,
+    isMultiWord,
+    combinedSearch,
+    hasCombinedSearch,
+  }
+}
+
+// =================== MAIN HANDLER ===================
+
+export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ message: 'Method not allowed' })
+  }
+
+  // Change default limit to a large number (10000) to effectively remove the limit for most use cases
+  const { q, category, limit = 10000, sort = 'alt_ids_length' } = req.query
+
+  try {
+    const db = await openDb()
+
+    // Handle empty query
+    if (!q && !category) {
+      return res.status(400).json({
+        message: 'Please provide a search query or category filter',
+      })
+    }
+
+    let queryData = {}
+    let categoryIds = []
+    const { baseQuery } = getBaseQueries()
+
+    // If category is provided, get all subcategories
+    if (category) {
+      categoryIds = await getAllSubcategories(db, category)
+    }
+
+    // Build query based on the search parameters
+    if (q) {
+      // Analyze the search term to determine search strategy
+      const analysis = analyzeSearchTerm(q.trim())
+
+      // Choose the appropriate query builder based on the analysis
+      if (analysis.hasCombinedSearch) {
+        queryData = buildCombinedSearch(baseQuery, analysis.searchTerm, q, analysis.combinedSearch)
+      } else if (analysis.isMultipleFormats) {
+        queryData = buildDimensionSearch(baseQuery, analysis.searchTerm, q, analysis.allDimensionFormats)
+      } else if (analysis.isMultiWord) {
+        queryData = buildMultiWordSearch(baseQuery, analysis.searchTerm, q, analysis.multiWordSearch)
+      } else {
+        queryData = buildBasicSearch(baseQuery, analysis.searchTerm, q)
+      }
+
+      // Add category filter if needed
+      if (category) {
+        queryData = addCategoryFilter(queryData, categoryIds)
+      }
+    } else if (category) {
+      // Only filtering by category
+      queryData = buildCategoryOnlyQuery(baseQuery, categoryIds)
+    }
+
+    // Wrap the query in a subquery to apply sorting consistently and eliminate duplicates
+    let { query, params, countQuery, countParams } = queryData
+    query = `SELECT DISTINCT * FROM (${query}) results_with_alt_ids`
+
+    // Apply sorting and limit
+    query = applySorting(query, sort)
+    const { query: finalQuery, params: finalParams } = applyLimit(query, params, limit)
+
+    // Execute query
+    const results = await db.all(finalQuery, ...finalParams)
+
+    // Get total count
+    const countResult = await db.get(countQuery, ...countParams)
+    const total = countResult ? countResult.total : 0
+
+    return res.status(200).json({
+      results,
+      total,
+      returned: results.length,
+      categories: categoryIds,
+    })
+  } catch (error) {
+    console.error('Search error:', error)
+    return res.status(500).json({
+      message: 'An error occurred during search',
+      error: error.message,
+    })
+  }
 }
