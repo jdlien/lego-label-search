@@ -144,11 +144,16 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
 
         <VStack align="stretch" spacing={4} flex="1">
           <Box>
-            <Heading size="lg">{part.ba_name || part.name}</Heading>
+            <Heading size="lg" mb={2}>
+              {part.ba_name || part.name}
+            </Heading>
             {part.ba_name && part.name && part.ba_name !== part.name && (
-              <Text color="gray.600" fontSize="md" mt={1}>
-                ({part.name})
-              </Text>
+              <Box>
+                <Heading size="sm">Rebrickable Name</Heading>
+                <Text color={useColorModeValue('gray.600', 'gray.300')} fontSize="md" mt={1}>
+                  {part.name}
+                </Text>
+              </Box>
             )}
           </Box>
 
@@ -167,14 +172,13 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
 
           <Box>
             <Heading size="sm" mb={2}>
-              Category
+              Rebrickable Category <span style={{ fontWeight: 'normal' }}>&nbsp;{part.category_id}</span>
             </Heading>
             <VStack align="stretch" spacing={2}>
               {/* Display both category types */}
               {part.category_name && (
                 <Flex alignItems="center" mb={1}>
-                  <Text fontWeight="medium" mr={2}></Text>
-                  <Badge colorScheme="purple" fontSize="md" px={2} py={1} borderRadius="md">
+                  <Badge colorScheme="purple" p={1} borderRadius="md">
                     {part.category_name}
                   </Badge>
                 </Flex>
@@ -183,9 +187,9 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
               {/* Breadcrumb-style category path */}
               {categoryPath.length > 0 ? (
                 <Flex flexDirection="column">
-                  <Text fontWeight="medium" mb={1}>
-                    BrickArchitect Category:
-                  </Text>
+                  <Heading size="sm" mb={2} pt={2}>
+                    BrickArchitect Category <span style={{ fontWeight: 'normal' }}>&nbsp;{part.ba_cat_id}</span>
+                  </Heading>
                   <Flex flexWrap="wrap" gap={2}>
                     {categoryPath.map((cat, index) => (
                       <React.Fragment key={cat.id}>
@@ -194,7 +198,7 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
                           colorScheme={index === categoryPath.length - 1 ? 'blue' : 'gray'}
                           cursor="pointer"
                           onClick={() => handleCategoryClick(cat.id)}
-                          p={2}
+                          p={1}
                           borderRadius="md"
                           _hover={{ bg: index === categoryPath.length - 1 ? 'blue.100' : 'gray.100' }}
                         >
@@ -207,9 +211,6 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
               ) : (
                 part.ba_cat_id && (
                   <Flex alignItems="center">
-                    <Text fontWeight="medium" mr={2}>
-                      BrickArk Category:
-                    </Text>
                     <Badge
                       colorScheme="blue"
                       cursor="pointer"
@@ -221,6 +222,20 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
                     </Badge>
                   </Flex>
                 )
+              )}
+
+              {/* Material */}
+              {part.part_material && (
+                <Box>
+                  <Heading size="sm" mb={2} pt={2}>
+                    Material
+                  </Heading>
+                  <Flex alignItems="center" mb={1}>
+                    <Badge colorScheme="green" p={1} borderRadius="md">
+                      {part.part_material}
+                    </Badge>
+                  </Flex>
+                </Box>
               )}
 
               {!part.category_name && !part.ba_cat_id && (
