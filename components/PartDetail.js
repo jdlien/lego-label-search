@@ -251,24 +251,74 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
               <Heading size="sm" mb={2}>
                 Description
               </Heading>
-              <Text>{part.description}</Text>
+              <Text dangerouslySetInnerHTML={{ __html: part.description }} />
             </Box>
           )}
 
-          {part.alternateIds && part.alternateIds.length > 0 && (
+          {part.alternatesByType &&
+          Object.entries(part.alternatesByType).some(([_, typeData]) => typeData.ids.length > 0) ? (
+            <Box>
+              <Heading size="sm" mb={2}>
+                Alternate Part Numbers
+              </Heading>
+              <VStack align="stretch" spacing={3}>
+                {Object.entries(part.alternatesByType).map(
+                  ([type, typeData]) =>
+                    typeData.ids.length > 0 && (
+                      <Box key={type} mb={3}>
+                        <Box mb={1}>
+                          <Text fontSize="sm" fontWeight="bold">
+                            {typeData.heading}
+                          </Text>
+                          <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mb={2}>
+                            {typeData.description}
+                          </Text>
+                        </Box>
+                        <HStack spacing={2} flexWrap="wrap" pl={0}>
+                          {typeData.ids.map((id, index) => (
+                            <Badge
+                              key={index}
+                              colorScheme="gray"
+                              p={1}
+                              borderRadius="md"
+                              cursor="pointer"
+                              onClick={() => router.push(`${router.asPath.split('&part=')[0]}&part=${id}`)}
+                              _hover={{
+                                bg: useColorModeValue('gray.200', 'gray.500'),
+                                color: useColorModeValue('gray.900', 'gray.100'),
+                              }}
+                            >
+                              {id}
+                            </Badge>
+                          ))}
+                        </HStack>
+                      </Box>
+                    )
+                )}
+              </VStack>
+            </Box>
+          ) : part.alternateIds && part.alternateIds.length > 0 ? (
             <Box>
               <Heading size="sm" mb={2}>
                 Alternate IDs
               </Heading>
               <HStack spacing={2} flexWrap="wrap">
                 {part.alternateIds.map((id, index) => (
-                  <Badge key={index} colorScheme="gray" p={1} borderRadius="md">
+                  <Badge
+                    key={index}
+                    colorScheme="gray"
+                    p={1}
+                    borderRadius="md"
+                    cursor="pointer"
+                    onClick={() => router.push(`${router.asPath.split('&part=')[0]}&part=${id}`)}
+                    _hover={{ bg: 'gray.300', color: 'gray.800' }}
+                  >
                     {id}
                   </Badge>
                 ))}
               </HStack>
             </Box>
-          )}
+          ) : null}
         </VStack>
       </Flex>
     </Box>

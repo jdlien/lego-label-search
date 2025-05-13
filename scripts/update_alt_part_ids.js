@@ -47,14 +47,14 @@ async function getAlternatePartIds(db, partNum) {
   const alternateIdsQuery = `
     SELECT child_part_num AS alt_id
     FROM part_relationships
-    WHERE rel_type IN ('A', 'M', 'R', 'T')
+    WHERE rel_type IN ('M', 'R', 'T')
     AND parent_part_num = ?
 
     UNION
 
     SELECT parent_part_num AS alt_id
     FROM part_relationships
-    WHERE rel_type IN ('A', 'M', 'R', 'T')
+    WHERE rel_type IN ('M', 'R', 'T')
     AND child_part_num = ?
   `
 
