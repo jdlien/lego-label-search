@@ -26,29 +26,36 @@ const theme = extendTheme({
   },
 })
 
-// Custom hook to update theme-color based on color mode
-function useThemeColorMetaTag() {
+// Simple hook to update theme color
+function useUpdateThemeColor() {
   const { colorMode } = useColorMode()
 
+  // Update as early as possible during render
   useEffect(() => {
-    // Make sure we're in the browser
-    if (typeof window === 'undefined') return
-
-    const themeColor = colorMode === 'dark' ? '#1A202C' : '#2b6cb0'
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]')
-
-    if (!metaThemeColor) {
-      // Create the meta tag if it doesn't exist
-      metaThemeColor = document.createElement('meta')
-      metaThemeColor.name = 'theme-color'
-      document.head.appendChild(metaThemeColor)
+    // Function to update the theme color
+    const updateThemeColor = () => {
+      const themeColor = colorMode === 'dark' ? '#1A202C' : '#2b6cb0'
+      const metaTag = document.querySelector('meta[name="theme-color"]')
+      if (metaTag) {
+        metaTag.setAttribute('content', themeColor)
+        console.log('Theme color updated to', themeColor, 'for mode', colorMode)
+      }
     }
 
-    // Update the content
-    metaThemeColor.setAttribute('content', themeColor)
+    // Update immediately
+    updateThemeColor()
 
-    // For debugging - you can remove this after confirming it works
-    console.log('Theme color updated to:', themeColor, 'for mode:', colorMode)
+    // Also update after everything is fully loaded
+    if (typeof window !== 'undefined') {
+      if (document.readyState === 'complete') {
+        // If already loaded, update again after a small delay
+        setTimeout(updateThemeColor, 100)
+      } else {
+        // Otherwise wait for load event
+        window.addEventListener('load', updateThemeColor)
+        return () => window.removeEventListener('load', updateThemeColor)
+      }
+    }
   }, [colorMode])
 }
 
@@ -68,69 +75,66 @@ function MyApp({ Component, pageProps }) {
         {/* iOS status bar style */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        {/* Initial theme color (will be overridden dynamically) */}
+        {/* Theme color - will be updated by JS */}
         <meta name="theme-color" content="#2b6cb0" />
         {/* PWA/Android support */}
         <link rel="manifest" href="/icons/manifest.json" />
-        {/* Script to detect and set initial theme color before hydration */}
+
+        {/* Direct script to update theme color for iOS home screen */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              (function() {
-                // Check if user prefers dark mode
-                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          // Function to update theme color
+          function updateThemeColor() {
+            // Try to get the color mode from localStorage
+            const storedMode = localStorage.getItem('chakra-ui-color-mode');
 
-                // Get stored theme preference if available (from localStorage)
-                const storedTheme = localStorage.getItem('chakra-ui-color-mode');
+            // Check if dark mode is preferred by the system
+            const prefersDark = window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-                // Determine theme: stored preference or system preference
-                const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+            // Determine the current mode
+            const isDarkMode = storedMode === 'dark' ||
+              (storedMode !== 'light' && prefersDark);
 
-                // Set the appropriate theme color
-                const themeColor = theme === 'dark' ? '#1A202C' : '#2b6cb0';
+            // Set the appropriate color
+            const themeColor = isDarkMode ? '#1A202C' : '#2b6cb0';
 
-                // Find the theme-color meta tag and update it
-                let metaTag = document.querySelector('meta[name="theme-color"]');
-                if (metaTag) {
-                  metaTag.setAttribute('content', themeColor);
-                }
-              })();
-            `,
+            // Update the meta tag
+            const metaTag = document.querySelector('meta[name="theme-color"]');
+            if (metaTag) {
+              metaTag.setAttribute('content', themeColor);
+              console.log('Direct script updated theme color to', themeColor);
+            }
+          }
+
+          // Run immediately
+          updateThemeColor();
+
+          // Also run when page is fully loaded
+          window.addEventListener('load', updateThemeColor);
+
+          // Watch for color scheme changes
+          if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)')
+              .addEventListener('change', updateThemeColor);
+          }
+        `,
           }}
-        />
+        ></script>
       </Head>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ChakraProvider theme={theme}>
         <Component {...pageProps} />
-        <ThemeColorUpdater />
+        <ThemeUpdater />
       </ChakraProvider>
     </>
   )
 }
 
-// This component uses the custom hook
-function ThemeColorUpdater() {
-  const { colorMode, setColorMode } = useColorMode()
-
-  // Force a check of the color mode on initial load
-  useEffect(() => {
-    // Get the stored theme from localStorage
-    const storedTheme = localStorage.getItem('chakra-ui-color-mode')
-
-    // Check system preference
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-
-    // If there's a stored theme and it doesn't match the current colorMode, force update
-    if (storedTheme && storedTheme !== colorMode) {
-      setColorMode(storedTheme)
-    }
-    // If no stored theme but system prefers dark and colorMode isn't dark, set to dark
-    else if (!storedTheme && prefersDark && colorMode !== 'dark') {
-      setColorMode('dark')
-    }
-  }, [])
-
-  useThemeColorMetaTag()
+// Simple component to use our hook
+function ThemeUpdater() {
+  useUpdateThemeColor()
   return null
 }
 
