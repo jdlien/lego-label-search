@@ -1,8 +1,8 @@
 /** @format */
 
-import { ChakraProvider, extendTheme, ColorModeScript, useColorModeValue } from '@chakra-ui/react'
+import { ChakraProvider, extendTheme, ColorModeScript, useColorMode } from '@chakra-ui/react'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 // Extend the theme to customize the app
 const theme = extendTheme({
@@ -26,22 +26,21 @@ const theme = extendTheme({
   },
 })
 
+// Custom hook to update theme-color based on color mode
+function useThemeColorMetaTag() {
+  const { colorMode } = useColorMode()
+
+  useEffect(() => {
+    const themeColor = colorMode === 'light' ? '#2b6cb0' : '#1A202C'
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]')
+
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', themeColor)
+    }
+  }, [colorMode])
+}
+
 function MyApp({ Component, pageProps }) {
-  // Create a component that will update the theme-color meta tag based on color mode
-  function ThemeColorMetaTag() {
-    const themeColor = useColorModeValue('#2b6cb0', '#1A202C') // Light bg / Dark bg
-    const [mounted, setMounted] = useState(false)
-
-    // Only render after mounting to prevent hydration mismatch
-    useEffect(() => {
-      setMounted(true)
-    }, [])
-
-    if (!mounted) return null
-
-    return <meta name="theme-color" content={themeColor} />
-  }
-
   return (
     <>
       <Head>
@@ -57,17 +56,24 @@ function MyApp({ Component, pageProps }) {
         {/* iOS status bar style */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* Initial theme color (will be overridden dynamically) */}
+        <meta name="theme-color" content="#2b6cb0" />
         {/* PWA/Android support */}
         <link rel="manifest" href="/icons/manifest.json" />
       </Head>
-      {/* This will render the theme-color meta tag dynamically */}
-      <ThemeColorMetaTag />
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ChakraProvider theme={theme}>
         <Component {...pageProps} />
+        <ThemeColorUpdater />
       </ChakraProvider>
     </>
   )
+}
+
+// This component uses the custom hook
+function ThemeColorUpdater() {
+  useThemeColorMetaTag()
+  return null
 }
 
 export default MyApp
