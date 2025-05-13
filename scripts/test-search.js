@@ -70,11 +70,11 @@ async function testSearch() {
 
     // Special handling for short queries
     if (isShortQuery) {
-      query = `${baseQuery} WHERE p.part_num LIKE ? LIMIT 20`
-      params = [`${q}%`]
+      query = `${baseQuery} WHERE p.part_num LIKE ? OR p.alt_part_ids LIKE ? LIMIT 20`
+      params = [`${q}%`, `%${q}%`]
 
-      countQuery = `${baseCountQuery} WHERE p.part_num LIKE ?`
-      countParams = [`${q}%`]
+      countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR p.alt_part_ids LIKE ?`
+      countParams = [`${q}%`, `%${q}%`]
     } else {
       const searchTerm = `%${q}%`
       query = `${baseQuery} WHERE p.part_num = ?
@@ -82,11 +82,13 @@ async function testSearch() {
               SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
               UNION ALL
               SELECT * FROM (${baseQuery} WHERE (p.name LIKE ? OR p.ba_name LIKE ?) AND p.part_num NOT LIKE ?)
+              UNION ALL
+              SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
               LIMIT 20`
-      params = [q, searchTerm, q, searchTerm, searchTerm, searchTerm]
+      params = [q, searchTerm, q, searchTerm, searchTerm, searchTerm, searchTerm, q]
 
-      countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?`
-      countParams = [searchTerm, searchTerm, searchTerm]
+      countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?`
+      countParams = [searchTerm, searchTerm, searchTerm, searchTerm]
     }
 
     console.log('Executing query:', query)
