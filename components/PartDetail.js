@@ -200,7 +200,16 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
                           onClick={() => handleCategoryClick(cat.id)}
                           p={1}
                           borderRadius="md"
-                          _hover={{ bg: index === categoryPath.length - 1 ? 'blue.100' : 'gray.100' }}
+                          _hover={{
+                            bg:
+                              index === categoryPath.length - 1
+                                ? useColorModeValue('blue.200', 'blue.700')
+                                : useColorModeValue('gray.200', 'gray.600'),
+                            color:
+                              index === categoryPath.length - 1
+                                ? useColorModeValue('blue.900', 'white')
+                                : useColorModeValue('gray.900', 'white'),
+                          }}
                         >
                           {cat.name}
                         </Badge>
@@ -217,6 +226,10 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
                       onClick={() => handleCategoryClick(part.ba_cat_id)}
                       p={2}
                       borderRadius="md"
+                      _hover={{
+                        bg: useColorModeValue('blue.100', 'blue.900'),
+                        color: useColorModeValue('blue.900', 'blue.100'),
+                      }}
                     >
                       {displayCategory || 'Unknown Category'}
                     </Badge>
@@ -284,7 +297,7 @@ const PartDetail = ({ part, isLoading, error, isInModal = false }) => {
                               cursor="pointer"
                               onClick={() => router.push(`${router.asPath.split('&part=')[0]}&part=${id}`)}
                               _hover={{
-                                bg: useColorModeValue('gray.200', 'gray.500'),
+                                bg: useColorModeValue('gray.200', 'gray.600'),
                                 color: useColorModeValue('gray.900', 'gray.100'),
                               }}
                             >
