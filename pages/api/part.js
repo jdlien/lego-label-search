@@ -52,6 +52,30 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Part not found' })
     }
 
+    // Get alternate part numbers (parts that are functionally equivalent)
+    const alternateIdsQuery = `
+      SELECT child_part_num AS alt_id
+      FROM part_relationships
+      WHERE rel_type IN ('A', 'M', 'R', 'T')
+      AND parent_part_num = ?
+
+      UNION
+
+      SELECT parent_part_num AS alt_id
+      FROM part_relationships
+      WHERE rel_type IN ('A', 'M', 'R', 'T')
+      AND child_part_num = ?
+    `
+
+    const alternateIds = await db.all(alternateIdsQuery, [id, id])
+
+    // Add alternateIds to the part object (filter out the current part ID)
+    if (alternateIds && alternateIds.length > 0) {
+      part.alternateIds = alternateIds.map((item) => item.alt_id).filter((altId) => altId !== id)
+    } else {
+      part.alternateIds = []
+    }
+
     // Return the part details
     return res.status(200).json(part)
   } catch (error) {
