@@ -69,6 +69,7 @@ npm start
 ## Acknowledgments
 
 - Brick Architect for the comprehensive LEGO part classification system
+- Rebrickable for extensive data on LEGO parts
 - The LEGO Group for creating the amazing building blocks we all love
 
 ## Performance Optimizations
