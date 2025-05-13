@@ -1,6 +1,6 @@
 <!-- @format -->
 
-# LEGO Part Label Maker
+# LEGO Part Label Search
 
 An application for searching LEGO parts and downloading printable labels to organize your collection.
 
