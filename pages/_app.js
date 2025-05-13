@@ -1,6 +1,7 @@
 /** @format */
 
 import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react'
+import Head from 'next/head'
 
 // Extend the theme to customize the app
 const theme = extendTheme({
@@ -27,6 +28,19 @@ const theme = extendTheme({
 function MyApp({ Component, pageProps }) {
   return (
     <>
+      <Head>
+        {/* Favicon - Legacy browsers */}
+        <link rel="icon" href="/icons/favicon.ico" sizes="any" />
+        {/* SVG Favicon - Modern Browsers */}
+        <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+        {/* PNG fallbacks for specific sizes (if needed) */}
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+        {/* Apple touch icon */}
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        {/* PWA/Android support */}
+        <link rel="manifest" href="/icons/manifest.json" />
+      </Head>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ChakraProvider theme={theme}>
         <Component {...pageProps} />
