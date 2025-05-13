@@ -1,7 +1,8 @@
 /** @format */
 
-import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react'
+import { ChakraProvider, extendTheme, ColorModeScript, useColorModeValue } from '@chakra-ui/react'
 import Head from 'next/head'
+import { useEffect, useState } from 'react'
 
 // Extend the theme to customize the app
 const theme = extendTheme({
@@ -26,6 +27,21 @@ const theme = extendTheme({
 })
 
 function MyApp({ Component, pageProps }) {
+  // Create a component that will update the theme-color meta tag based on color mode
+  function ThemeColorMetaTag() {
+    const themeColor = useColorModeValue('#2b6cb0', '#1A202C') // Light bg / Dark bg
+    const [mounted, setMounted] = useState(false)
+
+    // Only render after mounting to prevent hydration mismatch
+    useEffect(() => {
+      setMounted(true)
+    }, [])
+
+    if (!mounted) return null
+
+    return <meta name="theme-color" content={themeColor} />
+  }
+
   return (
     <>
       <Head>
@@ -38,9 +54,14 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
         {/* Apple touch icon */}
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        {/* iOS status bar style */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         {/* PWA/Android support */}
         <link rel="manifest" href="/icons/manifest.json" />
       </Head>
+      {/* This will render the theme-color meta tag dynamically */}
+      <ThemeColorMetaTag />
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ChakraProvider theme={theme}>
         <Component {...pageProps} />
