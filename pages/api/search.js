@@ -243,11 +243,13 @@ export default async function handler(req, res) {
                   SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
                   UNION ALL
                   SELECT * FROM (${baseQuery} WHERE (${combinedCondition}) AND p.part_num NOT LIKE ?)
+                  UNION ALL
+                  SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
                   `
-          params = [q, searchTerm, q, ...nameParams, searchTerm]
+          params = [q, searchTerm, q, ...nameParams, searchTerm, searchTerm, q]
 
-          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR (${combinedCondition})`
-          countParams = [searchTerm, ...nameParams]
+          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?`
+          countParams = [searchTerm, ...nameParams, searchTerm]
         } else if (isMultipleFormats) {
           // Dimension search handling (only dimensions, no regular terms to AND with)
           const nameLikeConditions = allDimensionFormats.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?').join(' OR ')
@@ -261,11 +263,13 @@ export default async function handler(req, res) {
                   SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
                   UNION ALL
                   SELECT * FROM (${baseQuery} WHERE (${nameLikeConditions}) AND p.part_num NOT LIKE ?)
+                  UNION ALL
+                  SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
                   `
-          params = [q, searchTerm, q, ...nameParams, searchTerm]
+          params = [q, searchTerm, q, ...nameParams, searchTerm, searchTerm, q]
 
-          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR ${nameLikeConditions}`
-          countParams = [searchTerm, ...nameParams]
+          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR ${nameLikeConditions} OR p.alt_part_ids LIKE ?`
+          countParams = [searchTerm, ...nameParams, searchTerm]
         } else if (isMultiWord) {
           // Handle multi-word search (words in any order)
           const nameConditions = []
@@ -286,12 +290,14 @@ export default async function handler(req, res) {
                   SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
                   UNION ALL
                   SELECT * FROM (${baseQuery} WHERE (${combinedNameCondition}) AND p.part_num NOT LIKE ?)
+                  UNION ALL
+                  SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
                   `
-          params = [q, searchTerm, q, ...nameParams, searchTerm]
+          params = [q, searchTerm, q, ...nameParams, searchTerm, searchTerm, q]
 
           // Count query needs to use the same logic
-          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR (${combinedNameCondition})`
-          countParams = [searchTerm, ...nameParams]
+          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?`
+          countParams = [searchTerm, ...nameParams, searchTerm]
         } else {
           // Original query for single-word searches
           query = `${baseQuery} WHERE p.part_num = ?
@@ -299,11 +305,13 @@ export default async function handler(req, res) {
                   SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
                   UNION ALL
                   SELECT * FROM (${baseQuery} WHERE (p.name LIKE ? OR p.ba_name LIKE ?) AND p.part_num NOT LIKE ?)
+                  UNION ALL
+                  SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
                   `
-          params = [q, searchTerm, q, searchTerm, searchTerm, searchTerm]
+          params = [q, searchTerm, q, searchTerm, searchTerm, searchTerm, searchTerm, q]
 
-          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?`
-          countParams = [searchTerm, searchTerm, searchTerm]
+          countQuery = `${baseCountQuery} WHERE p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?`
+          countParams = [searchTerm, searchTerm, searchTerm, searchTerm]
         }
       } else {
         // With category filter
@@ -334,11 +342,11 @@ export default async function handler(req, res) {
               nameParams.push(`%${term}%`, `%${term}%`)
             })
 
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedCondition})) AND p.ba_cat_id = ?`
-            params = [q, searchTerm, ...nameParams, categoryIds[0]]
+            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
+            params = [q, searchTerm, ...nameParams, searchTerm, categoryIds[0]]
 
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedCondition})) AND p.ba_cat_id = ?`
-            countParams = [searchTerm, ...nameParams, categoryIds[0]]
+            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
+            countParams = [searchTerm, ...nameParams, searchTerm, categoryIds[0]]
           } else if (isMultipleFormats) {
             // Dimension formats with category
             const nameLikeConditions = allDimensionFormats.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?').join(' OR ')
@@ -347,11 +355,11 @@ export default async function handler(req, res) {
               nameParams.push(`%${format}%`, `%${format}%`)
             })
 
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${nameLikeConditions})) AND p.ba_cat_id = ?`
-            params = [q, searchTerm, ...nameParams, categoryIds[0]]
+            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${nameLikeConditions}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
+            params = [q, searchTerm, ...nameParams, searchTerm, categoryIds[0]]
 
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR ${nameLikeConditions}) AND p.ba_cat_id = ?`
-            countParams = [searchTerm, ...nameParams, categoryIds[0]]
+            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR ${nameLikeConditions} OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
+            countParams = [searchTerm, ...nameParams, searchTerm, categoryIds[0]]
           } else if (isMultiWord) {
             // Multi-word search with single category
             const nameConditions = []
@@ -366,18 +374,18 @@ export default async function handler(req, res) {
             // Combine with AND
             const combinedNameCondition = nameConditions.join(' AND ')
 
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedNameCondition})) AND p.ba_cat_id = ?`
-            params = [q, searchTerm, ...nameParams, categoryIds[0]]
+            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
+            params = [q, searchTerm, ...nameParams, searchTerm, categoryIds[0]]
 
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedNameCondition})) AND p.ba_cat_id = ?`
-            countParams = [searchTerm, ...nameParams, categoryIds[0]]
+            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
+            countParams = [searchTerm, ...nameParams, searchTerm, categoryIds[0]]
           } else {
             // Original query with one category (unchanged)
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?) AND p.ba_cat_id = ?`
-            params = [q, searchTerm, searchTerm, searchTerm, categoryIds[0]]
+            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
+            params = [q, searchTerm, searchTerm, searchTerm, searchTerm, categoryIds[0]]
 
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?) AND p.ba_cat_id = ?`
-            countParams = [searchTerm, searchTerm, searchTerm, categoryIds[0]]
+            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?) AND p.ba_cat_id = ?`
+            countParams = [searchTerm, searchTerm, searchTerm, searchTerm, categoryIds[0]]
           }
         } else {
           // Multiple categories
@@ -408,11 +416,11 @@ export default async function handler(req, res) {
               nameParams.push(`%${term}%`, `%${term}%`)
             })
 
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedCondition})) AND p.ba_cat_id IN (${placeholders})`
-            params = [q, searchTerm, ...nameParams, ...categoryIds]
+            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
+            params = [q, searchTerm, ...nameParams, searchTerm, ...categoryIds]
 
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedCondition})) AND p.ba_cat_id IN (${placeholders})`
-            countParams = [searchTerm, ...nameParams, ...categoryIds]
+            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
+            countParams = [searchTerm, ...nameParams, searchTerm, ...categoryIds]
           } else if (isMultipleFormats) {
             // Dimension formats with multiple categories
             const nameLikeConditions = allDimensionFormats.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?').join(' OR ')
@@ -421,11 +429,11 @@ export default async function handler(req, res) {
               nameParams.push(`%${format}%`, `%${format}%`)
             })
 
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${nameLikeConditions})) AND p.ba_cat_id IN (${placeholders})`
-            params = [q, searchTerm, ...nameParams, ...categoryIds]
+            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${nameLikeConditions}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
+            params = [q, searchTerm, ...nameParams, searchTerm, ...categoryIds]
 
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR ${nameLikeConditions}) AND p.ba_cat_id IN (${placeholders})`
-            countParams = [searchTerm, ...nameParams, ...categoryIds]
+            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR ${nameLikeConditions} OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
+            countParams = [searchTerm, ...nameParams, searchTerm, ...categoryIds]
           } else if (isMultiWord) {
             // Multi-word search with multiple categories
             const nameConditions = []
@@ -440,18 +448,18 @@ export default async function handler(req, res) {
             // Combine with AND
             const combinedNameCondition = nameConditions.join(' AND ')
 
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedNameCondition})) AND p.ba_cat_id IN (${placeholders})`
-            params = [q, searchTerm, ...nameParams, ...categoryIds]
+            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
+            params = [q, searchTerm, ...nameParams, searchTerm, ...categoryIds]
 
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedNameCondition})) AND p.ba_cat_id IN (${placeholders})`
-            countParams = [searchTerm, ...nameParams, ...categoryIds]
+            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR (${combinedNameCondition}) OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
+            countParams = [searchTerm, ...nameParams, searchTerm, ...categoryIds]
           } else {
             // Original query with multiple categories (unchanged)
-            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            params = [q, searchTerm, searchTerm, searchTerm, ...categoryIds]
+            query = `${baseQuery} WHERE (p.part_num = ? OR p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
+            params = [q, searchTerm, searchTerm, searchTerm, searchTerm, ...categoryIds]
 
-            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?) AND p.ba_cat_id IN (${placeholders})`
-            countParams = [searchTerm, searchTerm, searchTerm, ...categoryIds]
+            countQuery = `${baseCountQuery} WHERE (p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ? OR p.alt_part_ids LIKE ?) AND p.ba_cat_id IN (${placeholders})`
+            countParams = [searchTerm, searchTerm, searchTerm, searchTerm, ...categoryIds]
           }
         }
       }
