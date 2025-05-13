@@ -63,6 +63,7 @@ function MyApp({ Component, pageProps }) {
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         {/* iOS status bar style */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         {/* Theme color will now be managed by ThemeColorMetaUpdater */}
         {/* <meta name="theme-color" content="#2b6cb0" /> */}
