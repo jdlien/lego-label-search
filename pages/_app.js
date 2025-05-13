@@ -31,12 +31,24 @@ function useThemeColorMetaTag() {
   const { colorMode } = useColorMode()
 
   useEffect(() => {
-    const themeColor = colorMode === 'light' ? '#2b6cb0' : '#1A202C'
+    // Make sure we're in the browser
+    if (typeof window === 'undefined') return
+
+    const themeColor = colorMode === 'dark' ? '#1A202C' : '#2b6cb0'
     let metaThemeColor = document.querySelector('meta[name="theme-color"]')
 
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', themeColor)
+    if (!metaThemeColor) {
+      // Create the meta tag if it doesn't exist
+      metaThemeColor = document.createElement('meta')
+      metaThemeColor.name = 'theme-color'
+      document.head.appendChild(metaThemeColor)
     }
+
+    // Update the content
+    metaThemeColor.setAttribute('content', themeColor)
+
+    // For debugging - you can remove this after confirming it works
+    console.log('Theme color updated to:', themeColor, 'for mode:', colorMode)
   }, [colorMode])
 }
 
@@ -60,6 +72,32 @@ function MyApp({ Component, pageProps }) {
         <meta name="theme-color" content="#2b6cb0" />
         {/* PWA/Android support */}
         <link rel="manifest" href="/icons/manifest.json" />
+        {/* Script to detect and set initial theme color before hydration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                // Check if user prefers dark mode
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                // Get stored theme preference if available (from localStorage)
+                const storedTheme = localStorage.getItem('chakra-ui-color-mode');
+
+                // Determine theme: stored preference or system preference
+                const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+
+                // Set the appropriate theme color
+                const themeColor = theme === 'dark' ? '#1A202C' : '#2b6cb0';
+
+                // Find the theme-color meta tag and update it
+                let metaTag = document.querySelector('meta[name="theme-color"]');
+                if (metaTag) {
+                  metaTag.setAttribute('content', themeColor);
+                }
+              })();
+            `,
+          }}
+        />
       </Head>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ChakraProvider theme={theme}>
@@ -72,6 +110,26 @@ function MyApp({ Component, pageProps }) {
 
 // This component uses the custom hook
 function ThemeColorUpdater() {
+  const { colorMode, setColorMode } = useColorMode()
+
+  // Force a check of the color mode on initial load
+  useEffect(() => {
+    // Get the stored theme from localStorage
+    const storedTheme = localStorage.getItem('chakra-ui-color-mode')
+
+    // Check system preference
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+
+    // If there's a stored theme and it doesn't match the current colorMode, force update
+    if (storedTheme && storedTheme !== colorMode) {
+      setColorMode(storedTheme)
+    }
+    // If no stored theme but system prefers dark and colorMode isn't dark, set to dark
+    else if (!storedTheme && prefersDark && colorMode !== 'dark') {
+      setColorMode('dark')
+    }
+  }, [])
+
   useThemeColorMetaTag()
   return null
 }
