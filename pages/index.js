@@ -134,6 +134,17 @@ export default function Home() {
       <Head>
         <title>LEGO Part Label Maker</title>
         <meta name="description" content="Search and create labels for LEGO parts" />
+        {/* Favicon - Legacy browsers */}
+        <link rel="icon" href="/icons/favicon.ico" sizes="any" />
+        {/* SVG Favicon - Modern Browsers */}
+        <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+        {/* PNG fallbacks for specific sizes (if needed) */}
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+        {/* Apple touch icon */}
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        {/* PWA/Android support */}
+        <link rel="manifest" href="/icons/manifest.json" />
       </Head>
 
       <Header />
