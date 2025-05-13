@@ -54,14 +54,14 @@ export default async function handler(req, res) {
 
     // Get alternate part numbers (parts that are functionally equivalent)
     const alternateIdsQuery = `
-      SELECT child_part_num AS alt_id
+      SELECT child_part_num AS alt_id, rel_type
       FROM part_relationships
       WHERE rel_type IN ('A', 'M', 'R', 'T')
       AND parent_part_num = ?
 
       UNION
 
-      SELECT parent_part_num AS alt_id
+      SELECT parent_part_num AS alt_id, rel_type
       FROM part_relationships
       WHERE rel_type IN ('A', 'M', 'R', 'T')
       AND child_part_num = ?
@@ -69,11 +69,50 @@ export default async function handler(req, res) {
 
     const alternateIds = await db.all(alternateIdsQuery, [id, id])
 
-    // Add alternateIds to the part object (filter out the current part ID)
+    // Group the alternate IDs by relationship type with descriptions
     if (alternateIds && alternateIds.length > 0) {
+      const relationshipDescriptions = {
+        R: {
+          heading: 'Replacement',
+          description: 'LEGO replacement part that supersedes this one.',
+        },
+        M: {
+          heading: 'Mold Variant',
+          description: 'Same function with minor mold changes.',
+        },
+        T: {
+          heading: 'Alias',
+          description: 'Alternative part number, with no difference.',
+        },
+        A: {
+          heading: 'Alternate Part',
+          description: 'Other parts that may perform the same function.',
+        },
+      }
+
+      part.alternatesByType = {}
+
+      // Initialize all relationship types
+      Object.keys(relationshipDescriptions).forEach((type) => {
+        part.alternatesByType[type] = {
+          heading: relationshipDescriptions[type].heading,
+          description: relationshipDescriptions[type].description,
+          ids: [],
+        }
+      })
+
+      // Fill with actual data
+      alternateIds.forEach((item) => {
+        if (item.alt_id !== id && relationshipDescriptions[item.rel_type]) {
+          part.alternatesByType[item.rel_type].ids.push(item.alt_id)
+        }
+      })
+
+      // Also keep the flat list for backward compatibility
       part.alternateIds = alternateIds.map((item) => item.alt_id).filter((altId) => altId !== id)
     } else {
       part.alternateIds = []
+      part.alternatesByType = {}
     }
 
     // Return the part details

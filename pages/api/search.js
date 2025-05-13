@@ -207,26 +207,78 @@ function buildBasicSearch(baseQuery, searchTerm, q) {
 
 // Build query for dimension search
 function buildDimensionSearch(baseQuery, searchTerm, q, dimensionFormats) {
+  // Create both name-based conditions and part-number conditions
   const nameLikeConditions = dimensionFormats.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?').join(' OR ')
   const nameParams = []
   dimensionFormats.forEach((format) => {
     nameParams.push(`%${format}%`, `%${format}%`)
   })
 
-  const query = `${baseQuery} WHERE p.part_num = ?
-                UNION ALL
-                SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ? AND p.part_num != ?)
-                UNION ALL
-                SELECT * FROM (${baseQuery} WHERE (${nameLikeConditions}) AND p.part_num NOT LIKE ?)
-                UNION ALL
-                SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ? AND p.part_num != ?)
-                `
-  const params = [q, searchTerm, q, ...nameParams, searchTerm, searchTerm, q]
+  // Check if the original query contains additional terms besides dimensions
+  // This handles cases where someone searches for a part number AND a dimension
+  const terms = q.split(/\s+/).filter((term) => term.trim().length > 0)
+  const hasPossiblePartNum = terms.length > 1
 
-  const countQuery = `${
+  let query, params, countQuery, countParams
+
+  if (hasPossiblePartNum) {
+    // Enhanced search that allows matching dimensions AND other terms (potentially part numbers)
+    const otherTerms = terms.filter((term) => {
+      // Exclude terms that look like dimension patterns
+      const dimensionPattern = /^\d+\s*[x×]\s*\d+$/i
+      return !dimensionPattern.test(term)
+    })
+
+    if (otherTerms.length > 0) {
+      // Create conditions for non-dimension terms
+      const otherConditions = []
+      const otherParams = []
+
+      otherTerms.forEach((term) => {
+        // Allow term to match part_num, name or ba_name
+        otherConditions.push('(p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?)')
+        otherParams.push(`%${term}%`, `%${term}%`, `%${term}%`)
+      })
+
+      // Combine dimension condition with other terms using AND
+      const otherConditionsSQL = otherConditions.join(' AND ')
+      const combinedCondition = `(${nameLikeConditions}) AND (${otherConditionsSQL})`
+
+      // Build query that requires both dimension match AND other term matches
+      query = `${baseQuery} WHERE p.part_num = ?
+              UNION ALL
+              SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ?)
+              UNION ALL
+              SELECT * FROM (${baseQuery} WHERE (${combinedCondition}))
+              UNION ALL
+              SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ?)
+              `
+      params = [q, searchTerm, ...nameParams, ...otherParams, searchTerm]
+
+      countQuery = `${
+        getBaseQueries().baseCountQuery
+      } WHERE p.part_num LIKE ? OR ((${nameLikeConditions}) AND (${otherConditionsSQL})) OR p.alt_part_ids LIKE ?`
+      countParams = [searchTerm, ...nameParams, ...otherParams, searchTerm]
+
+      return { query, params, countQuery, countParams }
+    }
+  }
+
+  // Standard dimension-only search if no part number is detected
+  query = `${baseQuery} WHERE p.part_num = ?
+          UNION ALL
+          SELECT * FROM (${baseQuery} WHERE p.part_num LIKE ?)
+          UNION ALL
+          SELECT * FROM (${baseQuery} WHERE (${nameLikeConditions}))
+          UNION ALL
+          SELECT * FROM (${baseQuery} WHERE p.alt_part_ids LIKE ?)
+          `
+  params = [q, searchTerm, ...nameParams, searchTerm]
+
+  countQuery = `${
     getBaseQueries().baseCountQuery
-  } WHERE p.part_num LIKE ? OR ${nameLikeConditions} OR p.alt_part_ids LIKE ?`
-  const countParams = [searchTerm, ...nameParams, searchTerm]
+  } WHERE p.part_num LIKE ? OR (${nameLikeConditions}) OR p.alt_part_ids LIKE ?`
+  countParams = [searchTerm, ...nameParams, searchTerm]
 
   return { query, params, countQuery, countParams }
 }
@@ -236,12 +288,33 @@ function buildMultiWordSearch(baseQuery, searchTerm, q, multiWordSearch) {
   const nameConditions = []
   const nameParams = []
 
-  // For each word, we need both name and ba_name to contain it
+  // Process each search term, with special handling for dimension patterns
   multiWordSearch.terms.forEach((term) => {
-    // Add conditions for this word - now also including part_num to allow finding parts where
-    // one of the terms is a part number and others are descriptive
-    nameConditions.push(`(p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?)`)
-    nameParams.push(`%${term}%`, `%${term}%`, `%${term}%`)
+    // Check if term is a dimension pattern
+    const dimensionPattern = /^\d+\s*[x×]\s*\d+$/i
+    if (dimensionPattern.test(term)) {
+      // For dimension patterns, use the dimension normalization to catch all formats
+      const dimensionFormats = normalizeDimensions(term)
+
+      if (Array.isArray(dimensionFormats)) {
+        // Create a condition that matches any of the dimension formats
+        const dimensionConditions = dimensionFormats.map(() => 'p.name LIKE ? OR p.ba_name LIKE ?').join(' OR ')
+        nameConditions.push(`(${dimensionConditions})`)
+
+        // Add params for each dimension format
+        dimensionFormats.forEach((format) => {
+          nameParams.push(`%${format}%`, `%${format}%`)
+        })
+      } else {
+        // Fallback if normalization didn't return formats
+        nameConditions.push(`(p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?)`)
+        nameParams.push(`%${term}%`, `%${term}%`, `%${term}%`)
+      }
+    } else {
+      // For non-dimension terms, include part_num, name and ba_name in search
+      nameConditions.push(`(p.part_num LIKE ? OR p.name LIKE ? OR p.ba_name LIKE ?)`)
+      nameParams.push(`%${term}%`, `%${term}%`, `%${term}%`)
+    }
   })
 
   // Combine conditions with AND to require all words to be present
@@ -402,6 +475,10 @@ function applyLimit(query, params, limit) {
 function analyzeSearchTerm(q) {
   const searchTerm = `%${q}%`
 
+  // First check if this is a multi-word search
+  const terms = q.split(/\s+/).filter((term) => term.trim().length > 0)
+  const isRawMultiWord = terms.length > 1
+
   // Check for exact dimension pattern
   const dimensionFormats = normalizeDimensions(q)
   const isExactDimension = Array.isArray(dimensionFormats)
@@ -410,11 +487,41 @@ function analyzeSearchTerm(q) {
   const extractedDimensions = extractDimensionPatterns(q)
   const hasDimensionsWithin = extractedDimensions !== null
 
+  // Check if any term is a dimension pattern
+  const hasDimensionTerm =
+    isRawMultiWord &&
+    terms.some((term) => {
+      const dimensionPattern = /^\d+\s*[x×]\s*\d+$/i
+      return dimensionPattern.test(term)
+    })
+
   // Combine dimension formats
   const isMultipleFormats = isExactDimension || hasDimensionsWithin
   const allDimensionFormats = isExactDimension ? dimensionFormats : hasDimensionsWithin ? extractedDimensions : null
 
-  // Check if multi-word search
+  // Special case: if it's multiple words and contains a dimension pattern,
+  // treat it as a multi-word search rather than a dimension search
+  if (isRawMultiWord && hasDimensionTerm) {
+    const multiWordSearch = {
+      isMultiWord: true,
+      original: q,
+      terms: terms,
+    }
+
+    return {
+      searchTerm,
+      isExactDimension: false,
+      hasDimensionsWithin: false,
+      isMultipleFormats: false,
+      allDimensionFormats: null,
+      multiWordSearch,
+      isMultiWord: true,
+      combinedSearch: null,
+      hasCombinedSearch: false,
+    }
+  }
+
+  // Standard checks
   const multiWordSearch = prepareMultiWordSearch(q)
   const isMultiWord = multiWordSearch.isMultiWord
 
