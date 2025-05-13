@@ -1,8 +1,7 @@
 /** @format */
 
-import { ChakraProvider, extendTheme, ColorModeScript, useColorMode } from '@chakra-ui/react'
+import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react'
 import Head from 'next/head'
-import { useEffect } from 'react'
 
 // Extend the theme to customize the app
 const theme = extendTheme({
@@ -26,39 +25,6 @@ const theme = extendTheme({
   },
 })
 
-// Simple hook to update theme color
-function useUpdateThemeColor() {
-  const { colorMode } = useColorMode()
-
-  // Update as early as possible during render
-  useEffect(() => {
-    // Function to update the theme color
-    const updateThemeColor = () => {
-      const themeColor = colorMode === 'dark' ? '#1A202C' : '#2b6cb0'
-      const metaTag = document.querySelector('meta[name="theme-color"]')
-      if (metaTag) {
-        metaTag.setAttribute('content', themeColor)
-        console.log('Theme color updated to', themeColor, 'for mode', colorMode)
-      }
-    }
-
-    // Update immediately
-    updateThemeColor()
-
-    // Also update after everything is fully loaded
-    if (typeof window !== 'undefined') {
-      if (document.readyState === 'complete') {
-        // If already loaded, update again after a small delay
-        setTimeout(updateThemeColor, 100)
-      } else {
-        // Otherwise wait for load event
-        window.addEventListener('load', updateThemeColor)
-        return () => window.removeEventListener('load', updateThemeColor)
-      }
-    }
-  }, [colorMode])
-}
-
 function MyApp({ Component, pageProps }) {
   return (
     <>
@@ -80,45 +46,68 @@ function MyApp({ Component, pageProps }) {
         {/* PWA/Android support */}
         <link rel="manifest" href="/icons/manifest.json" />
 
-        {/* Direct script to update theme color for iOS home screen */}
+        {/* Single script to handle theme color */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-          // Function to update theme color
-          function updateThemeColor() {
-            // Try to get the color mode from localStorage
-            const storedMode = localStorage.getItem('chakra-ui-color-mode');
+          (function() {
+            // Function to update the theme color
+            function updateThemeColor() {
+              // Get stored preference from localStorage
+              const storedMode = localStorage.getItem('chakra-ui-color-mode');
 
-            // Check if dark mode is preferred by the system
-            const prefersDark = window.matchMedia &&
-              window.matchMedia('(prefers-color-scheme: dark)').matches;
+              // Check system preference
+              const prefersDark = window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-            // Determine the current mode
-            const isDarkMode = storedMode === 'dark' ||
-              (storedMode !== 'light' && prefersDark);
+              // Determine the current mode - DARK has priority
+              const isDarkMode = storedMode === 'dark' ||
+                (storedMode !== 'light' && prefersDark);
 
-            // Set the appropriate color
-            const themeColor = isDarkMode ? '#1A202C' : '#2b6cb0';
+              // Set color based on mode
+              const themeColor = isDarkMode ? '#1A202C' : '#2b6cb0';
 
-            // Update the meta tag
-            const metaTag = document.querySelector('meta[name="theme-color"]');
-            if (metaTag) {
-              metaTag.setAttribute('content', themeColor);
-              console.log('Direct script updated theme color to', themeColor);
+              // Update the meta tag
+              const metaTag = document.querySelector('meta[name="theme-color"]');
+              if (metaTag) {
+                metaTag.setAttribute('content', themeColor);
+                console.log('Theme color set to', themeColor, 'based on', isDarkMode ? 'dark' : 'light', 'mode');
+              }
             }
-          }
 
-          // Run immediately
-          updateThemeColor();
+            // Run immediately
+            updateThemeColor();
 
-          // Also run when page is fully loaded
-          window.addEventListener('load', updateThemeColor);
+            // Run when color mode changes in localStorage
+            function handleStorageChange(e) {
+              if (e.key === 'chakra-ui-color-mode') {
+                updateThemeColor();
+              }
+            }
 
-          // Watch for color scheme changes
-          if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)')
-              .addEventListener('change', updateThemeColor);
-          }
+            // Run on page load completion
+            window.addEventListener('load', updateThemeColor);
+
+            // Listen for changes to localStorage
+            window.addEventListener('storage', handleStorageChange);
+
+            // Check periodically for 5 seconds after page load
+            let checkCount = 0;
+            const maxChecks = 10;
+            const checkInterval = setInterval(() => {
+              updateThemeColor();
+              checkCount++;
+              if (checkCount >= maxChecks) {
+                clearInterval(checkInterval);
+              }
+            }, 500);
+
+            // Also listen for color scheme changes
+            if (window.matchMedia) {
+              window.matchMedia('(prefers-color-scheme: dark)')
+                .addEventListener('change', updateThemeColor);
+            }
+          })();
         `,
           }}
         ></script>
@@ -126,16 +115,9 @@ function MyApp({ Component, pageProps }) {
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ChakraProvider theme={theme}>
         <Component {...pageProps} />
-        <ThemeUpdater />
       </ChakraProvider>
     </>
   )
-}
-
-// Simple component to use our hook
-function ThemeUpdater() {
-  useUpdateThemeColor()
-  return null
 }
 
 export default MyApp
