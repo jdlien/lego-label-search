@@ -30,15 +30,22 @@ const theme = extendTheme({
 const ThemeColorMetaUpdater = () => {
   const { colorMode } = useColorMode()
 
-  useEffect(() => {
-    const meta = document.querySelector('meta[name="theme-color"]')
-    if (meta) {
-      meta.setAttribute('content', colorMode === 'dark' ? '#1A202C' : '#2b6cb0')
-      console.log('Updated theme-color to match', colorMode, 'mode')
-    }
-  }, [colorMode])
+  // The content for the meta tag will be derived directly from colorMode
+  const currentThemeColor = colorMode === 'dark' ? '#1A202C' : '#2b6cb0'
 
-  return null
+  useEffect(() => {
+    // Optional: Log when the color mode or theme color changes to help debugging
+    console.log(
+      `ThemeColorMetaUpdater: colorMode is ${colorMode}, theme-color will be set to ${currentThemeColor} via next/head`
+    )
+  }, [colorMode, currentThemeColor])
+
+  return (
+    <Head>
+      {/* Add a key for efficient updates by Next.js */}
+      <meta name="theme-color" key="theme-color" content={currentThemeColor} />
+    </Head>
+  )
 }
 
 function MyApp({ Component, pageProps }) {
@@ -57,8 +64,8 @@ function MyApp({ Component, pageProps }) {
         {/* iOS status bar style */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        {/* Theme color - will be updated by React component */}
-        <meta name="theme-color" content="#2b6cb0" />
+        {/* Theme color will now be managed by ThemeColorMetaUpdater */}
+        {/* <meta name="theme-color" content="#2b6cb0" /> */}
         {/* PWA/Android support */}
         <link rel="manifest" href="/icons/manifest.json" />
       </Head>
