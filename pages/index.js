@@ -6,6 +6,7 @@ import {
   Box,
   Container,
   Heading,
+  Link,
   Text,
   VStack,
   Spinner,
@@ -21,6 +22,7 @@ import Header from '../components/Header'
 import SearchBar from '../components/SearchBar'
 import SearchResults from '../components/SearchResults'
 import PartDetailModal from '../components/PartDetailModal'
+import ImageSearchModal from '../components/ImageSearchModal'
 import Footer from '../components/Footer'
 
 export default function Home() {
@@ -28,6 +30,7 @@ export default function Home() {
   const { q, category, part } = router.query
   const pageBg = useColorModeValue('gray.50', 'gray.900')
   const textColor = useColorModeValue('gray.600', 'gray.300')
+  const linkColor = useColorModeValue('blue.500', 'blue.300')
 
   const [results, setResults] = useState([])
   const [totalResults, setTotalResults] = useState(0)
@@ -37,6 +40,7 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState(false)
   const [isPartModalOpen, setIsPartModalOpen] = useState(false)
   const [selectedPartId, setSelectedPartId] = useState(null)
+  const [isImageSearchModalOpen, setIsImageSearchModalOpen] = useState(false)
 
   // Fetch search results when query parameters change
   useEffect(() => {
@@ -129,6 +133,25 @@ export default function Home() {
     )
   }
 
+  const handleImageSearchModalOpen = () => {
+    setIsImageSearchModalOpen(true)
+  }
+
+  const handleImageSearchModalClose = () => {
+    setIsImageSearchModalOpen(false)
+  }
+
+  const handleImageSubmit = async (imageData) => {
+    // This function will handle the image data after submission from the modal
+    // For now, we'll just log it and close the modal.
+    // Later, this will trigger a new search or display results based on the API response.
+    console.log('Image submitted, data:', imageData)
+    // Example: You might want to fetch results based on the image submission here
+    // or update the UI to show that an image search is in progress.
+    setIsImageSearchModalOpen(false)
+    // Potentially, you could set loading state here and call another fetch function
+  }
+
   return (
     <Box minH="100vh" bg={pageBg}>
       <Head>
@@ -172,7 +195,18 @@ export default function Home() {
           {!isLoading && !error && !hasSearched && (
             <Box textAlign="center" pt={4} pb={32}>
               <Text color={textColor} fontSize="lg">
-                Enter a search term or select a category
+                Enter a search term, select a category,
+                <br />
+                or&nbsp;
+                <Link
+                  as="button"
+                  onClick={handleImageSearchModalOpen}
+                  color={linkColor}
+                  _hover={{ textDecoration: 'underline', color: useColorModeValue('blue.600', 'blue.300') }}
+                >
+                  {' '}
+                  search using an image
+                </Link>
               </Text>
             </Box>
           )}
@@ -181,6 +215,12 @@ export default function Home() {
 
       {/* Part Detail Modal for direct URL access */}
       <PartDetailModal isOpen={isPartModalOpen} onClose={handlePartModalClose} partId={selectedPartId} />
+      {/* Image Search Modal */}
+      <ImageSearchModal
+        isOpen={isImageSearchModalOpen}
+        onClose={handleImageSearchModalClose}
+        onImageSubmit={handleImageSubmit}
+      />
       <Footer />
     </Box>
   )
