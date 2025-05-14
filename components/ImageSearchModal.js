@@ -164,11 +164,64 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
     setIsLoading(true)
     setError(null)
 
-    const formData = new FormData()
-    const fileName = selectedImage.name || `captured_image_${Date.now()}.jpg`
-    formData.append('query_image', selectedImage, fileName)
-
     try {
+      // Health check before submitting image
+      const healthResponse = await fetch('https://api.brickognize.com/health/', {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+        },
+      }).catch((error) => {
+        // Log detailed information about network errors (like CORS)
+        console.error('Health check network error details:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+          url: 'https://api.brickognize.com/health/',
+          type: 'GET request',
+          cors: {
+            info: 'This is likely a CORS error. The API provider should check their server configuration.',
+            expected: 'Server should include Access-Control-Allow-Origin header for cross-origin requests',
+            recommendation: 'API provider should add appropriate CORS headers or use a proxy server',
+          },
+          browserDetails: {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            vendor: navigator.vendor,
+          },
+          timestamp: new Date().toISOString(),
+        })
+        throw error
+      })
+
+      if (!healthResponse.ok) {
+        // Log detailed information for non-ok responses
+        console.error('Health check API error details:', {
+          status: healthResponse.status,
+          statusText: healthResponse.statusText,
+          url: healthResponse.url,
+          headers: {
+            available: [...healthResponse.headers.entries()].reduce((obj, [key, val]) => {
+              obj[key] = val
+              return obj
+            }, {}),
+            missing: 'If Access-Control-Allow-Origin header is missing, this is a CORS configuration issue',
+          },
+          timestamp: new Date().toISOString(),
+        })
+        throw new Error(`API service is unavailable: ${healthResponse.status} ${healthResponse.statusText}`)
+      }
+
+      const healthData = await healthResponse.json()
+      if (!healthData.success) {
+        throw new Error('API service is currently experiencing issues. Please try again later.')
+      }
+
+      // Proceed with image submission if health check is successful
+      const formData = new FormData()
+      const fileName = selectedImage.name || `captured_image_${Date.now()}.jpg`
+      formData.append('query_image', selectedImage, fileName)
+
       const response = await fetch('https://api.brickognize.com/predict/parts/', {
         method: 'POST',
         body: formData,
