@@ -53,10 +53,7 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
       }
       setError(null)
       setIsLoading(false)
-
-      if (!showCamera && !searchResults) {
-        startCamera()
-      }
+      setShowCamera(true)
     } else {
       stopCameraStream()
       setShowCamera(false)
@@ -71,7 +68,15 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
         fileInputRef.current.value = ''
       }
     }
-  }, [isOpen, previewUrl, showCamera, searchResults])
+  }, [isOpen])
+
+  useEffect(() => {
+    if (isOpen && showCamera) {
+      startCamera()
+    } else if (isOpen && !showCamera) {
+      stopCameraStream()
+    }
+  }, [isOpen, showCamera])
 
   const checkApiHealth = async () => {
     setApiStatus({ isChecking: true, isAvailable: false })
@@ -367,8 +372,14 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
   const modalTitle = searchResults ? 'Search Results' : 'Search by Image'
 
   return (
-    <BaseModal isOpen={isOpen} onClose={handleCloseModal} title={modalTitle}>
-      <VStack spacing={4} align="stretch">
+    <BaseModal isOpen={isOpen} onClose={handleCloseModal} title={modalTitle} scrollBehavior="inside">
+      <VStack
+        spacing={4}
+        align="stretch"
+        flexGrow={{ base: 1, md: 0 }}
+        display={{ base: 'flex', md: 'block' }}
+        flexDirection={{ base: 'column', md: 'initial' }}
+      >
         {!apiStatus.isAvailable && !apiStatus.isChecking && (
           <Alert status="error" borderRadius="md" justifyContent="center">
             <Box>
@@ -404,39 +415,62 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
         ) : searchResults ? (
           renderResultsView()
         ) : showCamera ? (
-          <Box>
-            <AspectRatio ratio={4 / 3} mb={3} borderRadius="md" overflow="hidden">
+          <Flex direction="column" flexGrow={1} h={{ base: '100%', md: 'auto' }}>
+            <Box
+              flexGrow={1}
+              flexShrink={1}
+              minHeight="0"
+              position="relative"
+              mb={3}
+              maxH={{ base: '75vh', md: '600px' }}
+              w="full"
+            >
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  borderRadius: 'var(--chakra-radii-md)',
+                }}
               />
-            </AspectRatio>
+            </Box>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-            <Button onClick={takePicture} colorScheme="green" width="full" isDisabled={!isStreamActive}>
-              Take Picture
-            </Button>
-            <Button onClick={switchToUpload} width="full" mt={2}>
-              Upload Image
-            </Button>
-          </Box>
+            <VStack
+              spacing={2}
+              mt={{ base: 2, md: 3 }}
+              pt={{ base: 2, md: 0 }}
+              pb={{ base: 4, md: 0 }}
+              px={{ base: 4, md: 0 }}
+              w="full"
+              flexShrink={0}
+            >
+              <Button onClick={takePicture} colorScheme="green" width="full" isDisabled={!isStreamActive}>
+                Take Picture
+              </Button>
+              <Button onClick={switchToUpload} width="full" mt={2}>
+                Upload Image
+              </Button>
+            </VStack>
+          </Flex>
         ) : previewUrl ? (
           <Box textAlign="center">
             <Text mb={2} fontWeight="medium">
               Preview:
             </Text>
-            <img
+            <Image
               src={previewUrl}
               alt="Selected preview"
-              style={{
-                maxWidth: '100%',
-                maxHeight: '300px',
-                borderRadius: 'md',
-                margin: '0 auto',
-                border: `1px solid ${borderColor}`,
-              }}
+              maxW="100%"
+              maxH="300px"
+              borderRadius="md"
+              mx="auto"
+              borderWidth="1px"
+              borderColor={borderColor}
+              objectFit="contain"
             />
             <VStack mt={4} spacing={2}>
               <Button onClick={handleSubmit} colorScheme="blue" width="full" isLoading={isLoading}>
