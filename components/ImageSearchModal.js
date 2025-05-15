@@ -10,6 +10,7 @@ import {
   ModalCloseButton,
   ModalFooter,
   Box,
+  Flex,
   Button,
   VStack,
   Text,
@@ -46,6 +47,8 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
   const borderColor = useColorModeValue('gray.200', 'gray.600')
   const textColorSecondary = useColorModeValue('gray.600', 'gray.400')
   const cardBg = useColorModeValue('gray.50', 'gray.700')
+  const linkColor = useColorModeValue('blue.500', 'blue.300')
+  const placeholderBg = useColorModeValue('gray.100', 'gray.700')
 
   useEffect(() => {
     if (isOpen) {
@@ -82,7 +85,7 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
   const checkApiHealth = async () => {
     setApiStatus({ isChecking: true, isAvailable: false })
     try {
-      const healthResponse = await fetch('https://api.brickognize.com/health/', {
+      const healthResponse = await fetch('/api/health', {
         method: 'GET',
         headers: {
           accept: 'application/json',
@@ -91,8 +94,8 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
         // Log essential info about network errors
         console.error('API Health check failed:', {
           message: error.message,
-          type: 'CORS or network error',
-          url: 'https://api.brickognize.com/health/',
+          type: 'Network error',
+          url: '/api/health',
         })
         throw error
       })
@@ -223,7 +226,7 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
       const fileName = selectedImage.name || `captured_image_${Date.now()}.jpg`
       formData.append('query_image', selectedImage, fileName)
 
-      const response = await fetch('https://api.brickognize.com/predict/parts/', {
+      const response = await fetch('/api/predict/parts', {
         method: 'POST',
         body: formData,
       })
@@ -308,7 +311,11 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
                   alt={item.name}
                   objectFit="contain"
                   borderRadius="md"
-                  fallbackSrc="https://via.placeholder.com/100?text=No+Image"
+                  fallback={
+                    <Center w="100%" h="100px" bg={placeholderBg} borderRadius="md">
+                      <Spinner size="md" />
+                    </Center>
+                  }
                   maxH="100px"
                 />
               )}
@@ -317,7 +324,7 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
                 <Heading size="sm">{item.name}</Heading>
                 <Text fontSize="sm" fontWeight="bold" mt={1}>
                   ID:{' '}
-                  <Link href={`?q=${item.id}`} color={useColorModeValue('blue.500', 'blue.300')}>
+                  <Link href={`?q=${item.id}`} color={linkColor}>
                     {item.id}
                   </Link>
                 </Text>
@@ -372,14 +379,19 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
           <VStack spacing={4} align="stretch">
             {/* Show API error only if check is complete and failed */}
             {!apiStatus.isAvailable && !apiStatus.isChecking && (
-              <Alert status="error" borderRadius="md">
-                <AlertIcon />
+              <Alert status="error" borderRadius="md" justifyContent="center">
                 <Box>
-                  <Text fontWeight="medium">The image search service is currently unavailable</Text>
-                  <Text fontSize="sm">Please try again later or contact support if the issue persists.</Text>
-                  <Button onClick={checkApiHealth} colorScheme="blue" size="sm" mt={2}>
-                    Retry Connection
-                  </Button>
+                  <Text fontWeight="medium" textAlign="center">
+                    The image search service is currently unavailable
+                  </Text>
+                  <Text fontSize="sm" textAlign="center">
+                    Please try again later or contact support if the issue persists.
+                  </Text>
+                  <Flex justifyContent="center">
+                    <Button onClick={checkApiHealth} colorScheme="blue" size="sm" mt={2}>
+                      Retry Connection
+                    </Button>
+                  </Flex>
                 </Box>
               </Alert>
             )}
