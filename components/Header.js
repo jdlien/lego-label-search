@@ -40,7 +40,7 @@ const Header = () => {
                   d="M34.1 44.4v2.8s1.2 3.4 8.5 3.8v-3s-6.1 0-8.5-3.6Zm30.6-10.2V37s.8 3.4 8 3.7v-3s-5.7.1-8-3.5ZM17 26.7v2.6s.5 3.2 7.8 3.9v-3s-5.5 0-7.8-3.5Zm30.5-10.1v2.6s.5 3.2 7.8 3.9v-3s-5.5 0-7.8-3.5Z"
                 />
               </svg>
-              <div>LEGO Label Search</div>
+              <div>Brck Label Search</div>
             </Link>
           </NextLink>
         </Heading>
@@ -109,8 +109,8 @@ const Header = () => {
           />
           <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
             <DrawerOverlay />
-            <DrawerContent bg={bgColor} color="white">
-              <DrawerCloseButton />
+            <DrawerContent bg={bgColor} color="white" pt="env(safe-area-inset-top, 0)">
+              <DrawerCloseButton top="calc(env(safe-area-inset-top, 0px) + 14px)" />
               <DrawerHeader>Menu</DrawerHeader>
               <DrawerBody>
                 <Flex direction="column" gap={4}>
