@@ -28,7 +28,7 @@ export function usePWA() {
 // Component for the top safe area bar (frosted glass effect)
 export const PWATopBar = () => {
   const isPWA = usePWA()
-  const bgColor = useColorModeValue('rgba(255, 255, 255, 0.75)', 'rgba(26, 32, 44, 0.75)') // Light/Dark semi-transparent
+  const bgColor = useColorModeValue('blue.600', 'gray.800') // Light/Dark semi-transparent
 
   if (!isPWA) return null
 
