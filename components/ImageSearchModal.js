@@ -19,6 +19,13 @@ import {
   Center,
   Spinner,
   AspectRatio,
+  Grid,
+  Image,
+  Heading,
+  HStack,
+  Badge,
+  Link,
+  Divider,
 } from '@chakra-ui/react'
 
 const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
@@ -28,6 +35,8 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
   const [error, setError] = useState(null)
   const [showCamera, setShowCamera] = useState(false)
   const [isStreamActive, setIsStreamActive] = useState(false)
+  const [apiStatus, setApiStatus] = useState({ isChecking: false, isAvailable: true })
+  const [searchResults, setSearchResults] = useState(null)
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
   const fileInputRef = useRef(null)
@@ -36,21 +45,29 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
   const headerBg = useColorModeValue('gray.50', 'gray.700')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
   const textColorSecondary = useColorModeValue('gray.600', 'gray.400')
+  const cardBg = useColorModeValue('gray.50', 'gray.700')
 
   useEffect(() => {
     if (isOpen) {
+      checkApiHealth()
       setSelectedImage(null)
+      setSearchResults(null)
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl)
         setPreviewUrl(null)
       }
       setError(null)
       setIsLoading(false)
-      startCamera()
+
+      // Start camera immediately when modal opens
+      if (!showCamera && !searchResults) {
+        startCamera()
+      }
     } else {
       stopCameraStream()
       setShowCamera(false)
       setSelectedImage(null)
+      setSearchResults(null)
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl)
         setPreviewUrl(null)
@@ -61,6 +78,42 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
       }
     }
   }, [isOpen])
+
+  const checkApiHealth = async () => {
+    setApiStatus({ isChecking: true, isAvailable: false })
+    try {
+      const healthResponse = await fetch('https://api.brickognize.com/health/', {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+        },
+      }).catch((error) => {
+        // Log essential info about network errors
+        console.error('API Health check failed:', {
+          message: error.message,
+          type: 'CORS or network error',
+          url: 'https://api.brickognize.com/health/',
+        })
+        throw error
+      })
+
+      if (!healthResponse.ok) {
+        console.error('Health check failed with status:', healthResponse.status, healthResponse.statusText)
+        throw new Error(`API service is unavailable: ${healthResponse.status} ${healthResponse.statusText}`)
+      }
+
+      const healthData = await healthResponse.json()
+      if (!healthData.success) {
+        throw new Error('API service is currently experiencing issues. Please try again later.')
+      }
+
+      setApiStatus({ isChecking: false, isAvailable: true })
+    } catch (err) {
+      console.error('API Health check failed:', err.message)
+      setApiStatus({ isChecking: false, isAvailable: false })
+      // Don't set error here, we'll show it in the UI based on apiStatus
+    }
+  }
 
   const handleFileChange = (event) => {
     stopCameraStream()
@@ -147,6 +200,7 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
 
   const clearSelectionAndRestartCamera = () => {
     setSelectedImage(null)
+    setSearchResults(null)
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl)
       setPreviewUrl(null)
@@ -165,59 +219,6 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
     setError(null)
 
     try {
-      // Health check before submitting image
-      const healthResponse = await fetch('https://api.brickognize.com/health/', {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-        },
-      }).catch((error) => {
-        // Log detailed information about network errors (like CORS)
-        console.error('Health check network error details:', {
-          message: error.message,
-          name: error.name,
-          stack: error.stack,
-          url: 'https://api.brickognize.com/health/',
-          type: 'GET request',
-          cors: {
-            info: 'This is likely a CORS error. The API provider should check their server configuration.',
-            expected: 'Server should include Access-Control-Allow-Origin header for cross-origin requests',
-            recommendation: 'API provider should add appropriate CORS headers or use a proxy server',
-          },
-          browserDetails: {
-            userAgent: navigator.userAgent,
-            platform: navigator.platform,
-            vendor: navigator.vendor,
-          },
-          timestamp: new Date().toISOString(),
-        })
-        throw error
-      })
-
-      if (!healthResponse.ok) {
-        // Log detailed information for non-ok responses
-        console.error('Health check API error details:', {
-          status: healthResponse.status,
-          statusText: healthResponse.statusText,
-          url: healthResponse.url,
-          headers: {
-            available: [...healthResponse.headers.entries()].reduce((obj, [key, val]) => {
-              obj[key] = val
-              return obj
-            }, {}),
-            missing: 'If Access-Control-Allow-Origin header is missing, this is a CORS configuration issue',
-          },
-          timestamp: new Date().toISOString(),
-        })
-        throw new Error(`API service is unavailable: ${healthResponse.status} ${healthResponse.statusText}`)
-      }
-
-      const healthData = await healthResponse.json()
-      if (!healthData.success) {
-        throw new Error('API service is currently experiencing issues. Please try again later.')
-      }
-
-      // Proceed with image submission if health check is successful
       const formData = new FormData()
       const fileName = selectedImage.name || `captured_image_${Date.now()}.jpg`
       formData.append('query_image', selectedImage, fileName)
@@ -225,15 +226,13 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
       const response = await fetch('https://api.brickognize.com/predict/parts/', {
         method: 'POST',
         body: formData,
-        // Content-Type for multipart/form-data is set automatically by the browser with FormData
       })
 
       if (!response.ok) {
-        let errorBodyText = await response.text() // Get raw text first for more detailed error
+        let errorBodyText = await response.text()
         let errorMessage = `API Error: ${response.status} ${response.statusText}`
         try {
-          const errorData = JSON.parse(errorBodyText) // Try to parse as JSON
-          // Use more specific error message from API if available
+          const errorData = JSON.parse(errorBodyText)
           if (errorData && errorData.detail) {
             if (Array.isArray(errorData.detail) && errorData.detail.length > 0 && errorData.detail[0].msg) {
               errorMessage = errorData.detail[0].msg
@@ -242,9 +241,7 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
             }
           }
         } catch (e) {
-          // If parsing JSON fails or structure is unexpected, append raw text if it's not too long
           if (errorBodyText && errorBodyText.length < 500) {
-            // Avoid overly long error messages
             errorMessage += ` - ${errorBodyText}`
           }
         }
@@ -252,12 +249,14 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
       }
 
       const results = await response.json()
-      // console.log('API Results:', results); // For debugging by the developer
 
+      // Store results in state instead of immediately closing
+      setSearchResults(results)
+
+      // Pass keepModalOpen flag to parent
       if (onImageSubmit) {
-        onImageSubmit(results) // Pass results to parent component
+        onImageSubmit(results, { keepModalOpen: true })
       }
-      onClose() // Close the image search modal
     } catch (err) {
       console.error('Image submission error:', err)
       setError(err.message || 'Failed to submit image. Check console for more details.')
@@ -268,6 +267,86 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
 
   const handleCloseModal = () => {
     onClose()
+  }
+
+  const renderResultsView = () => {
+    if (!searchResults || !searchResults.items || searchResults.items.length === 0) {
+      return (
+        <Alert status="warning" borderRadius="md">
+          <AlertIcon />
+          No matching items found
+        </Alert>
+      )
+    }
+
+    return (
+      <VStack spacing={4} align="stretch">
+        <Box mb={2}>
+          <Heading size="md" mb={2}>
+            Search Results
+          </Heading>
+          <Text fontSize="sm" color={textColorSecondary}>
+            {searchResults.items.length} item{searchResults.items.length !== 1 ? 's' : ''} found
+          </Text>
+        </Box>
+
+        <Divider />
+
+        {searchResults.items.map((item, index) => (
+          <Box
+            key={`${item.id}-${index}`}
+            p={4}
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor={borderColor}
+            bg={cardBg}
+          >
+            <Grid templateColumns={{ base: '1fr', sm: '100px 1fr' }} gap={4}>
+              {item.img_url && (
+                <Image
+                  src={item.img_url}
+                  alt={item.name}
+                  objectFit="contain"
+                  borderRadius="md"
+                  fallbackSrc="https://via.placeholder.com/100?text=No+Image"
+                  maxH="100px"
+                />
+              )}
+
+              <Box>
+                <Heading size="sm">{item.name}</Heading>
+                <Text fontSize="sm" fontWeight="bold" mt={1}>
+                  ID:{' '}
+                  <Link href={`?q=${item.id}`} color={useColorModeValue('blue.500', 'blue.300')}>
+                    {item.id}
+                  </Link>
+                </Text>
+
+                <HStack spacing={2} mt={2} flexWrap="wrap">
+                  {item.category && <Badge colorScheme="blue">{item.category}</Badge>}
+                  {item.type && <Badge colorScheme="green">{item.type}</Badge>}
+                  {item.score && <Badge colorScheme="purple">Match: {Math.round(item.score * 100)}%</Badge>}
+                </HStack>
+
+                {item.external_sites && item.external_sites.length > 0 && (
+                  <HStack mt={3} spacing={3}>
+                    {item.external_sites.map((site, siteIndex) => (
+                      <Link key={siteIndex} href={site.url} isExternal color="blue.500" fontSize="sm" target="_blank">
+                        View on {site.name === 'bricklink' ? 'BrickLink' : site.name}
+                      </Link>
+                    ))}
+                  </HStack>
+                )}
+              </Box>
+            </Grid>
+          </Box>
+        ))}
+
+        <Button onClick={clearSelectionAndRestartCamera} colorScheme="blue" mt={4}>
+          Search New Image
+        </Button>
+      </VStack>
+    )
   }
 
   return (
@@ -286,11 +365,25 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
         overflow="hidden"
       >
         <ModalHeader pb={3} pt={4} px={6} bg={headerBg} borderBottomWidth="1px" borderBottomColor={borderColor}>
-          Search by Image
+          {searchResults ? 'Search Results' : 'Search by Image'}
         </ModalHeader>
         <ModalCloseButton size="lg" top={3} right={4} />
         <ModalBody p={{ base: 4, md: 6 }}>
           <VStack spacing={4} align="stretch">
+            {/* Show API error only if check is complete and failed */}
+            {!apiStatus.isAvailable && !apiStatus.isChecking && (
+              <Alert status="error" borderRadius="md">
+                <AlertIcon />
+                <Box>
+                  <Text fontWeight="medium">The image search service is currently unavailable</Text>
+                  <Text fontSize="sm">Please try again later or contact support if the issue persists.</Text>
+                  <Button onClick={checkApiHealth} colorScheme="blue" size="sm" mt={2}>
+                    Retry Connection
+                  </Button>
+                </Box>
+              </Alert>
+            )}
+
             {error && (
               <Alert status="error" borderRadius="md" mb={2}>
                 <AlertIcon />
@@ -305,6 +398,8 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
                   Processing image...
                 </Text>
               </Center>
+            ) : searchResults ? (
+              renderResultsView()
             ) : showCamera ? (
               <Box>
                 <AspectRatio ratio={4 / 3} mb={3} borderRadius="md" overflow="hidden">
