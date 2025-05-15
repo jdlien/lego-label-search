@@ -41,7 +41,7 @@ export const PWATopBar = () => {
       height="env(safe-area-inset-top)"
       bg={bgColor}
       backdropFilter="blur(10px)"
-      zIndex="1300" // Above most content, below modals
+      zIndex="1500" // Above most content, below modals
       pointerEvents="none" // Allow interactions with content behind, if any visible
     />
   )

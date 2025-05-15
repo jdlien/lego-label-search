@@ -2,13 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  ModalFooter,
   Box,
   Flex,
   Button,
@@ -26,8 +19,9 @@ import {
   HStack,
   Badge,
   Link,
-  Divider,
+  Spacer,
 } from '@chakra-ui/react'
+import BaseModal from './BaseModal'
 
 const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
   const [selectedImage, setSelectedImage] = useState(null)
@@ -42,8 +36,6 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
   const canvasRef = useRef(null)
   const fileInputRef = useRef(null)
 
-  const modalBg = useColorModeValue('white', 'gray.800')
-  const headerBg = useColorModeValue('gray.50', 'gray.700')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
   const textColorSecondary = useColorModeValue('gray.600', 'gray.400')
   const cardBg = useColorModeValue('gray.50', 'gray.700')
@@ -62,7 +54,6 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
       setError(null)
       setIsLoading(false)
 
-      // Start camera immediately when modal opens
       if (!showCamera && !searchResults) {
         startCamera()
       }
@@ -80,7 +71,7 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
         fileInputRef.current.value = ''
       }
     }
-  }, [isOpen])
+  }, [isOpen, previewUrl, showCamera, searchResults])
 
   const checkApiHealth = async () => {
     setApiStatus({ isChecking: true, isAvailable: false })
@@ -91,7 +82,6 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
           accept: 'application/json',
         },
       }).catch((error) => {
-        // Log essential info about network errors
         console.error('API Health check failed:', {
           message: error.message,
           type: 'Network error',
@@ -114,7 +104,6 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
     } catch (err) {
       console.error('API Health check failed:', err.message)
       setApiStatus({ isChecking: false, isAvailable: false })
-      // Don't set error here, we'll show it in the UI based on apiStatus
     }
   }
 
@@ -253,10 +242,8 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
 
       const results = await response.json()
 
-      // Store results in state instead of immediately closing
       setSearchResults(results)
 
-      // Pass keepModalOpen flag to parent
       if (onImageSubmit) {
         onImageSubmit(results, { keepModalOpen: true })
       }
@@ -272,6 +259,21 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
     onClose()
   }
 
+  const SearchIcon = (props) => (
+    <svg
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      width="18px"
+      height="18px"
+      {...props}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+  )
+
   const renderResultsView = () => {
     if (!searchResults || !searchResults.items || searchResults.items.length === 0) {
       return (
@@ -281,21 +283,6 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
         </Alert>
       )
     }
-
-    const SearchIcon = (props) => (
-      <svg
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        width="18px"
-        height="18px"
-        {...props}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg>
-    )
 
     return (
       <VStack spacing={4} align="stretch">
@@ -377,143 +364,119 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
     )
   }
 
+  const modalTitle = searchResults ? 'Search Results' : 'Search by Image'
+
   return (
-    <Modal isOpen={isOpen} onClose={handleCloseModal} size="xl" scrollBehavior="inside" motionPreset="slideInBottom">
-      <ModalOverlay bg="blackAlpha.400" />
-      <ModalContent
-        maxW={{ base: '95%', md: '600px' }}
-        mx="auto"
-        top={{ base: '40px', lg: '110px' }}
-        my={{ base: 3, md: 6 }}
-        borderRadius="lg"
-        boxShadow="xl"
-        bg={modalBg}
-        borderColor={borderColor}
-        borderWidth="1px"
-        overflow="hidden"
-      >
-        <ModalHeader pb={3} pt={4} px={6} bg={headerBg} borderBottomWidth="1px" borderBottomColor={borderColor}>
-          {searchResults ? 'Search Results' : 'Search by Image'}
-        </ModalHeader>
-        <ModalCloseButton size="lg" top={3} right={4} />
-        <ModalBody p={{ base: 4, md: 6 }}>
-          <VStack spacing={4} align="stretch">
-            {/* Show API error only if check is complete and failed */}
-            {!apiStatus.isAvailable && !apiStatus.isChecking && (
-              <Alert status="error" borderRadius="md" justifyContent="center">
-                <Box>
-                  <Text fontWeight="medium" textAlign="center">
-                    The image search service is currently unavailable
-                  </Text>
-                  <Text fontSize="sm" textAlign="center">
-                    Please try again later or contact support if the issue persists.
-                  </Text>
-                  <Flex justifyContent="center">
-                    <Button onClick={checkApiHealth} colorScheme="blue" size="sm" mt={2}>
-                      Retry Connection
-                    </Button>
-                  </Flex>
-                </Box>
-              </Alert>
-            )}
+    <BaseModal isOpen={isOpen} onClose={handleCloseModal} title={modalTitle}>
+      <VStack spacing={4} align="stretch">
+        {!apiStatus.isAvailable && !apiStatus.isChecking && (
+          <Alert status="error" borderRadius="md" justifyContent="center">
+            <Box>
+              <Text fontWeight="medium" textAlign="center">
+                The image search service is currently unavailable
+              </Text>
+              <Text fontSize="sm" textAlign="center">
+                Please try again later or contact support if the issue persists.
+              </Text>
+              <Flex justifyContent="center">
+                <Button onClick={checkApiHealth} colorScheme="blue" size="sm" mt={2}>
+                  Retry Connection
+                </Button>
+              </Flex>
+            </Box>
+          </Alert>
+        )}
 
-            {error && (
-              <Alert status="error" borderRadius="md" mb={2}>
-                <AlertIcon />
-                {error}
-              </Alert>
-            )}
+        {error && (
+          <Alert status="error" borderRadius="md" mb={2}>
+            <AlertIcon />
+            {error}
+          </Alert>
+        )}
 
-            {isLoading ? (
-              <Center py={6}>
-                <Spinner size="lg" color="blue.500" thickness="4px" />
-                <Text ml={3} fontWeight="medium">
-                  Processing image...
+        {isLoading ? (
+          <Center py={6}>
+            <Spinner size="lg" color="blue.500" thickness="4px" />
+            <Text ml={3} fontWeight="medium">
+              Processing image...
+            </Text>
+          </Center>
+        ) : searchResults ? (
+          renderResultsView()
+        ) : showCamera ? (
+          <Box>
+            <AspectRatio ratio={4 / 3} mb={3} borderRadius="md" overflow="hidden">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </AspectRatio>
+            <canvas ref={canvasRef} style={{ display: 'none' }} />
+            <Button onClick={takePicture} colorScheme="green" width="full" isDisabled={!isStreamActive}>
+              Take Picture
+            </Button>
+            <Button onClick={switchToUpload} width="full" mt={2}>
+              Upload Image
+            </Button>
+          </Box>
+        ) : previewUrl ? (
+          <Box textAlign="center">
+            <Text mb={2} fontWeight="medium">
+              Preview:
+            </Text>
+            <img
+              src={previewUrl}
+              alt="Selected preview"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '300px',
+                borderRadius: 'md',
+                margin: '0 auto',
+                border: `1px solid ${borderColor}`,
+              }}
+            />
+            <VStack mt={4} spacing={2}>
+              <Button onClick={handleSubmit} colorScheme="blue" width="full" isLoading={isLoading}>
+                Search with this Image
+              </Button>
+              <Button onClick={clearSelectionAndRestartCamera} width="full" variant="outline">
+                Choose Different Image
+              </Button>
+            </VStack>
+          </Box>
+        ) : (
+          <VStack spacing={3} width="full" pt={error ? 0 : 2} pb={2} textAlign="center">
+            {!error && (
+              <Center py={4}>
+                <Spinner size="md" />
+                <Text ml={3} color={textColorSecondary}>
+                  Starting camera...
                 </Text>
               </Center>
-            ) : searchResults ? (
-              renderResultsView()
-            ) : showCamera ? (
-              <Box>
-                <AspectRatio ratio={4 / 3} mb={3} borderRadius="md" overflow="hidden">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </AspectRatio>
-                <canvas ref={canvasRef} style={{ display: 'none' }} />
-                <Button onClick={takePicture} colorScheme="green" width="full" isDisabled={!isStreamActive}>
-                  Take Picture
-                </Button>
-                <Button onClick={switchToUpload} width="full" mt={2}>
-                  Upload Image
-                </Button>
-              </Box>
-            ) : previewUrl ? (
-              <Box textAlign="center">
-                <Text mb={2} fontWeight="medium">
-                  Preview:
-                </Text>
-                <img
-                  src={previewUrl}
-                  alt="Selected preview"
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '300px',
-                    borderRadius: 'md',
-                    margin: '0 auto',
-                    border: `1px solid ${borderColor}`,
-                  }}
-                />
-                <VStack mt={4} spacing={2}>
-                  <Button onClick={handleSubmit} colorScheme="blue" width="full" isLoading={isLoading}>
-                    Search with this Image
-                  </Button>
-                  <Button onClick={clearSelectionAndRestartCamera} width="full" variant="outline">
-                    Choose Different Image
-                  </Button>
-                </VStack>
-              </Box>
-            ) : (
-              <VStack spacing={3} width="full" pt={error ? 0 : 2} pb={2} textAlign="center">
-                {!error && (
-                  <Center py={4}>
-                    <Spinner size="md" />
-                    <Text ml={3} color={textColorSecondary}>
-                      Starting camera...
-                    </Text>
-                  </Center>
-                )}
-                <Text fontSize="sm" color={textColorSecondary} mt={error ? 2 : 0}>
-                  If the camera doesn't start, or you prefer to upload:
-                </Text>
-                <Button onClick={() => fileInputRef.current?.click()} width="full">
-                  Upload Image
-                </Button>
-                <Button onClick={startCamera} width="full">
-                  Retry Camera
-                </Button>
-              </VStack>
             )}
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
+            <Text fontSize="sm" color={textColorSecondary} mt={error ? 2 : 0}>
+              If the camera doesn't start, or you prefer to upload:
+            </Text>
+            <Button onClick={() => fileInputRef.current?.click()} width="full">
+              Upload Image
+            </Button>
+            <Button onClick={startCamera} width="full">
+              Retry Camera
+            </Button>
           </VStack>
-        </ModalBody>
-        {/* <ModalFooter borderTopWidth="1px" borderTopColor={borderColor} py={3} px={6}>
-          <Button onClick={handleCloseModal} variant="ghost">
-            Close
-          </Button>
-        </ModalFooter> */}
-      </ModalContent>
-    </Modal>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
+      </VStack>
+    </BaseModal>
   )
 }
 
