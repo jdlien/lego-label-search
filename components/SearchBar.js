@@ -11,7 +11,9 @@ import {
   Flex,
   Icon,
   Button,
+  Link,
   IconButton,
+  useColorModeValue,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 
@@ -36,12 +38,13 @@ const SearchIcon = (props) => (
   </svg>
 )
 
-const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
+const SearchBar = ({ initialQuery = '', initialCategory = '', onImageSearch }) => {
   const [query, setQuery] = useState(initialQuery)
   const [category, setCategory] = useState(initialCategory)
   const [categoriesForDropdown, setCategoriesForDropdown] = useState([])
   const router = useRouter()
   const searchTimeout = useRef(null)
+  const linkColor = useColorModeValue('blue.500', 'blue.300')
 
   // Fetch categories when component mounts
   useEffect(() => {
@@ -265,6 +268,27 @@ const SearchBar = ({ initialQuery = '', initialCategory = '' }) => {
               Go
             </Button>
           </Flex>
+          {onImageSearch && (
+            <Link
+              w="100%"
+              as="button"
+              fontSize="lg"
+              onClick={onImageSearch}
+              color={linkColor}
+              _hover={{ textDecoration: 'underline', color: useColorModeValue('blue.600', 'blue.300') }}
+              mt={0}
+            >
+              <Flex alignItems="center" gap={2} justifyContent="center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="20px" height="20px">
+                  <path
+                    fill="currentColor"
+                    d="M149.1 64.8L138.7 96 64 96C28.7 96 0 124.7 0 160L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64l-74.7 0L362.9 64.8C356.4 45.2 338.1 32 317.4 32L194.6 32c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                  />
+                </svg>
+                <span>Image Search</span>
+              </Flex>
+            </Link>
+          )}
         </Flex>
       </form>
     </Box>

@@ -163,8 +163,12 @@ export default function Home() {
       <Header />
 
       <Container maxW="container.2xl" pt={4} pb={3}>
-        <VStack spacing={2} align="stretch">
-          <SearchBar initialQuery={q || ''} initialCategory={category || ''} />
+        <VStack spacing={0} align="stretch">
+          <SearchBar
+            initialQuery={q || ''}
+            initialCategory={category || ''}
+            onImageSearch={handleImageSearchModalOpen}
+          />
 
           {/* Loading state */}
           {isLoading && (

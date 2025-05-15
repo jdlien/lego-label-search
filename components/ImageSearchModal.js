@@ -474,11 +474,11 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
             />
           </VStack>
         </ModalBody>
-        <ModalFooter borderTopWidth="1px" borderTopColor={borderColor} py={3} px={6}>
+        {/* <ModalFooter borderTopWidth="1px" borderTopColor={borderColor} py={3} px={6}>
           <Button onClick={handleCloseModal} variant="ghost">
             Close
           </Button>
-        </ModalFooter>
+        </ModalFooter> */}
       </ModalContent>
     </Modal>
   )
