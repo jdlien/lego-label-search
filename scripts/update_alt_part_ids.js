@@ -65,8 +65,6 @@ async function getAlternatePartIds(db, partNum) {
 }
 
 async function updateAltPartIds(db, partNum) {
-  console.log(`Updating alternate part IDs for part ${partNum}...`)
-
   // Get alternate part IDs for this part
   const altIds = await getAlternatePartIds(db, partNum)
 
@@ -102,9 +100,9 @@ async function updateAllAltPartIds(db) {
     totalUpdated++
 
     // Log progress every 1000 parts
-    if (totalUpdated % 1000 === 0) {
-      console.log(`Processed ${totalUpdated}/${partNumbers.length} parts...`)
-    }
+    // if (totalUpdated % 1000 === 0) {
+    //   console.log(`Processed ${totalUpdated}/${partNumbers.length} parts...`)
+    // }
   }
 
   console.log(`Updated alternate part IDs for ${totalUpdated} parts (${partsWithAlts} parts have alternates)`)
