@@ -90,4 +90,5 @@ The caching system ensures fast API responses while keeping count data up-to-dat
 ## TODO
 
 - For image search, I want a more prominent button in the search fields that is always visible.
+- Make the 'search for id' within image search results more prominent.
 - When a part has many alternates, they may all show at once. I might prefer to consolidate the search results to only show one record if it has many alternates.
