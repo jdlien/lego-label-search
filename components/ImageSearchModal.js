@@ -282,18 +282,26 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
       )
     }
 
+    const SearchIcon = (props) => (
+      <svg
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18px"
+        height="18px"
+        {...props}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    )
+
     return (
       <VStack spacing={4} align="stretch">
-        <Box mb={2}>
-          <Heading size="md" mb={2}>
-            Search Results
-          </Heading>
-          <Text fontSize="sm" color={textColorSecondary}>
-            {searchResults.items.length} item{searchResults.items.length !== 1 ? 's' : ''} found
-          </Text>
-        </Box>
-
-        <Divider />
+        <Text fontSize="sm" color={textColorSecondary}>
+          {searchResults.items.length} item{searchResults.items.length !== 1 ? 's' : ''} found
+        </Text>
 
         {searchResults.items.map((item, index) => (
           <Box
@@ -321,29 +329,42 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
               )}
 
               <Box>
-                <Heading size="sm">{item.name}</Heading>
-                <Text fontSize="sm" fontWeight="bold" mt={1}>
-                  ID:{' '}
-                  <Link href={`?q=${item.id}`} color={linkColor}>
+                <Heading size="md">{item.name}</Heading>
+
+                <Text fontSize="md" fontWeight="bold" display="flex" alignItems="center" mt={1} gap={1}>
+                  Part{' '}
+                  <Link
+                    href={`?q=${item.id}`}
+                    display="flex"
+                    alignItems="center"
+                    color={linkColor}
+                    fontSize="lg"
+                    gap={1}
+                  >
+                    <SearchIcon />
                     {item.id}
                   </Link>
                 </Text>
 
                 <HStack spacing={2} mt={2} flexWrap="wrap">
                   {item.category && <Badge colorScheme="blue">{item.category}</Badge>}
-                  {item.type && <Badge colorScheme="green">{item.type}</Badge>}
-                  {item.score && <Badge colorScheme="purple">Match: {Math.round(item.score * 100)}%</Badge>}
-                </HStack>
 
-                {item.external_sites && item.external_sites.length > 0 && (
-                  <HStack mt={3} spacing={3}>
-                    {item.external_sites.map((site, siteIndex) => (
-                      <Link key={siteIndex} href={site.url} isExternal color="blue.500" fontSize="sm" target="_blank">
-                        View on {site.name === 'bricklink' ? 'BrickLink' : site.name}
-                      </Link>
-                    ))}
-                  </HStack>
-                )}
+                  {item.score && (
+                    <Text fontSize="xs">
+                      <b>{Math.round(item.score * 100)}%</b> Match
+                    </Text>
+                  )}
+
+                  {item.external_sites && item.external_sites.length > 0 && (
+                    <>
+                      {item.external_sites.map((site, siteIndex) => (
+                        <Link key={siteIndex} href={site.url} isExternal color="blue.500" fontSize="sm" target="_blank">
+                          {site.name === 'bricklink' ? 'BrickLink' : site.name}
+                        </Link>
+                      ))}
+                    </>
+                  )}
+                </HStack>
               </Box>
             </Grid>
           </Box>
@@ -470,7 +491,7 @@ const ImageSearchModal = ({ isOpen, onClose, onImageSubmit }) => {
                   If the camera doesn't start, or you prefer to upload:
                 </Text>
                 <Button onClick={() => fileInputRef.current?.click()} width="full">
-                  Upload Image from Device
+                  Upload Image
                 </Button>
                 <Button onClick={startCamera} width="full">
                   Retry Camera
