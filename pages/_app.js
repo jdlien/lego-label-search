@@ -33,12 +33,12 @@ const ThemeColorMetaUpdater = () => {
   // The content for the meta tag will be derived directly from colorMode
   const currentThemeColor = colorMode === 'dark' ? '#1A202C' : '#2b6cb0'
 
-  useEffect(() => {
-    // Optional: Log when the color mode or theme color changes to help debugging
-    console.log(
-      `ThemeColorMetaUpdater: colorMode is ${colorMode}, theme-color will be set to ${currentThemeColor} via next/head`
-    )
-  }, [colorMode, currentThemeColor])
+  // Logging the color mode and theme color changes
+  // useEffect(() => {
+  //   console.log(
+  //     `ThemeColorMetaUpdater: colorMode is ${colorMode}, theme-color will be set to ${currentThemeColor} via next/head`
+  //   )
+  // }, [colorMode, currentThemeColor])
 
   return (
     <Head>
@@ -62,7 +62,6 @@ function MyApp({ Component, pageProps }) {
         {/* Apple touch icon */}
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         {/* iOS status bar style */}
-        <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         {/* Theme color will now be managed by ThemeColorMetaUpdater */}

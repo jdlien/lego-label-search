@@ -141,15 +141,16 @@ export default function Home() {
     setIsImageSearchModalOpen(false)
   }
 
-  const handleImageSubmit = async (imageData) => {
+  const handleImageSubmit = async (imageData, options = {}) => {
     // This function will handle the image data after submission from the modal
-    // For now, we'll just log it and close the modal.
-    // Later, this will trigger a new search or display results based on the API response.
     console.log('Image submitted, data:', imageData)
-    // Example: You might want to fetch results based on the image submission here
-    // or update the UI to show that an image search is in progress.
-    setIsImageSearchModalOpen(false)
-    // Potentially, you could set loading state here and call another fetch function
+
+    // Only close the modal if not told to keep it open
+    if (!options?.keepModalOpen) {
+      setIsImageSearchModalOpen(false)
+    }
+
+    // We'll keep the modal open when results are displayed within it
   }
 
   return (
