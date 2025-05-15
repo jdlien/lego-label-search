@@ -9,8 +9,14 @@ import { promises as fs } from 'fs'
 import fetch from 'node-fetch'
 import FormData from 'form-data'
 import { Agent } from 'https'
+import sharp from 'sharp'
+import heicConvert from 'heic-convert'
 
 const BRICKOGNIZE_BASE_URL = 'https://api.brickognize.com'
+
+// Define MIME types to be converted to WEBP by sharp
+const CONVERT_TO_WEBP_MIME_TYPES = ['image/avif', 'image/tiff', 'image/gif']
+const HEIC_MIME_TYPES = ['image/heic', 'image/heif']
 
 // Create an HTTPS agent with relaxed SSL settings
 const httpsAgent = new Agent({
@@ -62,7 +68,7 @@ export async function proxyImagePrediction(req, res) {
       maxFileSize: 20 * 1024 * 1024, // 20MB
     })
 
-    const formData = await new Promise((resolve, reject) => {
+    const { files: parsedFiles } = await new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
         if (err) {
           console.error('Form parsing error inside callback:', err)
@@ -70,27 +76,87 @@ export async function proxyImagePrediction(req, res) {
             responseSent = true
             res.status(500).json({ error: 'Error during form parsing.', details: err.message })
           }
-          return reject(err)
+          return reject(new Error('Form parsing failed'))
         }
         resolve({ fields, files })
       })
     })
 
-    if (!formData.files || Object.keys(formData.files).length === 0) {
+    if (!parsedFiles || Object.keys(parsedFiles).length === 0) {
       console.error('No files found in request')
-      responseSent = true
       return res.status(400).json({ error: 'No image file provided' })
     }
 
-    const fileKey = formData.files.query_image ? 'query_image' : Object.keys(formData.files)[0]
-    const imageFile = formData.files[fileKey][0]
+    const fileKey = parsedFiles.query_image ? 'query_image' : Object.keys(parsedFiles)[0]
+    const imageFile = parsedFiles[fileKey][0]
 
-    const fileBuffer = await fs.readFile(imageFile.filepath)
+    let originalFileBuffer = await fs.readFile(imageFile.filepath)
+    let targetMimeType = imageFile.mimetype || 'image/jpeg'
+    let targetFilename = imageFile.originalFilename || 'image.jpg'
+    let targetFileBuffer = originalFileBuffer
+
+    // Step 1: Convert HEIC/HEIF to JPEG using heic-convert
+    if (HEIC_MIME_TYPES.includes(targetMimeType)) {
+      console.log(`Attempting to convert ${targetFilename} from ${targetMimeType} to JPEG using heic-convert.`)
+      try {
+        targetFileBuffer = await heicConvert({
+          buffer: originalFileBuffer, // Pass the buffer directly
+          format: 'JPEG',
+          quality: 0.9, // JPEG quality
+        })
+        targetMimeType = 'image/jpeg'
+        targetFilename = `${targetFilename.substring(0, targetFilename.lastIndexOf('.') || targetFilename.length)}.jpg`
+        console.log(`Successfully converted ${targetFilename} to JPEG using heic-convert.`)
+      } catch (heicConversionError) {
+        console.error(`Failed to convert ${targetFilename} from HEIC/HEIF to JPEG:`, heicConversionError)
+        if (!responseSent && !res.headersSent) {
+          responseSent = true
+          return res.status(500).json({
+            error: 'HEIC/HEIF image conversion to JPEG failed.',
+            originalMimeType: imageFile.mimetype,
+            details: heicConversionError.message,
+          })
+        }
+        return // Stop further execution
+      }
+    }
+
+    // Step 2: Convert other specified types (or the JPEG from HEIC) to WEBP using sharp
+    if (
+      CONVERT_TO_WEBP_MIME_TYPES.includes(targetMimeType) ||
+      (HEIC_MIME_TYPES.includes(imageFile.mimetype) && targetMimeType === 'image/jpeg')
+    ) {
+      // The second part of the OR condition ensures that images originally HEIC (now JPEG) are also converted to WEBP
+      const convertToWebpLogName = HEIC_MIME_TYPES.includes(imageFile.mimetype)
+        ? `${imageFile.originalFilename} (originally HEIC)`
+        : targetFilename
+      console.log(`Attempting to convert ${convertToWebpLogName} from ${targetMimeType} to WEBP using sharp.`)
+      try {
+        targetFileBuffer = await sharp(targetFileBuffer).webp({ quality: 75 }).toBuffer()
+        targetMimeType = 'image/webp'
+        targetFilename = `${targetFilename.substring(0, targetFilename.lastIndexOf('.') || targetFilename.length)}.webp`
+        console.log(`Successfully converted ${convertToWebpLogName} to WEBP using sharp.`)
+      } catch (sharpConversionError) {
+        console.error(`Failed to convert ${convertToWebpLogName} to WEBP using sharp:`, sharpConversionError)
+        // If sharp fails, we might decide to send the JPEG (if it was HEIC) or the original,
+        // or return an error. For now, let's return an error if sharp fails.
+        if (!responseSent && !res.headersSent) {
+          responseSent = true
+          return res.status(500).json({
+            error: 'Image conversion to WEBP failed using sharp.',
+            originalMimeType: imageFile.mimetype, // report original for clarity
+            attemptedInputToSharp: HEIC_MIME_TYPES.includes(imageFile.mimetype) ? 'image/jpeg' : imageFile.mimetype,
+            details: sharpConversionError.message,
+          })
+        }
+        return // Stop further execution
+      }
+    }
 
     const apiFormData = new FormData()
-    apiFormData.append('query_image', fileBuffer, {
-      filename: imageFile.originalFilename || 'image.jpg',
-      contentType: imageFile.mimetype || 'image/jpeg',
+    apiFormData.append('query_image', targetFileBuffer, {
+      filename: targetFilename,
+      contentType: targetMimeType,
     })
 
     const formHeaders = apiFormData.getHeaders()
