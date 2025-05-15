@@ -76,6 +76,33 @@ const PartCard = ({ part, isSelected, onToggleSelect, onPartClick }) => {
     }
   }
 
+  // Unified download trigger function
+  const triggerDownload = async (fileUrl, fileName) => {
+    try {
+      const response = await fetch(fileUrl)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch file: ${response.statusText}`)
+      }
+      const blob = await response.blob()
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(link.href)
+    } catch (error) {
+      console.error('Error triggering download:', error)
+      toast({
+        title: 'Download initiation failed',
+        description: error.message || 'Could not start the file download.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    }
+  }
+
   // Handler for label download
   const handleLabelDownload = async (e) => {
     e.preventDefault()
@@ -90,7 +117,7 @@ const PartCard = ({ part, isSelected, onToggleSelect, onPartClick }) => {
 
       if (data.success) {
         // Start the download
-        window.location.href = `/data/labels/${part.id}.lbx`
+        await triggerDownload(`/data/labels/${part.id}.lbx`, `${part.id}.lbx`)
       } else {
         setLabelExists(false)
         toast({
@@ -152,7 +179,7 @@ const PartCard = ({ part, isSelected, onToggleSelect, onPartClick }) => {
         // Add a small delay to allow the server to recognize the new file
         await new Promise((resolve) => setTimeout(resolve, 300)) // 300ms delay
         // Start the download with a cache-busting query parameter
-        window.location.href = `/data/labels/${part.id}-24mm.lbx`
+        await triggerDownload(`/data/labels/${part.id}-24mm.lbx`, `${part.id}-24mm.lbx`)
       } else {
         // Check if the error message contains a SyntaxWarning about escape sequences
         const isEscapeSequenceWarning = data.message && data.message.includes('SyntaxWarning: invalid escape sequence')
@@ -162,7 +189,7 @@ const PartCard = ({ part, isSelected, onToggleSelect, onPartClick }) => {
           await new Promise((resolve) => setTimeout(resolve, 300)) // 300ms delay
           // Try one more time - the script might have executed properly despite the warning
           // Add cache-busting here as well
-          window.location.href = `/data/labels/${part.id}-24mm.lbx`
+          await triggerDownload(`/data/labels/${part.id}-24mm.lbx`, `${part.id}-24mm.lbx`)
           toast({
             title: 'Conversion completed with warnings',
             description: 'There were some warnings during conversion, but your file should be ready.',
