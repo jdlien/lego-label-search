@@ -3,6 +3,7 @@
 import { ChakraProvider, extendTheme, ColorModeScript, useColorMode } from '@chakra-ui/react'
 import Head from 'next/head'
 import { useEffect } from 'react'
+import { PWATopBar, PWABottomNav, PWAViewportAdjuster } from '../components/PWAHandler'
 
 // Extend the theme to customize the app
 const theme = extendTheme({
@@ -52,6 +53,8 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
+        {/* Viewport meta for safe area handling */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
         {/* Favicon - Legacy browsers */}
         <link rel="icon" href="/icons/favicon.ico" sizes="any" />
         {/* SVG Favicon - Modern Browsers */}
@@ -72,7 +75,12 @@ function MyApp({ Component, pageProps }) {
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ChakraProvider theme={theme}>
         <ThemeColorMetaUpdater />
-        <Component {...pageProps} />
+        {/* PWA specific UI elements */}
+        <PWATopBar />
+        <PWAViewportAdjuster>
+          <Component {...pageProps} />
+        </PWAViewportAdjuster>
+        <PWABottomNav />
       </ChakraProvider>
     </>
   )
