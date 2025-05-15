@@ -65,7 +65,7 @@ export const PWABottomNav = () => {
       height={`calc(env(safe-area-inset-bottom) + 30px)`} // 60px base height + safe area
       bg={bgColorNav}
       backdropFilter="blur(10px)"
-      zIndex="1300"
+      zIndex="2000"
       alignItems="center"
       justifyContent="space-between"
       // Padding respects safe areas for the content *within* the bar
