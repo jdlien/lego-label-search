@@ -7,7 +7,8 @@
     "dev": "node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "lint": "next lint"
+    "lint": "next lint",
+    "update-alt-parts": "node scripts/update_alt_part_ids.js"
   },
   "repository": {
     "type": "git",
