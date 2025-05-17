@@ -109,7 +109,7 @@ export default function SearchResults({
         <div className="flex justify-center items-center mt-0 mb-2">
           {searchParams.get('category') && (
             <button
-              className="ml-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+              className="link ml-2 text-sm"
               onClick={() => {
                 // Remove only the category param, preserve q if present
                 const params = new URLSearchParams()

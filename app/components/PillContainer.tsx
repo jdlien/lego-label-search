@@ -14,7 +14,7 @@ type PillContainerProps = {
   color?: string
 }
 
-export default function PillContainer({ pills, size = 24, color = 'oklch(60% 0 300)' }: PillContainerProps) {
+export default function PillContainer({ pills, size = 24 }: PillContainerProps) {
   // Normalize pills input to handle both strings and objects
   const normalizedPills = pills
     .map((pill): Pill => {
@@ -34,7 +34,6 @@ export default function PillContainer({ pills, size = 24, color = 'oklch(60% 0 3
   // Define the container style with CSS variables
   const containerStyle: React.CSSProperties = {
     '--pill-height': `${size}px`,
-    '--input-color': color,
   } as React.CSSProperties
 
   return (

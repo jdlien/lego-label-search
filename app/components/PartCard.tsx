@@ -109,7 +109,7 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
     <div
       className={`border rounded-md overflow-hidden transition-all ${
         isSelected
-          ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-400 dark:border-blue-500'
+          ? 'bg-sky-50 dark:bg-sky-900/20 border-sky-400 dark:border-sky-500'
           : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:shadow-md'
       }`}
     >
@@ -146,7 +146,7 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
               }}
               className="block"
             >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 truncate">
                 {part.name || 'Unnamed Part'}
               </h3>
               <p className="text-sm font-mono text-gray-500 dark:text-gray-400">{part.id}</p>
@@ -161,7 +161,7 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
         {/* Category Pills */}
         {categoryPills.length > 0 && (
           <div className="my-2 w-full">
-            <PillContainer pills={categoryPills} size={21} color="var(--tw-color-blue-600, #2563eb)" />
+            <PillContainer pills={categoryPills} size={21} />
           </div>
         )}
 
@@ -171,7 +171,7 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
             onClick={() => onToggleSelect(part.id)}
             className={`text-sm px-2 py-1 rounded ${
               isSelected
-                ? 'bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200'
+                ? 'bg-sky-100 dark:bg-sky-800 text-sky-700 dark:text-sky-200'
                 : 'bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-500'
             }`}
           >
