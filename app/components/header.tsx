@@ -16,7 +16,7 @@ function NavLink({ href, children, onClick = () => {} }) {
     <Link
       href={href}
       className={`px-3 py-2 rounded transition-colors ${
-        isActive ? 'bg-white/30' : 'hover:bg-sky-600 dark:hover:bg-gray-700'
+        isActive ? 'bg-sky-200/30' : 'hover:bg-sky-600/80 dark:hover:bg-gray-700/80'
       }`}
       onClick={onClick}
     >
