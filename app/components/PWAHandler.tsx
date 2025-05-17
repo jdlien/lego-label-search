@@ -30,7 +30,7 @@ export const PWATopBar = () => {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 bg-blue-600 dark:bg-gray-800 backdrop-blur-md z-[1500] pointer-events-none"
+      className="fixed top-0 left-0 right-0 bg-sky-600 dark:bg-gray-800 backdrop-blur-md z-[1500] pointer-events-none"
       style={{ height: 'env(safe-area-inset-top)' }}
     />
   )
