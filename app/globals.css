@@ -1,0 +1,41 @@
+/** @format */
+
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Brand colors extracted from the current theme */
+  --color-brand-50: #f7fafc;
+  --color-brand-100: #edf2f7;
+  --color-brand-500: #4299e1;
+  --color-brand-600: #3182ce;
+  --color-brand-700: #2b6cb0;
+  --color-brand-900: #1a365d;
+}
+
+@layer base {
+  html {
+    @apply h-full;
+  }
+
+  body {
+    /* Light mode gradient split background */
+    @apply bg-gradient-to-b from-brand-700 from-50% to-brand-100 to-50%;
+    @apply text-gray-800 min-h-screen flex flex-col;
+    /* Dark mode styles */
+    @apply dark:bg-gray-800 dark:text-white;
+  }
+}
+
+@layer components {
+  /* Component styles can be added here */
+
+  .link {
+    @apply text-blue-500 dark:text-blue-300 hover:text-blue-600 dark:hover:text-blue-400 hover:underline;
+  }
+}
+
+@layer utilities {
+  /* Custom utilities can be added here */
+}
