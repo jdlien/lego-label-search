@@ -57,6 +57,9 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
   // Start with WebP, fallback to PNG
   const [imageSrc, setImageSrc] = useState<string>(webpPath)
   const [imageError, setImageError] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [isConverting, setIsConverting] = useState(false)
+  const [labelExists, setLabelExists] = useState<boolean | null>(null)
   const router = useRouter()
 
   // Handle image error - try to load PNG if WebP fails
@@ -67,6 +70,110 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
     } else {
       // If PNG also fails
       setImageError(true)
+    }
+  }
+
+  // Unified download trigger function
+  const triggerDownload = async (fileUrl: string, fileName: string) => {
+    try {
+      const response = await fetch(fileUrl)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch file: ${response.statusText}`)
+      }
+      const blob = await response.blob()
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(link.href)
+    } catch (error) {
+      console.error('Error triggering download:', error)
+      alert('Download failed: Could not start the file download.')
+    }
+  }
+
+  // Handler for label download (12mm)
+  const handleLabelDownload = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (isDownloading) return
+
+    setIsDownloading(true)
+    try {
+      const response = await fetch(`/api/download-label?part_num=${part.id}`)
+      const data = await response.json()
+
+      if (data.success) {
+        // Start the download
+        await triggerDownload(`/data/labels/${part.id}.lbx`, `${part.id}.lbx`)
+        setLabelExists(true)
+      } else {
+        setLabelExists(false)
+        alert('Label not available: This part does not have a label available.')
+      }
+    } catch (error) {
+      console.error('Error downloading label:', error)
+      alert('Download failed: There was an error downloading the label.')
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
+  // Handler for 24mm label download
+  const handle24mmLabelDownload = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (isConverting) return
+
+    setIsConverting(true)
+    try {
+      // First, ensure the original label exists
+      const downloadResponse = await fetch(`/api/download-label?part_num=${part.id}`)
+      const downloadData = await downloadResponse.json()
+
+      if (!downloadData.success) {
+        setLabelExists(false)
+        alert('Label not available: The original label is not available for conversion.')
+        return
+      }
+
+      // Add a small delay to ensure the file is fully written to disk
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      // Now try to convert the label
+      const response = await fetch(`/api/convert-label?part_num=${part.id}`)
+      const data = await response.json()
+
+      if (data.success) {
+        // Add a small delay to allow the server to recognize the new file
+        await new Promise((resolve) => setTimeout(resolve, 300))
+        // Start the download
+        await triggerDownload(`/data/labels/${part.id}-24mm.lbx`, `${part.id}-24mm.lbx`)
+      } else {
+        // Check if the error message contains a SyntaxWarning about escape sequences
+        const isEscapeSequenceWarning = data.message && data.message.includes('SyntaxWarning: invalid escape sequence')
+
+        if (isEscapeSequenceWarning) {
+          // Add a small delay here as well if attempting retry on warning
+          await new Promise((resolve) => setTimeout(resolve, 300))
+          // Try one more time - the script might have executed properly despite the warning
+          await triggerDownload(`/data/labels/${part.id}-24mm.lbx`, `${part.id}-24mm.lbx`)
+          alert(
+            'Conversion completed with warnings: There were some warnings during conversion, but your file should be ready.'
+          )
+        } else {
+          alert(`Conversion failed: ${data.message || 'There was an error converting the label to 24mm format.'}`)
+        }
+      }
+    } catch (error) {
+      console.error('Error converting label:', error)
+      alert('Conversion failed: There was an error converting the label.')
+    } finally {
+      setIsConverting(false)
     }
   }
 
@@ -106,13 +213,7 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
   ].filter(Boolean) as { text: string; value?: string; onClick?: (e: React.MouseEvent) => void }[]
 
   return (
-    <div
-      className={`border rounded-md overflow-hidden transition-all ${
-        isSelected
-          ? 'bg-sky-50 dark:bg-sky-900/20 border-sky-400 dark:border-sky-500'
-          : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:shadow-md'
-      }`}
-    >
+    <div className="border rounded-md overflow-hidden transition-all bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:shadow-md">
       <div className="flex flex-col p-4">
         <div className="flex mb-3">
           {/* Part Image */}
@@ -166,27 +267,33 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
         )}
 
         {/* Selection button and Actions */}
-        <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100 dark:border-gray-600">
-          <button
-            onClick={() => onToggleSelect(part.id)}
-            className={`text-sm px-2 py-1 rounded ${
-              isSelected
-                ? 'bg-sky-100 dark:bg-sky-800 text-sky-700 dark:text-sky-200'
-                : 'bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-500'
-            }`}
-          >
-            {isSelected ? '✓ Selected' : 'Select'}
-          </button>
-
-          <div className="flex space-x-2">
-            <button
-              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-              title="Download"
-              aria-label="Download"
-            >
-              <DownloadIcon />
-            </button>
-          </div>
+        <div className="flex justify-center items-center mt-2 pt-2 border-t border-gray-100 dark:border-gray-600">
+          {labelExists === false ? (
+            <div className="text-sm text-gray-500 dark:text-gray-400">No label available</div>
+          ) : (
+            <div className="flex space-x-2">
+              <button
+                className="link text-sm flex items-center space-x-1"
+                onClick={handleLabelDownload}
+                disabled={isDownloading}
+                title="Download 12mm Label"
+                aria-label="Download 12mm Label"
+              >
+                <DownloadIcon />
+                <span>{isDownloading ? 'Downloading...' : 'LBX 12mm'}</span>
+              </button>
+              <button
+                className="link text-sm flex items-center space-x-1"
+                onClick={handle24mmLabelDownload}
+                disabled={isConverting}
+                title="Download 24mm Label"
+                aria-label="Download 24mm Label"
+              >
+                <DownloadIcon />
+                <span>{isConverting ? 'Converting...' : 'LBX 24mm'}</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
