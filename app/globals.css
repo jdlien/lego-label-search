@@ -22,11 +22,81 @@
     @apply text-sky-600 dark:text-sky-300 hover:text-sky-700 dark:hover:text-sky-400 hover:underline disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
+  /* Generic gray button that can be restyled */
   .btn {
-    @apply h-12 px-4 py-2 bg-sky-600 dark:bg-sky-300 text-white dark:text-sky-950 font-semibold rounded-md outline-none;
-    @apply hover:bg-sky-600 dark:hover:bg-sky-400;
-    @apply focus:ring-2 focus:ring-sky-500 focus:border-sky-500;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    --btn-bg: theme('colors.gray.200');
+    --btn-text: theme('colors.gray.950');
+    --btn-text-shadow: rgba(255, 255, 255, 0.6);
+    --btn-bg-hover: theme('colors.white');
+    --btn-text-hover: theme('colors.black');
+    --btn-border: color-mix(in oklch, var(--btn-bg) 80%, black 30%);
+    --btn-border-highlight: color-mix(in oklch, var(--btn-bg) 80%, white 20%);
+
+    background-color: var(--btn-bg);
+    background-image: linear-gradient(180deg, var(--btn-bg), color-mix(in oklch, var(--btn-bg) 80%, black 15%));
+    text-shadow: 1px 1px 1px var(--btn-text-shadow);
+
+    color: var(--btn-text);
+    border-top-color: var(--btn-border-highlight);
+    border-bottom-color: var(--btn-border);
+    border-left-color: var(--btn-border-highlight);
+    border-right-color: var(--btn-border);
+
+    @apply h-12 px-4 py-2 font-semibold rounded-md outline-none border;
+    @apply focus:ring-2 focus:ring-sky-500/30;
+    @apply disabled:opacity-70 disabled:cursor-not-allowed;
+    @apply transition-colors duration-100;
+  }
+
+  .dark .btn {
+    --btn-bg: theme('colors.gray.400');
+    --btn-bg-darkened: color-mix(in oklch, var(--btn-bg) 80%, black 20%);
+    --btn-text: white;
+    --btn-text-shadow: rgba(0, 0, 0, 0.25);
+    --btn-bg-hover: theme('colors.gray.400');
+    --btn-text-hover: theme('colors.gray.950');
+    --btn-border: color-mix(in oklch, var(--btn-bg) 80%, black 40%);
+    --btn-border-highlight: color-mix(in oklch, var(--btn-bg) 80%, white 70%);
+
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+  }
+
+  .btn:hover:not(:disabled) {
+    background-color: var(--btn-bg-hover);
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--btn-bg) 80%, white 17%),
+      color-mix(in oklch, var(--btn-bg) 80%, black 10%)
+    );
+  }
+
+  .btn:active:not(:disabled) {
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--btn-bg) 80%, black 5%),
+      color-mix(in oklch, var(--btn-bg) 80%, black 16%)
+    );
+
+    border-top-color: color-mix(in oklch, var(--btn-bg) 80%, black 10%);
+    border-bottom-color: color-mix(in oklch, var(--btn-border) 80%, black 15%);
+    border-left-color: color-mix(in oklch, var(--btn-bg) 80%, black 10%);
+    border-right-color: color-mix(in oklch, var(--btn-border) 80%, black 15%);
+  }
+
+  /* Blue button used for main actions like submit */
+  .btn-primary,
+  .dark .btn-primary {
+    --btn-bg: theme('colors.sky.600');
+    --btn-text: theme('colors.white');
+    --btn-text-shadow: 'black';
+  }
+
+  .btn-danger,
+  .dark .btn-danger {
+    --btn-bg: theme('colors.red.600');
+    --btn-text: theme('colors.white');
+    --btn-text-shadow: 'black';
   }
 }
 
