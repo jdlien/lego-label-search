@@ -80,10 +80,7 @@ export default function SearchResults({
       <div className="text-center py-10">
         <h3 className="text-md font-medium text-gray-500 dark:text-gray-400 mb-4">No results found</h3>
         {(searchParams.get('category') || searchParams.get('q')) && (
-          <button
-            onClick={() => router.push('/')}
-            className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
-          >
+          <button onClick={() => router.push('/')} className="text-sm link">
             Reset Search
           </button>
         )}
@@ -127,10 +124,7 @@ export default function SearchResults({
             <span className="text-sm text-gray-600 dark:text-gray-300">
               {selectedCount} part{selectedCount !== 1 ? 's' : ''} selected
             </span>
-            <button
-              className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
-              onClick={handleClearSelection}
-            >
+            <button className="link text-sm" onClick={handleClearSelection}>
               Clear Selection
             </button>
           </div>

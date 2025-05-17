@@ -32,6 +32,15 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
   const [categoriesForDropdown, setCategoriesForDropdown] = useState<any[]>([])
   const searchTimeout = useRef<NodeJS.Timeout | null>(null)
 
+  // Update state when URL parameters change
+  useEffect(() => {
+    const urlQuery = searchParams.get('q') || ''
+    const urlCategory = searchParams.get('category') || ''
+
+    setQuery(urlQuery)
+    setCategory(urlCategory)
+  }, [searchParams])
+
   // Fetch categories when component mounts
   useEffect(() => {
     const fetchCategories = async () => {
@@ -171,7 +180,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
               </div>
               <input
                 type="text"
-                className="w-full h-12 pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full h-12 pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                 placeholder="Search for part number or name..."
                 value={query}
                 onChange={handleInputChange}
@@ -202,8 +211,9 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
 
           <div className="flex flex-row gap-2 w-full md:w-auto">
             <div className="flex-1 min-w-0">
+              {/* TODO: pre-style input elements in the global.css */}
               <select
-                className="w-full h-12 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full h-12 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                 value={category}
                 onChange={handleCategoryChange}
               >
