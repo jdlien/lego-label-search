@@ -1,5 +1,3 @@
-/** @format */
-
 import { Box, Text, useColorModeValue, Link } from '@chakra-ui/react'
 
 export default function Footer() {

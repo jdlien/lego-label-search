@@ -222,10 +222,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
                 )}
               </select>
             </div>
-            <button
-              type="submit"
-              className="h-12 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md min-w-[64px]"
-            >
+            <button type="submit" className="btn btn-primary min-w-[64px]">
               Go
             </button>
           </div>
@@ -234,7 +231,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
             <button
               type="button"
               onClick={onImageSearch}
-              className="w-full text-blue-500 dark:text-blue-300 hover:text-blue-600 dark:hover:text-blue-400 hover:underline flex items-center justify-center gap-2 mt-0"
+              className="link w-full flex items-center justify-center gap-2 mt-0"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="w-5 h-5" fill="currentColor">
                 <path d="M149.1 64.8L138.7 96 64 96C28.7 96 0 124.7 0 160L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64l-74.7 0L362.9 64.8C356.4 45.2 338.1 32 317.4 32L194.6 32c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 1 1 0 192 96 96 0 1 1 0-192z" />
