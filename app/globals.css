@@ -38,7 +38,7 @@
   --pill-padding-x: calc(var(--pill-height) / 2.5);
   --pill-gap: 1px;
   --notch-radius: calc(var(--pill-height) / 2 + var(--pill-gap) * 2);
-  --input-color: oklch(60% 0 300); /* Default gray */
+  --input-color: var(--color-sky-800);
   --color-mix-distance: 18%;
   --base-color: var(--input-color);
   --middle-color: color-mix(in oklch, var(--input-color) calc(100% - var(--color-mix-distance)), white);
