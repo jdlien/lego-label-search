@@ -11,6 +11,9 @@ const nextConfig = {
   images: { unoptimized: true },
   */
   // Public directory files are automatically served by Next.js
+  experimental: {
+    esmExternals: 'loose',
+  },
 }
 
 module.exports = nextConfig

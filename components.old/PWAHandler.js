@@ -1,5 +1,3 @@
-/** @format */
-
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Box, Flex, IconButton, useColorModeValue } from '@chakra-ui/react'
