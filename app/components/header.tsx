@@ -16,7 +16,7 @@ function NavLink({ href, children, onClick = () => {} }) {
     <Link
       href={href}
       className={`px-3 py-2 rounded transition-colors ${
-        isActive ? 'bg-white/30' : 'hover:bg-brand-600 dark:hover:bg-gray-700'
+        isActive ? 'bg-white/30' : 'hover:bg-sky-600 dark:hover:bg-gray-700'
       }`}
       onClick={onClick}
     >
@@ -30,7 +30,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
-    <header className="bg-brand-700 dark:bg-gray-800 text-white px-4 py-2 shadow-md">
+    <header className="bg-sky-700 dark:bg-gray-800 text-white px-4 py-2 shadow-md">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <h1 className="text-xl sm:text-2xl font-semibold">
           <Link href="/" className="flex items-center gap-3">
@@ -53,7 +53,7 @@ export function Header() {
             type="button"
             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 rounded-md hover:bg-brand-600 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-md hover:bg-sky-600 dark:hover:bg-gray-700 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -76,13 +76,13 @@ export function Header() {
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} aria-hidden="true" />
 
           {/* Drawer panel */}
-          <div className="fixed right-0 top-0 h-full w-64 bg-brand-700 dark:bg-gray-800 p-4 shadow-xl">
+          <div className="fixed right-0 top-0 h-full w-64 bg-sky-700 dark:bg-gray-800 p-4 shadow-xl">
             <div className="flex justify-end">
               <button
                 type="button"
                 aria-label="Close menu"
                 onClick={() => setIsMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-brand-600 dark:hover:bg-gray-700 transition-colors"
+                className="p-2 rounded-md hover:bg-sky-600 dark:hover:bg-gray-700 transition-colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

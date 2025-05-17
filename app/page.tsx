@@ -94,7 +94,7 @@ export default function Home() {
           {/* Loading state */}
           {isLoading && (
             <div className="flex justify-center items-center py-6">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-500"></div>
             </div>
           )}
 
@@ -122,9 +122,9 @@ export default function Home() {
           {!isLoading && !error && hasSearched && (
             <>
               {totalResultCount > MAX_DISPLAY_RESULTS && (
-                <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-800 text-blue-800 dark:text-blue-300 px-4 py-2 rounded-md mb-4">
+                <div className="bg-sky-50 dark:bg-sky-900/30 border border-sky-300 dark:border-sky-800 text-sky-800 dark:text-sky-300 px-4 py-2 rounded-md mb-4">
                   <div className="flex items-center">
-                    <svg className="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-5 w-5 text-sky-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -153,10 +153,7 @@ export default function Home() {
                 Enter a search term, select a category,
                 <br />
                 or&nbsp;
-                <button
-                  onClick={handleImageSearchModalOpen}
-                  className="text-blue-500 dark:text-blue-300 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
-                >
+                <button onClick={handleImageSearchModalOpen} className="link">
                   search using an image
                 </button>
               </p>

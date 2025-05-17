@@ -12,7 +12,7 @@ export function DarkModeToggle({ className = '' }: DarkModeToggleProps) {
       type="button"
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
       onClick={toggleTheme}
-      className={`p-2 rounded-md hover:bg-brand-600 dark:hover:bg-gray-700 transition-colors ${className}`}
+      className={`p-2 rounded-md hover:bg-sky-600 dark:hover:bg-gray-700 transition-colors ${className}`}
     >
       {theme === 'light' ? (
         <svg

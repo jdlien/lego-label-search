@@ -1,8 +1,8 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import React from 'react'
-import { Header } from './components/header'
-import { Footer } from './components/footer'
+import { Header } from './components/Header'
+import { Footer } from './components/Footer'
 
 export const metadata: Metadata = {
   title: 'LEGO Part Label Search',
@@ -45,9 +45,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="dark:bg-gray-900 dark:text-white">
-        <div className="flex flex-col min-h-screen">
+        <div className="">
           <Header />
-          <main className="flex-grow">{children}</main>
+          <main className="">{children}</main>
           <Footer />
         </div>
       </body>
