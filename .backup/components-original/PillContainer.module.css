@@ -1,45 +1,10 @@
-@import 'tailwindcss';
+/**
+ * components/PillContainer.css
+ *
+ * @format
+ */
 
-@custom-variant dark (&:where(.dark, .dark *));
-
-@theme {
-  /* Brand colors extracted from the current theme */
-  --color-brand-50: #f7fafc;
-  --color-brand-100: #edf2f7;
-  --color-brand-500: #4299e1;
-  --color-brand-600: #3182ce;
-  --color-brand-700: #2b6cb0;
-  --color-brand-900: #1a365d;
-}
-
-@layer base {
-  html {
-    @apply h-full;
-  }
-
-  body {
-    /* Light mode gradient split background */
-    @apply bg-gradient-to-b from-brand-700 from-50% to-brand-100 to-50%;
-    @apply text-gray-800 min-h-screen flex flex-col;
-    /* Dark mode styles */
-    @apply dark:bg-gray-800 dark:text-white;
-  }
-}
-
-@layer components {
-  /* Component styles can be added here */
-
-  .link {
-    @apply text-blue-500 dark:text-blue-300 hover:text-blue-600 dark:hover:text-blue-400 hover:underline;
-  }
-}
-
-@layer utilities {
-  /* Custom utilities can be added here */
-}
-
-/* PillContainer styles */
-.pill-container {
+.pillContainer {
   --pill-height: 24px; /* Default size */
   --pill-padding-x: calc(var(--pill-height) / 2.5);
   --pill-gap: 1px;
@@ -53,6 +18,7 @@
   align-items: center;
   font-size: calc(var(--pill-height) * 0.66);
   filter: drop-shadow(-1px 1px 2px rgba(0, 0, 0, 0.3));
+  /* The default color if one is not provided */
 }
 
 .pill {
@@ -68,7 +34,6 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s;
-  white-space: nowrap;
 }
 
 .pill:hover {
@@ -79,12 +44,12 @@
   margin-right: var(--pill-gap);
 }
 
-.pill-left {
+.left {
   background-color: var(--left-color);
 }
 
-.pill-left,
-.pill-middle {
+.left,
+.middle {
   padding-right: calc(var(--pill-padding-x) + var(--notch-radius));
   mask: radial-gradient(
     circle var(--notch-radius) at calc(100% - var(--notch-radius) / 2) 50%,
@@ -95,12 +60,12 @@
   border-bottom-right-radius: 0;
 }
 
-.pill-middle {
+.middle {
   background-color: var(--middle-color);
   margin-left: calc(-1.5 * var(--notch-radius) + var(--pill-gap));
 }
 
-.pill-right {
+.right {
   background-color: var(--base-color);
   margin-left: calc(-1.5 * var(--notch-radius) + var(--pill-gap));
 }

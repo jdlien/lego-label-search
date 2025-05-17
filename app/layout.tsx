@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
         <link rel="icon" href="/icons/favicon.ico" sizes="any" />
@@ -27,18 +27,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `
               (function() {
                 try {
-                  var theme = localStorage.theme;
+                  var theme = localStorage.getItem('theme');
                   var mql = window.matchMedia('(prefers-color-scheme: dark)');
                   var isDark = theme === 'dark' || (!theme && mql.matches);
-                  if (isDark) document.documentElement.classList.add('dark');
-                  else document.documentElement.classList.remove('dark');
-                } catch(e) {}
+
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch(e) {
+                  console.error('Dark mode initialization error:', e);
+                }
               })();
             `,
           }}
         />
       </head>
-      <body>
+      <body className="dark:bg-gray-900 dark:text-white">
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-grow">{children}</main>

@@ -1,23 +1,94 @@
-/** @format */
-
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import SearchBar from './components/SearchBar'
+import ImageSearchModal from './components/ImageSearchModal'
+import SearchResults from './components/SearchResults'
+
+// Constants
+const MAX_DISPLAY_RESULTS = 200
 
 export default function Home() {
-  // State management is minimized for now - we'll add more when we implement search functionality
-  const [isLoading] = useState(false)
-  const [error] = useState<string | null>(null)
-  const [hasSearched] = useState(false)
+  const searchParams = useSearchParams()
+
+  // State management
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [results, setResults] = useState<any[]>([])
+  const [totalResultCount, setTotalResultCount] = useState(0)
+  const [hasSearched, setHasSearched] = useState(false)
+  const [isImageSearchModalOpen, setIsImageSearchModalOpen] = useState(false)
+
+  // Load search results when query parameters change
+  useEffect(() => {
+    const q = searchParams.get('q')
+    const category = searchParams.get('category')
+
+    if (!q && !category) {
+      setHasSearched(false)
+      setResults([])
+      setTotalResultCount(0)
+      return
+    }
+
+    setIsLoading(true)
+    setHasSearched(true)
+    setError(null)
+
+    const fetchResults = async () => {
+      try {
+        const queryParams = new URLSearchParams()
+        if (q) queryParams.append('q', q)
+        if (category) queryParams.append('category', category)
+
+        const response = await fetch(`/api/search?${queryParams.toString()}`)
+        if (!response.ok) {
+          throw new Error(`API error: ${response.statusText}`)
+        }
+        const data = await response.json()
+
+        // Store the total count of results
+        const allResults = data.results || []
+        setTotalResultCount(allResults.length)
+
+        // Limit displayed results
+        setResults(allResults.slice(0, MAX_DISPLAY_RESULTS))
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch results')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchResults()
+  }, [searchParams])
+
+  // Handler functions
+  const handleImageSearchModalOpen = () => {
+    setIsImageSearchModalOpen(true)
+  }
+
+  const handleImageSearchModalClose = () => {
+    setIsImageSearchModalOpen(false)
+  }
+
+  const handleImageSubmit = (imageData: string | File, options?: { keepModalOpen?: boolean }) => {
+    console.log('Image submitted:', imageData)
+    if (!options?.keepModalOpen) {
+      setIsImageSearchModalOpen(false)
+    }
+    // Additional processing would go here
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto max-w-screen-2xl px-4 pt-4 pb-3">
         <div className="flex flex-col items-stretch">
-          {/* SearchBar component will go here */}
+          {/* SearchBar component */}
           <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
-            <p className="text-center">Search bar will be implemented here</p>
+            <SearchBar onImageSearch={handleImageSearchModalOpen} />
           </div>
 
           {/* Loading state */}
@@ -49,9 +120,30 @@ export default function Home() {
 
           {/* Results */}
           {!isLoading && !error && hasSearched && (
-            <div>
-              <p className="text-center py-8">Search results will appear here</p>
-            </div>
+            <>
+              {totalResultCount > MAX_DISPLAY_RESULTS && (
+                <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-800 text-blue-800 dark:text-blue-300 px-4 py-2 rounded-md mb-4">
+                  <div className="flex items-center">
+                    <svg className="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <p>
+                      Showing {results.length} of {totalResultCount} total results
+                    </p>
+                  </div>
+                </div>
+              )}
+              <SearchResults
+                results={results}
+                totalResults={totalResultCount}
+                subcategoryCount={results.length > 0 ? 0 : 0}
+              />
+            </>
           )}
 
           {/* Initial state - welcome message */}
@@ -61,12 +153,22 @@ export default function Home() {
                 Enter a search term, select a category,
                 <br />
                 or&nbsp;
-                <button className="text-blue-500 dark:text-blue-300 hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
+                <button
+                  onClick={handleImageSearchModalOpen}
+                  className="text-blue-500 dark:text-blue-300 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
+                >
                   search using an image
                 </button>
               </p>
             </div>
           )}
+
+          {/* Modals */}
+          <ImageSearchModal
+            isOpen={isImageSearchModalOpen}
+            onClose={handleImageSearchModalClose}
+            onImageSubmit={handleImageSubmit}
+          />
         </div>
       </div>
     </div>
