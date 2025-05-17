@@ -40,5 +40,11 @@
     "sharp": "^0.34.1",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "@types/react": "^19.1.4",
+    "tailwindcss": "^4.1.7",
+    "typescript": "^5.8.3"
   }
 }

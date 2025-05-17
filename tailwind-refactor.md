@@ -3,6 +3,55 @@
 # Tailwind CSS Refactor Plan
 
 This document outlines the plan to refactor this Next.js project from Chakra UI to Tailwind CSS v4.1 (CSS-only configuration).
+Additionally we will migrate to the new Next.js App Directory Structure and use Typescript instead of Javascript.
+
+## Migrating to the New Next.js App Directory Structure
+
+Recent versions of Next.js (13+) recommend using the new `app/` directory structure, which offers improved routing, layouts, server components, and more. This is now the canonical way to structure Next.js projects.
+
+### Key Steps to Refactor:
+
+1. **Create an `app/` Directory at the Project Root**
+
+   - Move your main application files from `pages/` to `app/`.
+   - Each route becomes a folder inside `app/` with a `page.js` (or `page.tsx`) file. For example, `pages/about.js` becomes `app/about/page.js`.
+   - The root route is `app/page.js`.
+
+2. **Layouts and Templates**
+
+   - Create a `layout.js` file in the `app/` directory for your root layout (replaces `_app.js` and `_document.js` for most use cases).
+   - You can nest layouts for sub-routes as needed.
+   - For global styles (like Tailwind), import your CSS in `app/layout.js`.
+
+3. **Global CSS**
+
+   - Move your Tailwind import to `app/globals.css` (or keep `styles/app.css` and import it in `app/layout.js`).
+   - Example in `app/layout.js`:
+     ```js
+     import '../styles/app.css'
+     ```
+
+4. **API Routes**
+
+   - API routes should remain in the `pages/api/` directory for now, as the `app/` directory does not yet support API routes.
+
+5. **Remove `pages/` Directory**
+
+   - Once all routes are migrated and tested, you can remove the old `pages/` directory (except for `pages/api/` if you have API routes).
+
+6. **Update Routing and Links**
+
+   - Update any imports or links that reference the old `pages/` structure to use the new `app/` paths.
+
+7. **Dark Mode and FOUC Prevention**
+   - The new `app/` directory structure handles server-side rendering differently. You can still use the same FOUC-prevention script, but inject it in `app/layout.js` using a `<script>` tag with `dangerouslySetInnerHTML`.
+
+### References
+
+- [Next.js App Directory Documentation](https://nextjs.org/docs/app)
+- [Migrating from Pages to App Directory](https://nextjs.org/docs/app/building-your-application/upgrading/app-directory)
+
+---
 
 ## General Setup (Tailwind CSS v4.1 - CSS-only)
 
@@ -15,7 +64,7 @@ This document outlines the plan to refactor this Next.js project from Chakra UI 
 
     - `npm install -D tailwindcss`
 
-3.  **Create `styles/app.css`**:
+3.  **Create `app/globals.css`**:
 
     ```css
     @import 'tailwindcss';
@@ -64,7 +113,7 @@ This document outlines the plan to refactor this Next.js project from Chakra UI 
 
 4.  **Import Tailwind CSS**:
 
-    - In `pages/_app.js`, import the CSS file: `import '../styles/app.css';` (adjust path accordingly).
+    - In `pages/_app.js`, import the CSS file: `import '../app/globals.css';` (adjust path accordingly).
 
 5.  **Dark Mode Setup**:
     - Tailwind CSS uses a class (typically `dark`) on an ancestor element (like `<html>` or `<body>`) to enable dark mode styles (e.g., `dark:bg-black`).
@@ -98,10 +147,10 @@ This document outlines the plan to refactor this Next.js project from Chakra UI 
       - `Box as={PWAViewportAdjuster}` -> `<PWAViewportAdjuster className="flex flex-col flex-1 min-h-0 overflow-y-auto bg-white dark:bg-gray-900" ...>` (background will be dynamic).
       - Inner `Box` (page wrapper) -> `<div className="flex-1 min-h-0">`
   - **Custom Theme**:
-    - Transfer `brand` colors to the `@theme` block in `app.css`.
+    - Transfer `brand` colors to the `@theme` block in `globals.css`.
     - Tailwind's default sans-serif stack includes `system-ui`, so explicit font declarations might not be needed unless further customization is desired.
   - **Global Styles**:
-    - Translate global styles for `html`, `body`, `#__next` to `@apply` directives in `app.css` under `@layer base`.
+    - Translate global styles for `html`, `body`, `#__next` to `@apply` directives in `globals.css` under `@layer base`.
     - The light mode body background: `bg-gradient-to-b from-brand-700 from-50% to-brand-100 to-50%`.
     - The dark mode body background: `dark:bg-gray-800`.
     - The HTML background: `dark:bg-gray-800` (if dark is the default or toggled), or a light equivalent like `bg-gray-100`. The original was `props.colorMode === 'dark' ? '#1A202C' : '#1A202C'`, which implies it was always dark (`#1A202C`). This needs clarification for Tailwind, perhaps `bg-gray-800` for html.
