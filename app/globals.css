@@ -29,8 +29,8 @@
     --btn-text-shadow: rgba(255, 255, 255, 0.6);
     --btn-bg-hover: theme('colors.white');
     --btn-text-hover: theme('colors.black');
-    --btn-border: color-mix(in oklch, var(--btn-bg) 80%, black 30%);
-    --btn-border-highlight: color-mix(in oklch, var(--btn-bg) 80%, white 20%);
+    --btn-border: color-mix(in oklch, var(--btn-bg) 80%, black 20%);
+    --btn-border-highlight: color-mix(in oklch, var(--btn-bg) 85%, white 50%);
 
     background-color: var(--btn-bg);
     background-image: linear-gradient(180deg, var(--btn-bg), color-mix(in oklch, var(--btn-bg) 80%, black 15%));
@@ -42,10 +42,10 @@
     border-left-color: var(--btn-border-highlight);
     border-right-color: var(--btn-border);
 
-    @apply h-12 px-4 py-2 font-semibold rounded-md outline-none border;
+    @apply px-4 py-2 font-semibold rounded-md outline-none border shadow-sm;
     @apply focus:ring-2 focus:ring-sky-500/30;
     @apply disabled:opacity-70 disabled:cursor-not-allowed;
-    @apply transition-colors duration-100;
+    @apply transition-colors duration-150;
   }
 
   .dark .btn {
@@ -56,7 +56,7 @@
     --btn-bg-hover: theme('colors.gray.400');
     --btn-text-hover: theme('colors.gray.950');
     --btn-border: color-mix(in oklch, var(--btn-bg) 80%, black 40%);
-    --btn-border-highlight: color-mix(in oklch, var(--btn-bg) 80%, white 70%);
+    --btn-border-highlight: color-mix(in oklch, var(--btn-bg) 90%, white 25%);
 
     background-color: var(--btn-bg);
     color: var(--btn-text);
@@ -74,8 +74,8 @@
   .btn:active:not(:disabled) {
     background-image: linear-gradient(
       180deg,
-      color-mix(in oklch, var(--btn-bg) 80%, black 5%),
-      color-mix(in oklch, var(--btn-bg) 80%, black 16%)
+      color-mix(in oklch, var(--btn-bg) 90%, black 5%),
+      color-mix(in oklch, var(--btn-bg) 85%, black 20%)
     );
 
     border-top-color: color-mix(in oklch, var(--btn-bg) 80%, black 10%);
@@ -98,10 +98,32 @@
     --btn-text: theme('colors.white');
     --btn-text-shadow: 'black';
   }
+
+  .btn-green,
+  .dark .btn-green {
+    --btn-bg: theme('colors.green.600');
+    --btn-text: theme('colors.white');
+    --btn-text-shadow: 'black';
+  }
+
+  .btn-ghost,
+  .dark .btn-ghost {
+    background-color: transparent;
+    background-image: none;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    box-shadow: none;
+  }
 }
 
 @layer utilities {
   /* Custom utilities can be added here */
+  /* Custom select down chevron icon */
+  .select-arrow-img {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3e%3cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z' clip-rule='evenodd' /%3e%3c/svg%3e");
+  }
 }
 
 /* PillContainer styles */
