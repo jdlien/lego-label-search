@@ -8,7 +8,6 @@ interface InputErrorProps {
   className?: string
 }
 
-// --- COMPONENT ---
 const InputError: React.FC<InputErrorProps> = ({ id, error, className }) => {
   if (!error) return <div className="min-h-[20px]"></div> // Maintain space like original
   return (

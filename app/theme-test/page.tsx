@@ -4,6 +4,12 @@ import React, { useState } from 'react'
 import InputField from '../components/InputField' // Assuming InputField is in components
 import { IconUser, IconAt, IconCurrencyDollar } from '../components/InputField/InputIcons' // Assuming icons might be used as prefixes/suffixes
 
+/*
+  TODO:
+  - Allow a global theme to be set for the app so we don't have to set theme="gray" on every input field
+  - Add size options to have jumbo inputs for an app where that aesthetic makes sense
+*/
+
 export default function ThemeTestPage() {
   const [textValue, setTextValue] = useState('Initial Text')
   const [emailValue, setEmailValue] = useState('test@example.com')
@@ -107,13 +113,20 @@ export default function ThemeTestPage() {
           Standard Text Inputs
         </h2>
         <div className="">
-          <InputField label="Basic Text Input" name="text_basic" placeholder="Enter some text" fullWidth={true} />
+          <InputField
+            label="Basic Text Input"
+            name="text_basic"
+            placeholder="Enter some text"
+            fullWidth={true}
+            theme="gray"
+          />
           <InputField label="With Default Value" name="text_default" defaultValue="Hello World" fullWidth={true} />
           <InputField
             label="Controlled Text Input"
             name="text_controlled"
             value={textValue}
             onChange={(e) => setTextValue(e.target.value)}
+            theme="gray"
           />
           <InputField
             label="With Error"
@@ -125,7 +138,13 @@ export default function ThemeTestPage() {
           <InputField label="With Description" name="text_desc" description="This is a helpful description." />
           <InputField label="Disabled" name="text_disabled" placeholder="Cannot type here" disabled />
           <InputField label="Read Only" name="text_readonly" value="You can only read this" readOnly />
-          <InputField label="With Prefix" name="text_prefix" prefix={<IconUser />} placeholder="Username" />
+          <InputField
+            label="With Prefix"
+            name="text_prefix"
+            prefix={<IconUser />}
+            placeholder="Username"
+            theme="gray"
+          />
           <InputField
             label="With Suffix (Icon)"
             name="text_suffix_icon"
