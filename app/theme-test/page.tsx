@@ -107,8 +107,8 @@ export default function ThemeTestPage() {
           Standard Text Inputs
         </h2>
         <div className="">
-          <InputField label="Basic Text Input" name="text_basic" placeholder="Enter some text" />
-          <InputField label="With Default Value" name="text_default" defaultValue="Hello World" />
+          <InputField label="Basic Text Input" name="text_basic" placeholder="Enter some text" fullWidth={true} />
+          <InputField label="With Default Value" name="text_default" defaultValue="Hello World" fullWidth={true} />
           <InputField
             label="Controlled Text Input"
             name="text_controlled"
@@ -162,6 +162,7 @@ export default function ThemeTestPage() {
         </h2>
         <div className="">
           <InputField
+            fullWidth={true}
             type="email"
             label="Email Input"
             name="email_input"
