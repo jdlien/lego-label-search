@@ -29,13 +29,13 @@ import type { OptionType, NormalizedOptionType, InputFieldProps } from './types'
 const inputFieldStyles = tv({
   slots: {
     // Applied to the outermost div, formerly form-item
-    root: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5',
+    root: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5 my-3',
     labelSlot: 'block text-sm sm:text-base font-medium sm:mt-px sm:pt-1', // For InputLabel component and its text color
     inputContainer: 'mt-1 sm:mt-0', // Wrapper for the input group or standalone checkbox/radio
     inputGroup: 'relative flex shadow-sm', // Wraps prefix, input, suffix. Base rounding via compound variants.
     inputElement: `
-      block w-full px-4 py-2 text-sm sm:text-base transition duration-150 ease-in-out sm:leading-5
-      focus:outline-none focus:ring-2 focus:ring-offset-0
+      block w-full border px-4 py-2 text-sm sm:text-base transition duration-150 ease-in-out sm:leading-5
+      focus:outline-none focus:ring-2 focus:ring-sky-500/40 inset-shadow-sm
       `,
     // Specific slots for checkbox/radio elements
     checkboxRadioGroup: 'space-y-2', // Container for multiple checkboxes/radios
@@ -44,7 +44,6 @@ const inputFieldStyles = tv({
     checkboxRadioInput: 'h-4 w-4 rounded', // Theme-specific: accent color, border, focus ring
     checkboxRadioLabelWrapper: 'ml-3 text-sm',
     checkboxRadioLabel: 'font-medium', // Theme-specific: text color
-    checkboxRadioDescription: '', // Theme-specific: text color (subtle)
 
     affixSlot: 'inline-flex items-center px-3 text-sm', // For InputAffix (prefix/suffix)
     // Theme-specific: Border, bg, text. Assumes InputAffix handles its own edge rounding.
@@ -60,35 +59,58 @@ const inputFieldStyles = tv({
   variants: {
     theme: {
       zinc: {
-        inputElement:
-          'border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:ring-blue-500 hover:enabled:bg-zinc-100 dark:hover:enabled:bg-zinc-700',
-        labelSlot: 'text-zinc-700 dark:text-zinc-200',
+        inputElement: `
+          border-zinc-300 dark:border-zinc-500 bg-zinc-50 dark:bg-zinc-900/50 text-zinc-700 dark:text-zinc-200
+          placeholder-zinc-400 dark:placeholder-zinc-500 dark:hover:enabled:bg-zinc-900/80
+          `,
+        labelSlot: 'text-zinc-700 dark:text-zinc-100',
         descriptionSlot: 'text-zinc-500 dark:text-zinc-400',
-        affixSlot: 'border-zinc-300 dark:border-zinc-500 bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400', // Adjusted from original themeClassSet.prefixSuffixColors
-        checkboxRadioInput: 'border-zinc-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500',
+        affixSlot: 'border-zinc-300 dark:border-zinc-500 bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+        checkboxRadioInput: 'border-zinc-300 dark:border-zinc-500',
         checkboxRadioLabel: 'text-zinc-700 dark:text-zinc-200',
-        checkboxRadioDescription: 'text-zinc-500 dark:text-zinc-400',
       },
       stone: {
-        inputElement:
-          'border-stone-300 dark:border-stone-600 bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-200 placeholder-stone-400 dark:placeholder-stone-500 focus:ring-amber-500 hover:enabled:bg-stone-100 dark:hover:enabled:bg-stone-700',
-        labelSlot: 'text-stone-700 dark:text-stone-200',
+        inputElement: `border-stone-300 dark:border-stone-500 bg-stone-50 dark:bg-stone-900/50 text-stone-700 dark:text-stone-200
+        placeholder-stone-400 dark:placeholder-stone-500 dark:hover:enabled:bg-stone-900/80
+        `,
+        labelSlot: 'text-stone-700 dark:text-stone-100',
         descriptionSlot: 'text-stone-500 dark:text-stone-400',
         affixSlot:
-          'border-stone-300 dark:border-stone-500 bg-stone-200 text-stone-600 dark:bg-stone-700 dark:text-stone-400',
-        checkboxRadioInput: 'border-stone-300 dark:border-stone-600 text-indigo-600 focus:ring-indigo-500', // Assuming indigo accent for now
+          'border-stone-300 dark:border-stone-500 bg-stone-200 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+        checkboxRadioInput: 'border-stone-300 dark:border-stone-500',
         checkboxRadioLabel: 'text-stone-700 dark:text-stone-200',
-        checkboxRadioDescription: 'text-stone-500 dark:text-stone-400',
       },
       gray: {
-        inputElement:
-          'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-amber-500 hover:enabled:bg-gray-100 dark:hover:enabled:bg-gray-700',
-        labelSlot: 'text-gray-700 dark:text-gray-200',
+        inputElement: `border-gray-300 dark:border-gray-500 bg-gray-50 dark:bg-gray-950/50 text-gray-700 dark:text-gray-200
+          placeholder-gray-400 dark:placeholder-gray-500 dark:hover:enabled:bg-gray-950/80
+        `,
+        labelSlot: 'text-gray-700 dark:text-gray-100',
         descriptionSlot: 'text-gray-500 dark:text-gray-400',
-        affixSlot: 'border-gray-300 dark:border-gray-500 bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
-        checkboxRadioInput: 'border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500', // Assuming indigo accent for now
+        affixSlot: 'border-gray-300 dark:border-gray-500 bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+        checkboxRadioInput: 'border-gray-300 dark:border-gray-500',
         checkboxRadioLabel: 'text-gray-700 dark:text-gray-200',
-        checkboxRadioDescription: 'text-gray-500 dark:text-gray-400',
+      },
+      slate: {
+        inputElement: `border-slate-300 dark:border-slate-500 bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200
+          placeholder-slate-400 dark:placeholder-slate-500 dark:hover:enabled:bg-slate-900/80
+        `,
+        labelSlot: 'text-slate-700 dark:text-slate-100',
+        descriptionSlot: 'text-slate-500 dark:text-slate-400',
+        affixSlot:
+          'border-slate-300 dark:border-slate-500 bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+        checkboxRadioInput: 'border-slate-300 dark:border-slate-500',
+        checkboxRadioLabel: 'text-slate-700 dark:text-slate-200',
+      },
+      neutral: {
+        inputElement: `border-neutral-300 dark:border-neutral-500 bg-neutral-50 dark:bg-neutral-900/50 text-neutral-700 dark:text-neutral-200
+          placeholder-neutral-400 dark:placeholder-neutral-500 dark:hover:enabled:bg-neutral-900/80
+        `,
+        labelSlot: 'text-neutral-700 dark:text-neutral-100',
+        descriptionSlot: 'text-neutral-500 dark:text-neutral-400',
+        affixSlot:
+          'border-neutral-300 dark:border-neutral-500 bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400',
+        checkboxRadioInput: 'border-neutral-300 dark:border-neutral-500',
+        checkboxRadioLabel: 'text-neutral-700 dark:text-neutral-200',
       },
     },
     inputType: {
@@ -117,7 +139,7 @@ const inputFieldStyles = tv({
     error: {
       true: {
         inputElement:
-          'border-red-500 dark:border-red-400 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-500 dark:focus:ring-red-400',
+          'border-red-500 dark:border-red-400 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-500/40',
         errorSlot: 'text-red-600 dark:text-red-500', // Ensures error text color
         // labelSlot: "text-red-600 dark:text-red-500", // Optional: make label red on error
       },
@@ -158,6 +180,21 @@ const inputFieldStyles = tv({
       theme: 'gray',
       disabled: true,
       class: { inputElement: 'bg-gray-100 dark:bg-gray-700 hover:enabled:bg-gray-100 dark:hover:enabled:bg-gray-700' },
+    },
+    {
+      theme: 'slate',
+      disabled: true,
+      class: {
+        inputElement: 'bg-slate-100 dark:bg-slate-700 hover:enabled:bg-slate-100 dark:hover:enabled:bg-slate-700',
+      },
+    },
+    {
+      theme: 'neutral',
+      disabled: true,
+      class: {
+        inputElement:
+          'bg-neutral-100 dark:bg-neutral-700 hover:enabled:bg-neutral-100 dark:hover:enabled:bg-neutral-700',
+      },
     },
 
     // Input group and input element rounding based on prefix/suffix presence
@@ -507,7 +544,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                     <label htmlFor={optionId} className={styles.checkboxRadioLabel()}>
                       {opt.label}
                     </label>
-                    {opt.description && <p className={styles.checkboxRadioDescription()}>{opt.description}</p>}
+                    {opt.description && <p className={styles.descriptionSlot()}>{opt.description}</p>}
                   </div>
                 </div>
               )
@@ -580,6 +617,11 @@ const InputField: React.FC<InputFieldProps> = (props) => {
         {(rawType === 'checkbox' || rawType === 'radio') && normalizedOptions.length === 0 ? (
           <>
             {renderInput()}
+            <InputDescription
+              id={`${idToUse}-description`}
+              description={description}
+              className={styles.descriptionSlot({ class: descriptionClassName })}
+            />
             {!noErrorEl && (
               <InputError
                 id={`${idToUse}-error`}
@@ -587,11 +629,6 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                 className={styles.errorSlot({ class: errorClassName })}
               />
             )}
-            <InputDescription
-              id={`${idToUse}-description`}
-              description={description}
-              className={styles.descriptionSlot({ class: descriptionClassName })}
-            />
           </>
         ) : (
           <>
@@ -599,7 +636,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
               rawType !== 'checkbox' && rawType !== 'radio' && rawType !== 'display' ? (
                 <div className={styles.inputGroup()}>
                   {currentPrefix && (
-                    <InputAffix isPrefix className={styles.affixSlot({ class: prefixClassName })}>
+                    <InputAffix isPrefix htmlFor={idToUse} className={styles.affixSlot({ class: prefixClassName })}>
                       {currentPrefix}
                     </InputAffix>
                   )}
@@ -638,6 +675,11 @@ const InputField: React.FC<InputFieldProps> = (props) => {
               renderInput()
             )}
 
+            <InputDescription
+              id={`${idToUse}-description`}
+              description={description}
+              className={styles.descriptionSlot({ class: descriptionClassName })}
+            />
             {!noErrorEl && (
               <InputError
                 id={`${idToUse}-error`}
@@ -645,11 +687,6 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                 className={styles.errorSlot({ class: errorClassName })}
               />
             )}
-            <InputDescription
-              id={`${idToUse}-description`}
-              description={description}
-              className={styles.descriptionSlot({ class: descriptionClassName })}
-            />
           </>
         )}
       </div>
