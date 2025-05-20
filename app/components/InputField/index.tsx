@@ -31,19 +31,29 @@ const inputFieldStyles = tv({
     // Applied to the outermost div, formerly form-item
     root: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5 my-3',
     labelSlot: 'block text-sm sm:text-base font-medium sm:mt-px sm:pt-1', // For InputLabel component and its text color
-    inputContainer: 'mt-1 sm:mt-0', // Wrapper for the input group or standalone checkbox/radio
+    inputContainer: 'sm:mt-0', // Wrapper for the input group or standalone checkbox/radio
     inputGroup: 'relative flex shadow-sm', // Wraps prefix, input, suffix. Base rounding via compound variants.
     inputElement: `
-      block w-full border px-4 py-2 text-sm sm:text-base transition duration-150 ease-in-out sm:leading-5
-      focus:outline-none focus:ring-2 focus:ring-sky-500/40 inset-shadow-sm
+      block w-full border px-4 py-2 text-sm sm:text-base transition duration-150 ease-in-out sm:leading-5 bg-white/90 hover:enabled:bg-white focus:enabled:bg-white
+      focus:outline-none focus:ring-2 inset-shadow-sm dark:hover:enabled:bg-black/40 dark:enabled:focus:bg-black/50
       `,
     // Specific slots for checkbox/radio elements
     checkboxRadioGroup: 'space-y-2', // Container for multiple checkboxes/radios
     checkboxRadioItem: 'flex items-start',
-    checkboxRadioInputWrapper: 'flex h-5 items-center',
+    checkboxRadioInputWrapper: 'flex items-center',
     checkboxRadioInput: 'size-5 rounded', // Theme-specific: accent color, border, focus ring
     checkboxRadioLabelWrapper: 'ml-3 text-sm',
     checkboxRadioLabel: 'font-medium', // Theme-specific: text color
+
+    // New slot for the checked-border container. Note: dark:has-checked seems not to work here.
+    checkboxRadioContainer: `
+      inline-flex items-center border px-0.5 shadow-inner
+      enabled:hover:bg-white transition-colors duration-150 ease-in-out
+      has-checked:text-black dark:has-checked:text-shadow-sm
+      dark:hover:bg-black/50 disabled:pointer-events-none
+    `,
+    // For checked state:
+    checkedLabelText: 'ml-1.5 mr-1', // For the label text to have proper spacing
 
     affixSlot: 'inline-flex items-center px-3 text-sm', // For InputAffix (prefix/suffix)
     // Theme-specific: Border, bg, text. Assumes InputAffix handles its own edge rounding.
@@ -57,60 +67,94 @@ const inputFieldStyles = tv({
     selectArrowIconSlot: 'size-6 mr-0.75 text-gray-500 dark:text-gray-400', // Default size, margin, and color
   },
   variants: {
+    accent: {
+      blue: {
+        inputElement: 'focus:ring-blue-500/40',
+        checkboxRadioInput: 'accent-blue-600',
+        checkboxRadioContainer: 'has-checked:border-blue-600',
+      },
+      sky: {
+        inputElement: 'focus:ring-sky-500/40',
+        checkboxRadioInput: 'accent-sky-600',
+        checkboxRadioContainer: 'has-checked:border-sky-600',
+      },
+      red: {
+        inputElement: 'focus:ring-red-500/40',
+        checkboxRadioInput: 'accent-red-600',
+        checkboxRadioContainer: 'has-checked:border-red-600',
+      },
+      green: {
+        inputElement: 'focus:ring-green-500/40',
+        checkboxRadioInput: 'accent-green-600',
+        checkboxRadioContainer: 'has-checked:border-green-600',
+      },
+    },
+    // Offer all Tailwind shades of gray as options, from coolest to warmest
     theme: {
-      zinc: {
-        inputElement: `
-          border-zinc-300 dark:border-zinc-500 bg-zinc-50 dark:bg-zinc-900/50 text-zinc-700 dark:text-zinc-200
-          placeholder-zinc-400 dark:placeholder-zinc-500 dark:hover:enabled:bg-zinc-900/80
-          `,
-        labelSlot: 'text-zinc-700 dark:text-zinc-100',
-        descriptionSlot: 'text-zinc-500 dark:text-zinc-400',
-        affixSlot: 'border-zinc-300 dark:border-zinc-500 bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
-        checkboxRadioInput: 'border-zinc-300 dark:border-zinc-500',
-        checkboxRadioLabel: 'text-zinc-700 dark:text-zinc-200',
-      },
-      stone: {
-        inputElement: `border-stone-300 dark:border-stone-500 bg-stone-50 dark:bg-stone-900/50 text-stone-700 dark:text-stone-200
-        placeholder-stone-400 dark:placeholder-stone-500 dark:hover:enabled:bg-stone-900/80
-        `,
-        labelSlot: 'text-stone-700 dark:text-stone-100',
-        descriptionSlot: 'text-stone-500 dark:text-stone-400',
-        affixSlot:
-          'border-stone-300 dark:border-stone-500 bg-stone-200 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
-        checkboxRadioInput: 'border-stone-300 dark:border-stone-500',
-        checkboxRadioLabel: 'text-stone-700 dark:text-stone-200',
-      },
-      gray: {
-        inputElement: `border-gray-300 dark:border-gray-500 bg-gray-50 dark:bg-gray-950/50 text-gray-700 dark:text-gray-200
-          placeholder-gray-400 dark:placeholder-gray-500 dark:hover:enabled:bg-gray-950/80
-        `,
-        labelSlot: 'text-gray-700 dark:text-gray-100',
-        descriptionSlot: 'text-gray-500 dark:text-gray-400',
-        affixSlot: 'border-gray-300 dark:border-gray-500 bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-        checkboxRadioInput: 'border-gray-300 dark:border-gray-500',
-        checkboxRadioLabel: 'text-gray-700 dark:text-gray-200',
-      },
       slate: {
-        inputElement: `border-slate-300 dark:border-slate-500 bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200
-          placeholder-slate-400 dark:placeholder-slate-500 dark:hover:enabled:bg-slate-900/80
+        inputElement: `border-slate-400/80 bg-slate-50 dark:bg-slate-950/50 text-slate-700 dark:text-slate-200
+          placeholder-slate-400 dark:placeholder-slate-500
         `,
         labelSlot: 'text-slate-700 dark:text-slate-100',
         descriptionSlot: 'text-slate-500 dark:text-slate-400',
-        affixSlot:
-          'border-slate-300 dark:border-slate-500 bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-        checkboxRadioInput: 'border-slate-300 dark:border-slate-500',
+        affixSlot: 'border-slate-400/80 bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+        checkboxRadioInput: 'border-slate-400/80',
         checkboxRadioLabel: 'text-slate-700 dark:text-slate-200',
+        checkboxRadioContainer: `
+          border-slate-400/30 bg-slate-50 text-slate-700 dark:bg-slate-950/50 dark:text-slate-100
+        `,
+      },
+      gray: {
+        inputElement: `border-gray-400/80 bg-gray-50 dark:bg-gray-950/50 text-gray-700 dark:text-gray-200
+          placeholder-gray-400 dark:placeholder-gray-500
+        `,
+        labelSlot: 'text-gray-700 dark:text-gray-100',
+        descriptionSlot: 'text-gray-500 dark:text-gray-400',
+        affixSlot: 'border-gray-400/80 bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+        checkboxRadioInput: 'border-gray-400/80',
+        checkboxRadioLabel: 'text-gray-700 dark:text-gray-200',
+        checkboxRadioContainer: `
+          border-gray-400/30 bg-gray-50 text-gray-700 dark:bg-gray-950/50 dark:text-gray-100
+        `,
+      },
+      zinc: {
+        inputElement: `border-zinc-400/80 bg-zinc-50 dark:bg-zinc-950/50 text-zinc-700 dark:text-zinc-200
+          placeholder-zinc-400 dark:placeholder-zinc-500
+          `,
+        labelSlot: 'text-zinc-700 dark:text-zinc-100',
+        descriptionSlot: 'text-zinc-500 dark:text-zinc-400',
+        affixSlot: 'border-zinc-400/80 bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+        checkboxRadioInput: 'border-zinc-400/80',
+        checkboxRadioLabel: 'text-zinc-700 dark:text-zinc-200',
+        checkboxRadioContainer: `
+          border-zinc-400/30 bg-zinc-50 text-zinc-700 dark:bg-zinc-950/50 dark:text-zinc-100
+        `,
       },
       neutral: {
-        inputElement: `border-neutral-300 dark:border-neutral-500 bg-neutral-50 dark:bg-neutral-900/50 text-neutral-700 dark:text-neutral-200
-          placeholder-neutral-400 dark:placeholder-neutral-500 dark:hover:enabled:bg-neutral-900/80
+        inputElement: `border-neutral-400/80 bg-neutral-50 dark:bg-neutral-950/50 text-neutral-700 dark:text-neutral-200
+          placeholder-neutral-400 dark:placeholder-neutral-500
         `,
         labelSlot: 'text-neutral-700 dark:text-neutral-100',
         descriptionSlot: 'text-neutral-500 dark:text-neutral-400',
-        affixSlot:
-          'border-neutral-300 dark:border-neutral-500 bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400',
-        checkboxRadioInput: 'border-neutral-300 dark:border-neutral-500',
+        affixSlot: 'border-neutral-400/80 bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400',
+        checkboxRadioInput: 'border-neutral-400/80',
         checkboxRadioLabel: 'text-neutral-700 dark:text-neutral-200',
+        checkboxRadioContainer: `
+          border-neutral-400/30 bg-neutral-50 text-neutral-700 dark:bg-neutral-950/50 dark:text-neutral-100
+        `,
+      },
+      stone: {
+        inputElement: `border-stone-400/80 bg-stone-50 dark:bg-stone-950/50 text-stone-700 dark:text-stone-200
+        placeholder-stone-400 dark:placeholder-stone-500
+        `,
+        labelSlot: 'text-stone-700 dark:text-stone-100',
+        descriptionSlot: 'text-stone-500 dark:text-stone-400',
+        affixSlot: 'border-stone-400/80 bg-stone-200 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+        checkboxRadioInput: 'border-stone-400/80',
+        checkboxRadioLabel: 'text-stone-700 dark:text-stone-200',
+        checkboxRadioContainer: `
+          border-stone-400/30 bg-stone-50 text-stone-700 dark:bg-stone-950/50 dark:text-stone-100
+        `,
       },
     },
     inputType: {
@@ -165,15 +209,10 @@ const inputFieldStyles = tv({
   compoundVariants: [
     // Disabled states with theme-specific background for inputElement (overrides hover)
     {
-      theme: 'zinc',
-      disabled: true,
-      class: { inputElement: 'bg-zinc-100 dark:bg-zinc-700 hover:enabled:bg-zinc-100 dark:hover:enabled:bg-zinc-700' },
-    },
-    {
-      theme: 'stone',
+      theme: 'slate',
       disabled: true,
       class: {
-        inputElement: 'bg-stone-100 dark:bg-stone-700 hover:enabled:bg-stone-100 dark:hover:enabled:bg-stone-700',
+        inputElement: 'bg-slate-100 dark:bg-slate-700 hover:enabled:bg-slate-100 dark:hover:enabled:bg-slate-700',
       },
     },
     {
@@ -182,11 +221,9 @@ const inputFieldStyles = tv({
       class: { inputElement: 'bg-gray-100 dark:bg-gray-700 hover:enabled:bg-gray-100 dark:hover:enabled:bg-gray-700' },
     },
     {
-      theme: 'slate',
+      theme: 'zinc',
       disabled: true,
-      class: {
-        inputElement: 'bg-slate-100 dark:bg-slate-700 hover:enabled:bg-slate-100 dark:hover:enabled:bg-slate-700',
-      },
+      class: { inputElement: 'bg-zinc-100 dark:bg-zinc-700 hover:enabled:bg-zinc-100 dark:hover:enabled:bg-zinc-700' },
     },
     {
       theme: 'neutral',
@@ -196,7 +233,13 @@ const inputFieldStyles = tv({
           'bg-neutral-100 dark:bg-neutral-700 hover:enabled:bg-neutral-100 dark:hover:enabled:bg-neutral-700',
       },
     },
-
+    {
+      theme: 'stone',
+      disabled: true,
+      class: {
+        inputElement: 'bg-stone-100 dark:bg-stone-700 hover:enabled:bg-stone-100 dark:hover:enabled:bg-stone-700',
+      },
+    },
     // Input group and input element rounding based on prefix/suffix presence
     // The inputGroup itself gets rounded-md. The inputElement's rounding is adjusted.
     { hasPrefix: false, hasSuffix: false, class: { inputGroup: 'rounded-md', inputElement: 'rounded-md' } },
@@ -215,9 +258,20 @@ const inputFieldStyles = tv({
     // Ensure that for types like checkbox/radio, if they are somehow rendered using inputGroup, it doesn't get default input styles
     { inputType: 'checkbox', class: { inputGroup: 'shadow-none border-none bg-transparent' } }, // Example: clear inputGroup styles for checkbox type if it uses it.
     { inputType: 'radio', class: { inputGroup: 'shadow-none border-none bg-transparent' } },
+
+    // Adjust the checkbox/radio container rounding based on input type
+    {
+      inputType: 'radio',
+      class: { checkboxRadioContainer: 'rounded-full' },
+    },
+    {
+      inputType: 'checkbox',
+      class: { checkboxRadioContainer: 'rounded-xs' },
+    },
   ],
   defaultVariants: {
-    theme: 'zinc', // Matches your component's prop default
+    accent: 'sky',
+    theme: 'gray', // Matches your component's prop default
     disabled: false,
     error: false,
     hasPrefix: false,
@@ -276,7 +330,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     horizontal,
     noErrorEl,
     fullWidth,
-    theme = 'zinc', // Default theme
+    theme = 'gray', // Default theme
     // Class overrides
     labelClassName,
     inputClassName: baseInputClassName, // Renamed for clarity
@@ -523,32 +577,37 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                     : propDefaultValue === opt.value
               }
 
-              // TODO: In appInput.cfc we have a slightly different structure that allows us to use a
-              // border around checked checkboxes and radios. We should refactor to use that structure.
-              // There was also a hover effect. This version doesn't do that at all yet.
               return (
                 <div key={optionId} className={styles.checkboxRadioItem()}>
-                  <div className={styles.checkboxRadioInputWrapper()}>
-                    <input
-                      id={optionId}
-                      name={propName}
-                      type={inputType as HTMLInputTypeAttribute}
-                      value={opt.value}
-                      onChange={propOnChange}
-                      onBlur={propOnBlur}
-                      disabled={disabled}
-                      required={required && rawType === 'radio'}
-                      checked={isOptionChecked}
-                      defaultChecked={isOptionDefaultChecked}
-                      className={styles.checkboxRadioInput({ class: baseInputClassName })}
-                    />
-                  </div>
-                  <div className={styles.checkboxRadioLabelWrapper()}>
-                    <label htmlFor={optionId} className={styles.checkboxRadioLabel()}>
-                      {opt.label}
+                  <div className={styles.checkboxRadioInputWrapper()} data-testid="checkbox-radio-input-wrapper">
+                    {/* Wrap both input and label. Note: complex dark variants don't seem to work in the main tv styles, so they are added here */}
+                    <label
+                      htmlFor={optionId}
+                      className={styles.checkboxRadioContainer({
+                        class: 'dark:has-checked:text-white',
+                      })}
+                    >
+                      <input
+                        id={optionId}
+                        name={propName}
+                        type={inputType as HTMLInputTypeAttribute}
+                        value={opt.value}
+                        onChange={propOnChange}
+                        onBlur={propOnBlur}
+                        disabled={disabled}
+                        required={required && rawType === 'radio'}
+                        checked={isOptionChecked}
+                        defaultChecked={isOptionDefaultChecked}
+                        className={styles.checkboxRadioInput({ class: baseInputClassName })}
+                      />
+                      <span className={styles.checkedLabelText()}>{opt.label}</span>
                     </label>
-                    {opt.description && <p className={styles.descriptionSlot()}>{opt.description}</p>}
                   </div>
+                  {opt.description && (
+                    <div className={styles.checkboxRadioLabelWrapper()}>
+                      <p className={styles.descriptionSlot()}>{opt.description}</p>
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -558,26 +617,23 @@ const InputField: React.FC<InputFieldProps> = (props) => {
         // Single checkbox
         return (
           <div className="flex items-start">
-            <div className={styles.checkboxRadioInputWrapper()}>
-              <input
-                {...nativeInputProps}
-                type={inputType as HTMLInputTypeAttribute}
-                value={propValue}
-                checked={propChecked}
-                defaultChecked={propDefaultChecked}
-                className={styles.checkboxRadioInput({ class: baseInputClassName })}
-              />
-            </div>
-            {label && (
-              <div className={styles.checkboxRadioLabelWrapper()}>
-                <InputLabel
-                  htmlFor={idToUse}
-                  label={label}
-                  className={styles.checkboxRadioLabel({ class: labelClassName })}
-                  required={required}
+            <div className={styles.checkboxRadioInputWrapper()} data-testid="checkbox-radio-input-wrapper">
+              {/* Single checkbox/radio. Note: dark:has-checked:text-white does not work in the main tv styles. */}
+              <label
+                htmlFor={idToUse}
+                className={styles.checkboxRadioContainer({ class: 'dark:has-checked:text-white' })}
+              >
+                <input
+                  {...nativeInputProps}
+                  type={inputType as HTMLInputTypeAttribute}
+                  value={propValue}
+                  checked={propChecked}
+                  defaultChecked={propDefaultChecked}
+                  className={styles.checkboxRadioInput({ class: baseInputClassName })}
                 />
-              </div>
-            )}
+                {label && <span className={styles.checkedLabelText()}>{label}</span>}
+              </label>
+            </div>
           </div>
         )
       }
@@ -617,7 +673,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
         />
       )}
       <div
-        className={styles.inputContainer({ class: rawType === 'checkbox' || rawType === 'radio' ? 'pt-2' : '' })}
+        className={styles.inputContainer({ class: rawType === 'checkbox' || rawType === 'radio' ? 'pt-1.5' : '' })}
         data-testid="input-container"
       >
         {(rawType === 'checkbox' || rawType === 'radio') && normalizedOptions.length === 0 ? (

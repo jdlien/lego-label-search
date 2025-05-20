@@ -66,7 +66,7 @@ export interface BaseInputProps {
   noErrorEl?: boolean // To hide the error message element
   fullWidth?: boolean // Hint for layout, might influence wrapper or label
   // Theming - simplified for now, can be expanded
-  theme?: 'zinc' | 'stone' | 'gray'
+  theme?: 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone'
   // Classes for sub-elements (optional overrides)
   labelClassName?: string
   inputClassName?: string // Specifically for the <input>, <select>, <textarea>
