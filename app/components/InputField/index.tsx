@@ -31,7 +31,7 @@ import type { OptionType, NormalizedOptionType, InputFieldProps } from './types'
 
 const inputFieldStyles = tv({
   slots: {
-    // Applied to the outermost div, formerly form-item
+    // Applied to the outermost div, formerly form-item (this is now the InputFieldContainer)
     inputFieldOuterContainer: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5',
     label: 'block text-sm sm:text-base font-medium', // For InputLabel component and its text color
     inputContainer: 'sm:mt-0 pt-1.5', // Wrapper for the input group or standalone checkbox/radio
@@ -870,99 +870,87 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     )
   }
 
-  const showOuterLabel =
-    label && !((rawType === 'checkbox' || rawType === 'radio') && normalizedOptions.length === 0 && !label)
+  // We no longer need showOuterLabel as we don't render the label here anymore
 
-  // Return the outer container div with the label and input container
+  // Return just the input container without the outer wrapper or label
   return (
-    <div className={styles.inputFieldOuterContainer()} data-testid="input-field-outer-container">
-      {showOuterLabel && (
-        <InputLabel
-          htmlFor={idToUse}
-          label={label}
-          className={styles.label({ class: labelClassName, fullWidth: fullWidth })}
-          required={required}
-          data-testid="input-label"
-        />
-      )}
-      <div className={styles.inputContainer()} data-testid="input-container">
-        {(rawType === 'checkbox' || rawType === 'radio') && normalizedOptions.length === 0 ? (
-          <>
-            {renderInput()}
-            <InputDescription
-              id={`${idToUse}-description`}
-              description={description}
-              className={styles.description({ class: descriptionClassName })}
-            />
-            {!noErrorEl && (
-              <InputError id={`${idToUse}-error`} error={error} className={styles.error({ class: errorClassName })} />
-            )}
-          </>
-        ) : (
-          <>
-            {(rawType !== 'checkbox' && rawType !== 'radio') || normalizedOptions.length === 0 ? (
-              rawType !== 'checkbox' && rawType !== 'radio' && rawType !== 'display' ? (
-                <div className={styles.inputGroup()}>
-                  {currentPrefix && (
-                    <InputAffix isPrefix htmlFor={idToUse} className={styles.affix({ class: prefixClassName })}>
-                      {currentPrefix}
-                    </InputAffix>
-                  )}
-                  <div className="relative w-full">
-                    {renderInput()}
-                    {clearButton && inputHasValue && !disabled && !readOnly && (
-                      <button
-                        type="button"
-                        className={styles.clearButton()}
-                        onClick={handleClearButtonClick}
-                        aria-label="Clear input"
-                        data-testid="clear-button"
-                      >
-                        <IconXMark className={styles.clearButtonIcon()} />
-                      </button>
-                    )}
-                  </div>
-                  {rawType === 'color' && false && (
-                    <label
-                      htmlFor={`${idToUse}-colorpicker`}
-                      className="min-w-[30px] cursor-pointer border border-l-0"
-                      style={{
-                        backgroundColor: (typeof propValue === 'string' ? propValue : '#888888') as string,
-                      }}
+    <div className={styles.inputContainer()} data-testid="input-container">
+      {(rawType === 'checkbox' || rawType === 'radio') && normalizedOptions.length === 0 ? (
+        <>
+          {renderInput()}
+          <InputDescription
+            id={`${idToUse}-description`}
+            description={description}
+            className={styles.description({ class: descriptionClassName })}
+          />
+          {!noErrorEl && (
+            <InputError id={`${idToUse}-error`} error={error} className={styles.error({ class: errorClassName })} />
+          )}
+        </>
+      ) : (
+        <>
+          {(rawType !== 'checkbox' && rawType !== 'radio') || normalizedOptions.length === 0 ? (
+            rawType !== 'checkbox' && rawType !== 'radio' && rawType !== 'display' ? (
+              <div className={styles.inputGroup()}>
+                {currentPrefix && (
+                  <InputAffix isPrefix htmlFor={idToUse} className={styles.affix({ class: prefixClassName })}>
+                    {currentPrefix}
+                  </InputAffix>
+                )}
+                <div className="relative w-full">
+                  {renderInput()}
+                  {clearButton && inputHasValue && !disabled && !readOnly && (
+                    <button
+                      type="button"
+                      className={styles.clearButton()}
+                      onClick={handleClearButtonClick}
+                      aria-label="Clear input"
+                      data-testid="clear-button"
                     >
-                      <input
-                        type="color"
-                        id={`${idToUse}-colorpicker`}
-                        className="invisible h-full w-full"
-                        value={typeof propValue === 'string' ? propValue : '#888888'}
-                        onChange={propOnChange}
-                      />
-                    </label>
-                  )}
-                  {currentSuffix && (
-                    <InputAffix isPrefix={false} className={styles.affix({ class: suffixClassName })} htmlFor={idToUse}>
-                      {currentSuffix}
-                    </InputAffix>
+                      <IconXMark className={styles.clearButtonIcon()} />
+                    </button>
                   )}
                 </div>
-              ) : (
-                renderInput()
-              )
+                {rawType === 'color' && false && (
+                  <label
+                    htmlFor={`${idToUse}-colorpicker`}
+                    className="min-w-[30px] cursor-pointer border border-l-0"
+                    style={{
+                      backgroundColor: (typeof propValue === 'string' ? propValue : '#888888') as string,
+                    }}
+                  >
+                    <input
+                      type="color"
+                      id={`${idToUse}-colorpicker`}
+                      className="invisible h-full w-full"
+                      value={typeof propValue === 'string' ? propValue : '#888888'}
+                      onChange={propOnChange}
+                    />
+                  </label>
+                )}
+                {currentSuffix && (
+                  <InputAffix isPrefix={false} className={styles.affix({ class: suffixClassName })} htmlFor={idToUse}>
+                    {currentSuffix}
+                  </InputAffix>
+                )}
+              </div>
             ) : (
               renderInput()
-            )}
+            )
+          ) : (
+            renderInput()
+          )}
 
-            <InputDescription
-              id={`${idToUse}-description`}
-              description={description}
-              className={styles.description({ class: descriptionClassName })}
-            />
-            {!noErrorEl && (
-              <InputError id={`${idToUse}-error`} error={error} className={styles.error({ class: errorClassName })} />
-            )}
-          </>
-        )}
-      </div>
+          <InputDescription
+            id={`${idToUse}-description`}
+            description={description}
+            className={styles.description({ class: descriptionClassName })}
+          />
+          {!noErrorEl && (
+            <InputError id={`${idToUse}-error`} error={error} className={styles.error({ class: errorClassName })} />
+          )}
+        </>
+      )}
     </div>
   )
 }
