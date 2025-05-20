@@ -21,3 +21,5 @@ export type AccentColor =
   | 'emerald'
   | 'teal'
   | 'cyan'
+
+export type UISize = 'sm' | 'md' | 'lg'

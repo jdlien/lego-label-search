@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="dark:bg-gray-900 dark:text-white">
         <div className="">
-          <ThemeProvider defaultTheme="gray" defaultAccent="sky">
+          <ThemeProvider defaultTheme="gray" defaultAccent="sky" defaultUISize="lg">
             <Header />
             <main className="">{children}</main>
             <Footer />

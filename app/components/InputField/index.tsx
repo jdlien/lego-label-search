@@ -4,7 +4,6 @@ import React, { useId, ChangeEvent, FocusEvent, HTMLInputTypeAttribute, ReactNod
 import { tv, type VariantProps } from 'tailwind-variants'
 // Import the useTheme hook and types
 import { useTheme } from '../../context/ThemeContext'
-import { AccentColor } from '../../types/theme'
 // Custom SVG icons
 import {
   IconEnvelope,
@@ -468,7 +467,7 @@ const normalizeOptions = (options?: OptionType[]): NormalizedOptionType[] => {
 
 const InputField: React.FC<InputFieldProps> = (props) => {
   // Get default theme and accent from context
-  const { defaultTheme, defaultAccent } = useTheme()
+  const { defaultTheme, defaultAccent, defaultUISize } = useTheme()
 
   const {
     // Destructure all props, separating InputField-specific ones from those to be passed down
@@ -496,7 +495,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     fullWidth,
     theme = defaultTheme, // Use context default
     accent = defaultAccent, // Use context default
-    size = 'sm', // Add size prop with default 'md'
+    size = defaultUISize, // Use context default
     // Class overrides
     labelClassName,
     inputClassName: baseInputClassName, // Renamed for clarity
