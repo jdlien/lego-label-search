@@ -322,7 +322,7 @@ export default function ThemeTestPage() {
             name="time_input"
             value={timeValue}
             onChange={(e) => setTimeValue(e.target.value)}
-            prefix="Event at:"
+            prefix="Event&nbsp;at:"
           />
           <InputField
             type="color"
