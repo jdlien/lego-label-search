@@ -1,4 +1,5 @@
 import type { ReactNode, ChangeEvent, FocusEvent, HTMLInputTypeAttribute } from 'react'
+import type { ThemeColor, AccentColor } from '../../types/theme'
 
 // --- TYPE DEFINITIONS ---
 
@@ -66,7 +67,8 @@ export interface BaseInputProps {
   noErrorEl?: boolean // To hide the error message element
   fullWidth?: boolean // Hint for layout, might influence wrapper or label
   // Theming - simplified for now, can be expanded
-  theme?: 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone'
+  theme?: ThemeColor
+  accent?: AccentColor // Allow any accent color in props, even if not all are implemented yet
   // Classes for sub-elements (optional overrides)
   labelClassName?: string
   inputClassName?: string // Specifically for the <input>, <select>, <textarea>
