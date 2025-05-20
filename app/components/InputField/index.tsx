@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useId, ChangeEvent, FocusEvent, HTMLInputTypeAttribute, ReactNode } from 'react'
+import React, { useId, ChangeEvent, FocusEvent, HTMLInputTypeAttribute, ReactNode, useState, useEffect } from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
 // Import the useTheme hook and types
 import { useTheme } from '../../context/ThemeContext'
@@ -16,6 +16,7 @@ import {
   IconClock,
   IconLock,
   IconPalette,
+  IconXMark,
 } from './InputIcons' // Adjusted path
 
 // Import sub-components
@@ -268,6 +269,10 @@ const inputFieldStyles = tv({
         inputContainer: 'sm:col-span-2',
       },
     },
+    clearButton: {
+      true: {},
+      false: {},
+    },
   },
   compoundVariants: [
     // Disabled states with theme-specific background for inputElement (overrides hover)
@@ -331,6 +336,12 @@ const inputFieldStyles = tv({
       inputType: 'checkbox',
       class: { checkboxRadioContainer: 'rounded-xs' },
     },
+    {
+      clearButton: true,
+      class: {
+        inputElement: 'pr-8',
+      },
+    },
   ],
   defaultVariants: {
     accent: 'sky',
@@ -342,6 +353,7 @@ const inputFieldStyles = tv({
     horizontalLayout: false,
     inputType: 'text',
     fullWidth: false, // Default to not fullWidth
+    clearButton: false,
   },
 })
 
@@ -391,6 +403,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     description,
     prefix: rawPrefix,
     suffix: rawSuffix,
+    clearButton,
     options: rawOptions,
     emptyOption = true,
     horizontal,
@@ -421,6 +434,48 @@ const InputField: React.FC<InputFieldProps> = (props) => {
   } = props
 
   const idToUse = propId || useId()
+
+  // Add this - Track input value for clear button visibility
+  const [inputHasValue, setInputHasValue] = useState(!!propValue || !!propDefaultValue)
+
+  // Update internal tracking when controlled value changes
+  useEffect(() => {
+    if (propValue !== undefined) {
+      setInputHasValue(!!propValue)
+    }
+  }, [propValue])
+
+  // Update the handler to track value changes for both controlled and uncontrolled inputs
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setInputHasValue(!!e.target.value)
+    if (propOnChange) {
+      propOnChange(e)
+    }
+  }
+
+  // Add a specific handler for the clear button
+  const handleClearButtonClick = () => {
+    // Always update our tracking state
+    setInputHasValue(false)
+
+    // For controlled inputs
+    if (propOnChange) {
+      // Create a synthetic event with the empty value
+      const syntheticEvent = {
+        target: { value: '', name: propName, id: idToUse },
+        currentTarget: { value: '', name: propName, id: idToUse },
+      } as React.ChangeEvent<HTMLInputElement>
+      propOnChange(syntheticEvent)
+    }
+
+    // For uncontrolled inputs
+    const input = document.getElementById(idToUse) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    if (input) {
+      input.value = ''
+      // Trigger a native change event for any listeners
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    }
+  }
 
   // Process type and derive related attributes
   let inputType = rawType
@@ -538,6 +593,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     horizontalLayout: horizontal && (rawType === 'checkbox' || rawType === 'radio') && normalizedOptions.length > 0,
     fullWidth: fullWidth,
     class: className,
+    clearButton: clearButton,
   })
 
   const ariaDescribedBy: string[] = []
@@ -547,7 +603,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
   const nativeInputProps: Record<string, any> = {
     id: idToUse,
     name: propName,
-    onChange: propOnChange,
+    onChange: handleInputChange, // Use our wrapped handler instead of direct propOnChange
     onBlur: propOnBlur,
     placeholder: currentPlaceholder,
     disabled,
@@ -768,7 +824,20 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                       {currentPrefix}
                     </InputAffix>
                   )}
-                  {renderInput()}
+                  <div className="relative w-full">
+                    {renderInput()}
+                    {clearButton && inputHasValue && !disabled && !readOnly && (
+                      <button
+                        type="button"
+                        className={`absolute right-0.5 px-2 top-0 h-full flex items-center justify-center group`}
+                        onClick={handleClearButtonClick}
+                        aria-label="Clear input"
+                        data-testid="clear-button"
+                      >
+                        <IconXMark className="size-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+                      </button>
+                    )}
+                  </div>
                   {rawType === 'color' && false && (
                     <label
                       htmlFor={`${idToUse}-colorpicker`}

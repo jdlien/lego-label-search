@@ -54,6 +54,7 @@ export interface BaseInputProps {
   description?: ReactNode
   prefix?: ReactNode
   suffix?: ReactNode
+  clearButton?: boolean
   'data-pattern'?: string // For validator compatibility
   inputMode?: 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search'
   'data-type'?: string // For specific data handling, e.g., 'date', 'integer'
