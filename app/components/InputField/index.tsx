@@ -2,6 +2,9 @@
 
 import React, { useId, ChangeEvent, FocusEvent, HTMLInputTypeAttribute, ReactNode } from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
+// Import the useTheme hook and types
+import { useTheme } from '../../context/ThemeContext'
+import { AccentColor } from '../../types/theme'
 // Custom SVG icons
 import {
   IconEnvelope,
@@ -39,10 +42,10 @@ const inputFieldStyles = tv({
       `,
     // Specific slots for checkbox/radio elements
     checkboxRadioGroup: 'space-y-2', // Container for multiple checkboxes/radios
-    checkboxRadioItem: 'flex items-start',
+    checkboxRadioItem: '',
     checkboxRadioInputWrapper: 'flex items-center',
-    checkboxRadioInput: 'size-5 rounded', // Theme-specific: accent color, border, focus ring
-    checkboxRadioLabelWrapper: 'ml-3 text-sm',
+    checkboxRadioInput: 'size-5 rounded', // Size and shape of checkbox and radio inputs
+    checkboxRadioLabelWrapper: 'text-sm', // Affects checkbox/radio descriptions
     checkboxRadioLabel: 'font-medium', // Theme-specific: text color
 
     // New slot for the checked-border container. Note: dark:has-checked seems not to work here.
@@ -87,6 +90,66 @@ const inputFieldStyles = tv({
         inputElement: 'focus:ring-green-500/40',
         checkboxRadioInput: 'accent-green-600',
         checkboxRadioContainer: 'has-checked:border-green-600',
+      },
+      indigo: {
+        inputElement: 'focus:ring-indigo-500/40',
+        checkboxRadioInput: 'accent-indigo-600',
+        checkboxRadioContainer: 'has-checked:border-indigo-600',
+      },
+      violet: {
+        inputElement: 'focus:ring-violet-500/40',
+        checkboxRadioInput: 'accent-violet-600',
+        checkboxRadioContainer: 'has-checked:border-violet-600',
+      },
+      purple: {
+        inputElement: 'focus:ring-purple-500/40',
+        checkboxRadioInput: 'accent-purple-600',
+        checkboxRadioContainer: 'has-checked:border-purple-600',
+      },
+      fuchsia: {
+        inputElement: 'focus:ring-fuchsia-500/40',
+        checkboxRadioInput: 'accent-fuchsia-600',
+        checkboxRadioContainer: 'has-checked:border-fuchsia-600',
+      },
+      pink: {
+        inputElement: 'focus:ring-pink-500/40',
+        checkboxRadioInput: 'accent-pink-600',
+        checkboxRadioContainer: 'has-checked:border-pink-600',
+      },
+      rose: {
+        inputElement: 'focus:ring-rose-500/40',
+        checkboxRadioInput: 'accent-rose-600',
+        checkboxRadioContainer: 'has-checked:border-rose-600',
+      },
+      amber: {
+        inputElement: 'focus:ring-amber-500/40',
+        checkboxRadioInput: 'accent-amber-600',
+        checkboxRadioContainer: 'has-checked:border-amber-600',
+      },
+      yellow: {
+        inputElement: 'focus:ring-yellow-500/40',
+        checkboxRadioInput: 'accent-yellow-600',
+        checkboxRadioContainer: 'has-checked:border-yellow-600',
+      },
+      lime: {
+        inputElement: 'focus:ring-lime-500/40',
+        checkboxRadioInput: 'accent-lime-600',
+        checkboxRadioContainer: 'has-checked:border-lime-600',
+      },
+      emerald: {
+        inputElement: 'focus:ring-emerald-500/40',
+        checkboxRadioInput: 'accent-emerald-600',
+        checkboxRadioContainer: 'has-checked:border-emerald-600',
+      },
+      teal: {
+        inputElement: 'focus:ring-teal-500/40',
+        checkboxRadioInput: 'accent-teal-600',
+        checkboxRadioContainer: 'has-checked:border-teal-600',
+      },
+      cyan: {
+        inputElement: 'focus:ring-cyan-500/40',
+        checkboxRadioInput: 'accent-cyan-600',
+        checkboxRadioContainer: 'has-checked:border-cyan-600',
       },
     },
     // Offer all Tailwind shades of gray as options, from coolest to warmest
@@ -165,9 +228,9 @@ const inputFieldStyles = tv({
       },
       textarea: {},
       // For checkbox/radio, their specific slots (checkboxRadioInput, etc.) are primary. inputElement slot is often not used or cleared.
-      checkbox: { inputElement: '' },
-      radio: { inputElement: '' },
-      display: { inputElement: '', inputGroup: 'shadow-none' }, // 'display' uses displaySpan, not typical inputElement
+      checkbox: {},
+      radio: { checkboxRadioLabelWrapper: 'ml-1.5' }, // Radios are round so descriptions need a bit more left margin
+      display: { inputGroup: 'shadow-none' }, // 'display' uses displaySpan, not typical inputElement
       // Other types like 'email', 'date', etc., will use base 'inputElement' styles unless specified
       // 'markdown' should be handled by component logic to map to 'textarea' type for styling
       // 'color' might need special handling for its custom picker UI part
@@ -193,7 +256,7 @@ const inputFieldStyles = tv({
     hasSuffix: { true: {} },
     // For checkbox/radio group layout
     horizontalLayout: {
-      true: { checkboxRadioGroup: 'flex flex-wrap items-center space-x-4 space-y-0' },
+      true: { checkboxRadioGroup: 'flex flex-wrap items-start space-x-4 space-y-0' },
     },
     fullWidth: {
       true: {
@@ -307,6 +370,9 @@ const normalizeOptions = (options?: OptionType[]): NormalizedOptionType[] => {
 }
 
 const InputField: React.FC<InputFieldProps> = (props) => {
+  // Get default theme and accent from context
+  const { defaultTheme, defaultAccent } = useTheme()
+
   const {
     // Destructure all props, separating InputField-specific ones from those to be passed down
     type: rawType = 'text',
@@ -330,7 +396,8 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     horizontal,
     noErrorEl,
     fullWidth,
-    theme = 'gray', // Default theme
+    theme = defaultTheme, // Use context default
+    accent = defaultAccent, // Use context default
     // Class overrides
     labelClassName,
     inputClassName: baseInputClassName, // Renamed for clarity
@@ -462,6 +529,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
 
   const styles = inputFieldStyles({
     theme,
+    accent,
     disabled,
     error: !!error,
     hasPrefix: !!currentPrefix,
@@ -528,8 +596,6 @@ const InputField: React.FC<InputFieldProps> = (props) => {
           </select>
           {/* Select arrow icon - could change the text color of this div to adjust the color of the icon */}
           <div className={styles.selectArrowContainerSlot()}>
-            {/* TODO: These classes should be added to InputField.styles.ts as a variant so we can use TV to style the icon size/position. */}
-            {/* The TODO is now addressed by using styles.selectArrowIconSlot() */}
             <svg className={styles.selectArrowIconSlot()} viewBox="0 0 20 20" fill="currentColor">
               <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" />
             </svg>

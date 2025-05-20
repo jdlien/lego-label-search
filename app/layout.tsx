@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import React from 'react'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
+import { ThemeProvider } from './context/ThemeContext'
 
 export const metadata: Metadata = {
   title: 'LEGO Part Label Search',
@@ -46,9 +47,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="dark:bg-gray-900 dark:text-white">
         <div className="">
-          <Header />
-          <main className="">{children}</main>
-          <Footer />
+          <ThemeProvider defaultTheme="gray" defaultAccent="sky">
+            <Header />
+            <main className="">{children}</main>
+            <Footer />
+          </ThemeProvider>
         </div>
       </body>
     </html>
