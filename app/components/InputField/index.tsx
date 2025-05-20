@@ -34,7 +34,7 @@ const inputFieldStyles = tv({
   slots: {
     // Applied to the outermost div, formerly form-item
     root: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5 my-3',
-    labelSlot: 'block text-sm sm:text-base font-medium sm:mt-px sm:pt-1', // For InputLabel component and its text color
+    label: 'block text-sm sm:text-base font-medium sm:mt-px sm:pt-1', // For InputLabel component and its text color
     inputContainer: 'sm:mt-0', // Wrapper for the input group or standalone checkbox/radio
     inputGroup: 'relative flex shadow-sm', // Wraps prefix, input, suffix. Base rounding via compound variants.
     inputElement: `
@@ -48,27 +48,25 @@ const inputFieldStyles = tv({
     checkboxRadioInput: 'size-5 rounded', // Size and shape of checkbox and radio inputs
     checkboxRadioLabelWrapper: 'text-sm', // Affects checkbox/radio descriptions
     checkboxRadioLabel: 'font-medium', // Theme-specific: text color
-
-    // New slot for the checked-border container. Note: dark:has-checked seems not to work here.
+    // New slot for the checkedbox and radio border container. Note: dark:has-checked seems not to work here.
     checkboxRadioContainer: `
       inline-flex items-center border px-0.5 shadow-inner
       enabled:hover:bg-white transition-colors duration-150 ease-in-out
       has-checked:text-black dark:has-checked:text-shadow-sm
       dark:hover:bg-black/50 disabled:pointer-events-none
     `,
-    // For checked state:
     checkedLabelText: 'ml-1.5 mr-1', // For the label text to have proper spacing
-
-    affixSlot: 'inline-flex items-center px-3 text-sm', // For InputAffix (prefix/suffix)
-    // Theme-specific: Border, bg, text. Assumes InputAffix handles its own edge rounding.
-
-    descriptionSlot: '', // For InputDescription component and its text color
-    errorSlot: 'mt-2 text-sm', // For InputError component, primarily for error text color
-    displaySpan: 'block w-full sm:mt-px sm:pt-1', // For type='display'
+    affix: 'inline-flex items-center px-3 text-sm', // For InputAffix (prefix/suffix)
+    description: '', // For InputDescription component and its text color
+    error: 'mt-2 text-sm', // For InputError component, primarily for error text color
+    display: 'block w-full sm:mt-px sm:pt-1', // For type='display'
 
     // Slots for custom select arrow
-    selectArrowContainerSlot: 'absolute inset-y-0 right-0 flex items-center pointer-events-none opacity-60',
-    selectArrowIconSlot: 'size-6 mr-0.75 text-gray-500 dark:text-gray-400', // Default size, margin, and color
+    selectArrowContainer: 'absolute inset-y-0 right-0 flex items-center pointer-events-none opacity-60',
+    selectArrowIcon: 'size-6 mr-0.75 text-gray-500 dark:text-gray-400', // Default size, margin, and color
+
+    // New slot for clear button icon
+    clearButtonIcon: 'size-4', // Base size, theme variants will handle colors
   },
   variants: {
     accent: {
@@ -159,66 +157,74 @@ const inputFieldStyles = tv({
         inputElement: `border-slate-400/80 bg-slate-50 dark:bg-slate-950/50 text-slate-700 dark:text-slate-200
           placeholder-slate-400 dark:placeholder-slate-500
         `,
-        labelSlot: 'text-slate-700 dark:text-slate-100',
-        descriptionSlot: 'text-slate-500 dark:text-slate-400',
-        affixSlot: 'border-slate-400/80 bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+        label: 'text-slate-700 dark:text-slate-100',
+        description: 'text-slate-500 dark:text-slate-400',
+        affix: 'border-slate-400/80 bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
         checkboxRadioInput: 'border-slate-400/80',
         checkboxRadioLabel: 'text-slate-700 dark:text-slate-200',
         checkboxRadioContainer: `
           border-slate-400/30 bg-slate-50 text-slate-700 dark:bg-slate-950/50 dark:text-slate-100
         `,
+        clearButtonIcon:
+          'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300',
       },
       gray: {
         inputElement: `border-gray-400/80 bg-gray-50 dark:bg-gray-950/50 text-gray-700 dark:text-gray-200
           placeholder-gray-400 dark:placeholder-gray-500
         `,
-        labelSlot: 'text-gray-700 dark:text-gray-100',
-        descriptionSlot: 'text-gray-500 dark:text-gray-400',
-        affixSlot: 'border-gray-400/80 bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+        label: 'text-gray-700 dark:text-gray-100',
+        description: 'text-gray-500 dark:text-gray-400',
+        affix: 'border-gray-400/80 bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
         checkboxRadioInput: 'border-gray-400/80',
         checkboxRadioLabel: 'text-gray-700 dark:text-gray-200',
         checkboxRadioContainer: `
           border-gray-400/30 bg-gray-50 text-gray-700 dark:bg-gray-950/50 dark:text-gray-100
         `,
+        clearButtonIcon: 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300',
       },
       zinc: {
         inputElement: `border-zinc-400/80 bg-zinc-50 dark:bg-zinc-950/50 text-zinc-700 dark:text-zinc-200
           placeholder-zinc-400 dark:placeholder-zinc-500
           `,
-        labelSlot: 'text-zinc-700 dark:text-zinc-100',
-        descriptionSlot: 'text-zinc-500 dark:text-zinc-400',
-        affixSlot: 'border-zinc-400/80 bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+        label: 'text-zinc-700 dark:text-zinc-100',
+        description: 'text-zinc-500 dark:text-zinc-400',
+        affix: 'border-zinc-400/80 bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
         checkboxRadioInput: 'border-zinc-400/80',
         checkboxRadioLabel: 'text-zinc-700 dark:text-zinc-200',
         checkboxRadioContainer: `
           border-zinc-400/30 bg-zinc-50 text-zinc-700 dark:bg-zinc-950/50 dark:text-zinc-100
         `,
+        clearButtonIcon: 'text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-600 dark:group-hover:text-zinc-300',
       },
       neutral: {
         inputElement: `border-neutral-400/80 bg-neutral-50 dark:bg-neutral-950/50 text-neutral-700 dark:text-neutral-200
           placeholder-neutral-400 dark:placeholder-neutral-500
         `,
-        labelSlot: 'text-neutral-700 dark:text-neutral-100',
-        descriptionSlot: 'text-neutral-500 dark:text-neutral-400',
-        affixSlot: 'border-neutral-400/80 bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400',
+        label: 'text-neutral-700 dark:text-neutral-100',
+        description: 'text-neutral-500 dark:text-neutral-400',
+        affix: 'border-neutral-400/80 bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400',
         checkboxRadioInput: 'border-neutral-400/80',
         checkboxRadioLabel: 'text-neutral-700 dark:text-neutral-200',
         checkboxRadioContainer: `
           border-neutral-400/30 bg-neutral-50 text-neutral-700 dark:bg-neutral-950/50 dark:text-neutral-100
         `,
+        clearButtonIcon:
+          'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-600 dark:group-hover:text-neutral-300',
       },
       stone: {
         inputElement: `border-stone-400/80 bg-stone-50 dark:bg-stone-950/50 text-stone-700 dark:text-stone-200
         placeholder-stone-400 dark:placeholder-stone-500
         `,
-        labelSlot: 'text-stone-700 dark:text-stone-100',
-        descriptionSlot: 'text-stone-500 dark:text-stone-400',
-        affixSlot: 'border-stone-400/80 bg-stone-200 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+        label: 'text-stone-700 dark:text-stone-100',
+        description: 'text-stone-500 dark:text-stone-400',
+        affix: 'border-stone-400/80 bg-stone-200 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
         checkboxRadioInput: 'border-stone-400/80',
         checkboxRadioLabel: 'text-stone-700 dark:text-stone-200',
         checkboxRadioContainer: `
           border-stone-400/30 bg-stone-50 text-stone-700 dark:bg-stone-950/50 dark:text-stone-100
         `,
+        clearButtonIcon:
+          'text-stone-400 dark:text-stone-500 group-hover:text-stone-600 dark:group-hover:text-stone-300',
       },
     },
     inputType: {
@@ -241,15 +247,15 @@ const inputFieldStyles = tv({
         // General disabled opacity, cursor. BG color is theme-dependent via compoundVariants.
         inputElement: 'opacity-50 cursor-not-allowed',
         checkboxRadioInput: 'opacity-50 cursor-not-allowed',
-        affixSlot: 'opacity-50 cursor-not-allowed',
+        affix: 'opacity-50 cursor-not-allowed',
       },
     },
     error: {
       true: {
         inputElement:
           'border-red-500 dark:border-red-400 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-500/40',
-        errorSlot: 'text-red-600 dark:text-red-500', // Ensures error text color
-        // labelSlot: "text-red-600 dark:text-red-500", // Optional: make label red on error
+        error: 'text-red-600 dark:text-red-500', // Ensures error text color
+        // label: "text-red-600 dark:text-red-500", // Optional: make label red on error
       },
     },
     // Boolean variants for structural changes, used in compoundVariants primarily
@@ -261,11 +267,11 @@ const inputFieldStyles = tv({
     },
     fullWidth: {
       true: {
-        labelSlot: 'sm:col-span-3',
+        label: 'sm:col-span-3',
         inputContainer: 'sm:col-span-3',
       },
       false: {
-        // labelSlot: 'sm:col-span-2',
+        // label: 'sm:col-span-2',
         inputContainer: 'sm:col-span-2',
       },
     },
@@ -651,8 +657,8 @@ const InputField: React.FC<InputFieldProps> = (props) => {
             ))}
           </select>
           {/* Select arrow icon - could change the text color of this div to adjust the color of the icon */}
-          <div className={styles.selectArrowContainerSlot()}>
-            <svg className={styles.selectArrowIconSlot()} viewBox="0 0 20 20" fill="currentColor">
+          <div className={styles.selectArrowContainer()}>
+            <svg className={styles.selectArrowIcon()} viewBox="0 0 20 20" fill="currentColor">
               <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" />
             </svg>
           </div>
@@ -727,7 +733,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                   </div>
                   {opt.description && (
                     <div className={styles.checkboxRadioLabelWrapper()}>
-                      <p className={styles.descriptionSlot()}>{opt.description}</p>
+                      <p className={styles.description()}>{opt.description}</p>
                     </div>
                   )}
                 </div>
@@ -763,7 +769,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
 
     if (rawType === 'display') {
       return (
-        <span id={idToUse} className={styles.displaySpan({ class: baseInputClassName })} {...restHtmlAttributes}>
+        <span id={idToUse} className={styles.display({ class: baseInputClassName })} {...restHtmlAttributes}>
           {propValue}
         </span>
       )
@@ -790,7 +796,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
         <InputLabel
           htmlFor={idToUse}
           label={label}
-          className={styles.labelSlot({ class: labelClassName, fullWidth: fullWidth })}
+          className={styles.label({ class: labelClassName, fullWidth: fullWidth })}
           required={required}
         />
       )}
@@ -804,14 +810,10 @@ const InputField: React.FC<InputFieldProps> = (props) => {
             <InputDescription
               id={`${idToUse}-description`}
               description={description}
-              className={styles.descriptionSlot({ class: descriptionClassName })}
+              className={styles.description({ class: descriptionClassName })}
             />
             {!noErrorEl && (
-              <InputError
-                id={`${idToUse}-error`}
-                error={error}
-                className={styles.errorSlot({ class: errorClassName })}
-              />
+              <InputError id={`${idToUse}-error`} error={error} className={styles.error({ class: errorClassName })} />
             )}
           </>
         ) : (
@@ -820,7 +822,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
               rawType !== 'checkbox' && rawType !== 'radio' && rawType !== 'display' ? (
                 <div className={styles.inputGroup()}>
                   {currentPrefix && (
-                    <InputAffix isPrefix htmlFor={idToUse} className={styles.affixSlot({ class: prefixClassName })}>
+                    <InputAffix isPrefix htmlFor={idToUse} className={styles.affix({ class: prefixClassName })}>
                       {currentPrefix}
                     </InputAffix>
                   )}
@@ -829,12 +831,12 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                     {clearButton && inputHasValue && !disabled && !readOnly && (
                       <button
                         type="button"
-                        className={`absolute right-0.5 px-2 top-0 h-full flex items-center justify-center group`}
+                        className="absolute right-0 px-2.5 top-0 h-full flex items-center justify-center group"
                         onClick={handleClearButtonClick}
                         aria-label="Clear input"
                         data-testid="clear-button"
                       >
-                        <IconXMark className="size-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+                        <IconXMark className={styles.clearButtonIcon()} />
                       </button>
                     )}
                   </div>
@@ -856,11 +858,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                     </label>
                   )}
                   {currentSuffix && (
-                    <InputAffix
-                      isPrefix={false}
-                      className={styles.affixSlot({ class: suffixClassName })}
-                      htmlFor={idToUse}
-                    >
+                    <InputAffix isPrefix={false} className={styles.affix({ class: suffixClassName })} htmlFor={idToUse}>
                       {currentSuffix}
                     </InputAffix>
                   )}
@@ -875,14 +873,10 @@ const InputField: React.FC<InputFieldProps> = (props) => {
             <InputDescription
               id={`${idToUse}-description`}
               description={description}
-              className={styles.descriptionSlot({ class: descriptionClassName })}
+              className={styles.description({ class: descriptionClassName })}
             />
             {!noErrorEl && (
-              <InputError
-                id={`${idToUse}-error`}
-                error={error}
-                className={styles.errorSlot({ class: errorClassName })}
-              />
+              <InputError id={`${idToUse}-error`} error={error} className={styles.error({ class: errorClassName })} />
             )}
           </>
         )}
