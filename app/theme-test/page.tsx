@@ -126,6 +126,28 @@ export default function ThemeTestPage() {
             fullWidth={true}
             theme="gray"
           />
+
+          <InputField
+            label="With Clear Button Uncontrolled"
+            name="text_clear_button"
+            placeholder="Enter some text"
+            theme="gray"
+            clearButton
+            defaultValue="A value here causes the clear button to be shown at the right."
+          />
+
+          <InputField
+            label="With Clear Button Controlled"
+            name="text_clear_button_controlled"
+            placeholder="Enter some text"
+            value={textValue}
+            onChange={(e) => setTextValue(e.target.value)}
+            theme="gray"
+            clearButton
+          />
+
+          <p>Text Value: {textValue}</p>
+
           <InputField label="With Default Value" name="text_default" defaultValue="Hello World" fullWidth={true} />
           <InputField
             label="Controlled Text Input"
