@@ -37,6 +37,9 @@ const inputFieldStyles = tv({
     label: 'block text-sm sm:text-base font-medium sm:mt-px sm:pt-1', // For InputLabel component and its text color
     inputContainer: 'sm:mt-0', // Wrapper for the input group or standalone checkbox/radio
     inputGroup: 'relative flex shadow-sm', // Wraps prefix, input, suffix. Base rounding via compound variants.
+    clearButton:
+      'absolute right-1 p-1.5 top-1/2 -translate-y-1/2 justify-center group outline-none focus:inset-ring-sky-500/40 focus:inset-ring-2 rounded-full',
+    clearButtonIcon: 'size-4', // Base size, theme variants will handle colors
     inputElement: `
       block w-full border px-4 py-2 text-sm sm:text-base transition duration-150 ease-in-out sm:leading-5 bg-white/90 hover:enabled:bg-white focus:enabled:bg-white
       focus:outline-none focus:ring-2 inset-shadow-sm dark:hover:enabled:bg-black/40 dark:enabled:focus:bg-black/50
@@ -64,9 +67,6 @@ const inputFieldStyles = tv({
     // Slots for custom select arrow
     selectArrowContainer: 'absolute inset-y-0 right-0 flex items-center pointer-events-none opacity-60',
     selectArrowIcon: 'size-6 mr-0.75 text-gray-500 dark:text-gray-400', // Default size, margin, and color
-
-    // New slot for clear button icon
-    clearButtonIcon: 'size-4', // Base size, theme variants will handle colors
   },
   variants: {
     accent: {
@@ -831,7 +831,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                     {clearButton && inputHasValue && !disabled && !readOnly && (
                       <button
                         type="button"
-                        className="absolute right-0 px-2.5 top-0 h-full flex items-center justify-center group"
+                        className={styles.clearButton()}
                         onClick={handleClearButtonClick}
                         aria-label="Clear input"
                         data-testid="clear-button"
