@@ -54,6 +54,12 @@ export default function ThemeTestPage() {
     { value: 'check3', label: 'Choice Gamma', description: 'Description for Gamma' },
   ]
 
+  const radioCheckboxOptionsNoDesc = [
+    { value: 'check1', label: 'Choice Alpha' },
+    { value: 'check2', label: 'Choice Beta' },
+    { value: 'check3', label: 'Choice Gamma' },
+  ]
+
   // Handler for checkbox group
   const handleCheckboxGroupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target as HTMLInputElement // Assert target type
@@ -161,7 +167,13 @@ export default function ThemeTestPage() {
             type="number"
           />
           <InputField label="Required Field" name="text_required" placeholder="Must be filled" required />
-          <InputField label="Stone Theme" name="text_stone" theme="stone" placeholder="Stone theme input" />
+          <InputField
+            type="email"
+            label="Stone Theme"
+            name="text_stone"
+            theme="stone"
+            placeholder="Stone theme input"
+          />
           <InputField label="Full Width" name="text_full_width" fullWidth placeholder="Takes up more space" />
           <InputField
             label="No Error Element"
@@ -356,6 +368,30 @@ export default function ThemeTestPage() {
         </div>
       </section>
 
+      <section className="p-6">
+        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">Gray Themes</h2>
+
+        <div className="py-1 bg-slate-50 dark:bg-slate-900">
+          <InputField type="email" label="Slate Theme" name="text_slate" theme="slate" placeholder="Slate" />
+        </div>
+
+        <div className="py-1 bg-gray-50 dark:bg-gray-900">
+          <InputField type="email" label="Gray Theme" name="text_gray" theme="gray" placeholder="Gray" />
+        </div>
+
+        <div className="py-1 bg-zinc-50 dark:bg-zinc-900">
+          <InputField type="email" label="Zinc Theme" name="text_zinc" theme="zinc" placeholder="Zinc" />
+        </div>
+
+        <div className="py-1 bg-neutral-50 dark:bg-neutral-900">
+          <InputField type="email" label="Neutral Theme" name="text_neutral" theme="neutral" placeholder="Neutral" />
+        </div>
+
+        <div className="py-1 bg-stone-50 dark:bg-stone-900">
+          <InputField type="email" label="Stone Theme" name="text_stone" theme="stone" placeholder="Stone" />
+        </div>
+      </section>
+
       {/* Textarea and Markdown */}
       <section className="p-6">
         <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">
@@ -435,6 +471,32 @@ export default function ThemeTestPage() {
               error="At least one option must be selected if this was required."
             />
           </div>
+
+          <div className="md:col-span-2">
+            <InputField
+              type="checkbox"
+              label="Checkbox Group (Horizontal, No Desc)"
+              name="checkbox_group_horizontal"
+              options={radioCheckboxOptionsNoDesc}
+              value={checkboxGroup} // Pass current selection array
+              onChange={handleCheckboxGroupChange} // Custom handler for group
+              horizontal
+              error="At least one option must be selected if this was required."
+            />
+          </div>
+        </div>
+
+        <div className="md:col-span-2">
+          <InputField
+            type="radio"
+            label="Radio Group (Horizontal, No Desc)"
+            name="radio_group_horizontal_no_desc"
+            options={radioCheckboxOptionsNoDesc}
+            value={radioValue} // Pass current selection array
+            onChange={(e) => setRadioValue(e.target.value)} // Custom handler for group
+            horizontal
+            error="At least one option must be selected if this was required."
+          />
         </div>
       </section>
 
