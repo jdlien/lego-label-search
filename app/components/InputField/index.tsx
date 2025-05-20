@@ -41,7 +41,7 @@ const inputFieldStyles = tv({
     checkboxRadioGroup: 'space-y-2', // Container for multiple checkboxes/radios
     checkboxRadioItem: 'flex items-start',
     checkboxRadioInputWrapper: 'flex h-5 items-center',
-    checkboxRadioInput: 'h-4 w-4 rounded', // Theme-specific: accent color, border, focus ring
+    checkboxRadioInput: 'size-5 rounded', // Theme-specific: accent color, border, focus ring
     checkboxRadioLabelWrapper: 'ml-3 text-sm',
     checkboxRadioLabel: 'font-medium', // Theme-specific: text color
 
@@ -523,6 +523,9 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                     : propDefaultValue === opt.value
               }
 
+              // TODO: In appInput.cfc we have a slightly different structure that allows us to use a
+              // border around checked checkboxes and radios. We should refactor to use that structure.
+              // There was also a hover effect. This version doesn't do that at all yet.
               return (
                 <div key={optionId} className={styles.checkboxRadioItem()}>
                   <div className={styles.checkboxRadioInputWrapper()}>
@@ -613,7 +616,10 @@ const InputField: React.FC<InputFieldProps> = (props) => {
           required={required}
         />
       )}
-      <div className={styles.inputContainer()} data-testid="input-container">
+      <div
+        className={styles.inputContainer({ class: rawType === 'checkbox' || rawType === 'radio' ? 'pt-2' : '' })}
+        data-testid="input-container"
+      >
         {(rawType === 'checkbox' || rawType === 'radio') && normalizedOptions.length === 0 ? (
           <>
             {renderInput()}
