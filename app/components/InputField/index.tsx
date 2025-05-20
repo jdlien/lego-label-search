@@ -33,42 +33,89 @@ import type { OptionType, NormalizedOptionType, InputFieldProps } from './types'
 const inputFieldStyles = tv({
   slots: {
     // Applied to the outermost div, formerly form-item
-    root: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5 my-3',
-    label: 'block text-sm sm:text-base font-medium sm:mt-px sm:pt-1', // For InputLabel component and its text color
-    inputContainer: 'sm:mt-0', // Wrapper for the input group or standalone checkbox/radio
+    inputFieldOuterContainer: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5',
+    label: 'block text-sm sm:text-base font-medium', // For InputLabel component and its text color
+    inputContainer: 'sm:mt-0 pt-1.5', // Wrapper for the input group or standalone checkbox/radio
     inputGroup: 'relative flex shadow-sm', // Wraps prefix, input, suffix. Base rounding via compound variants.
     clearButton:
-      'absolute right-1 p-1.5 top-1/2 -translate-y-1/2 justify-center group outline-none focus:inset-ring-sky-500/40 focus:inset-ring-2 rounded-full',
+      'absolute p-1.5 top-1/2 -translate-y-1/2 justify-center group outline-none focus:inset-ring-sky-500/40 focus:inset-ring-2 rounded-full',
     clearButtonIcon: 'size-4', // Base size, theme variants will handle colors
     inputElement: `
-      block w-full border px-4 py-2 text-sm sm:text-base transition duration-150 ease-in-out sm:leading-5 bg-white/90 hover:enabled:bg-white focus:enabled:bg-white
+      block w-full border transition duration-150 ease-in-out bg-white/90 hover:enabled:bg-white focus:enabled:bg-white
       focus:outline-none focus:ring-2 inset-shadow-sm dark:hover:enabled:bg-black/40 dark:enabled:focus:bg-black/50
       `,
     // Specific slots for checkbox/radio elements
     checkboxRadioGroup: 'space-y-2', // Container for multiple checkboxes/radios
     checkboxRadioItem: '',
     checkboxRadioInputWrapper: 'flex items-center',
-    checkboxRadioInput: 'size-5 rounded', // Size and shape of checkbox and radio inputs
-    checkboxRadioLabelWrapper: 'text-sm', // Affects checkbox/radio descriptions
+    checkboxRadioInput: '', // Size and shape of checkbox and radio inputs
+    checkboxRadioDescriptionWrapper: '', // Affects checkbox/radio descriptions
     checkboxRadioLabel: 'font-medium', // Theme-specific: text color
     // New slot for the checkedbox and radio border container. Note: dark:has-checked seems not to work here.
     checkboxRadioContainer: `
-      inline-flex items-center border px-0.5 shadow-inner
+      inline-flex items-center border shadow-inner
       enabled:hover:bg-white transition-colors duration-150 ease-in-out
       has-checked:text-black dark:has-checked:text-shadow-sm
       dark:hover:bg-black/50 disabled:pointer-events-none
     `,
     checkedLabelText: 'ml-1.5 mr-1', // For the label text to have proper spacing
-    affix: 'inline-flex items-center px-3 text-sm', // For InputAffix (prefix/suffix)
+    affix: 'inline-flex items-center', // For InputAffix (prefix/suffix)
     description: '', // For InputDescription component and its text color
     error: 'mt-2 text-sm', // For InputError component, primarily for error text color
     display: 'block w-full sm:mt-px sm:pt-1', // For type='display'
 
     // Slots for custom select arrow
     selectArrowContainer: 'absolute inset-y-0 right-0 flex items-center pointer-events-none opacity-60',
-    selectArrowIcon: 'size-6 mr-0.75 text-gray-500 dark:text-gray-400', // Default size, margin, and color
+    selectArrowIcon: 'mr-0.75 text-gray-500 dark:text-gray-400', // Default size, margin, and color
   },
   variants: {
+    size: {
+      sm: {
+        inputFieldOuterContainer: 'my-2',
+        label: 'sm:text-sm sm:mt-0.25 sm:pt-2',
+        inputElement: 'px-2 py-1 text-sm leading-4',
+        clearButton: 'right-0.5',
+        checkboxRadioInputWrapper: '',
+        checkboxRadioContainer: 'text-sm px-0.5',
+        checkboxRadioInput: 'size-4',
+        checkboxRadioDescriptionWrapper: 'text-sm',
+        checkedLabelText: 'ml-1 mr-0.5',
+        affix: 'px-2 text-xs',
+        clearButtonIcon: 'size-3',
+        selectArrowIcon: 'size-5',
+        error: 'text-sm',
+      },
+      md: {
+        inputFieldOuterContainer: 'my-3',
+        label: 'text-sm sm:text-base sm:mt-px sm:pt-3',
+        inputElement: 'px-4 py-2 text-sm sm:text-base sm:leading-5',
+        clearButton: 'right-1',
+        checkboxRadioInputWrapper: '',
+        checkboxRadioContainer: 'px-0.5',
+        checkboxRadioInput: 'size-5',
+        checkboxRadioDescriptionWrapper: 'text-sm',
+        checkedLabelText: 'ml-1.5 mr-1',
+        affix: 'px-3 text-sm',
+        clearButtonIcon: 'size-4',
+        selectArrowIcon: 'size-6',
+        error: 'text-sm',
+      },
+      lg: {
+        inputFieldOuterContainer: 'my-4',
+        label: 'text-base sm:text-lg sm:mt-0.25 sm:pt-3.75',
+        inputElement: 'px-5 py-3 text-base sm:text-lg leading-6',
+        clearButton: 'right-1.5',
+        checkboxRadioInputWrapper: '',
+        checkboxRadioContainer: 'px-0.5 py-0.5',
+        checkboxRadioInput: 'size-6',
+        checkboxRadioDescriptionWrapper: 'text-base',
+        checkedLabelText: 'ml-2 mr-1.5',
+        affix: 'px-4 text-base',
+        clearButtonIcon: 'size-5',
+        selectArrowIcon: 'size-7',
+        error: 'text-base',
+      },
+    },
     accent: {
       blue: {
         inputElement: 'focus:ring-blue-500/40',
@@ -236,7 +283,7 @@ const inputFieldStyles = tv({
       textarea: {},
       // For checkbox/radio, their specific slots (checkboxRadioInput, etc.) are primary. inputElement slot is often not used or cleared.
       checkbox: {},
-      radio: { checkboxRadioLabelWrapper: 'ml-1.5' }, // Radios are round so descriptions need a bit more left margin
+      radio: {}, // Removed checkboxRadioDescriptionWrapper: 'ml-1.5' to move to compound variants
       display: { inputGroup: 'shadow-none' }, // 'display' uses displaySpan, not typical inputElement
       // Other types like 'email', 'date', etc., will use base 'inputElement' styles unless specified
       // 'markdown' should be handled by component logic to map to 'textarea' type for styling
@@ -340,7 +387,7 @@ const inputFieldStyles = tv({
     },
     {
       inputType: 'checkbox',
-      class: { checkboxRadioContainer: 'rounded-xs' },
+      class: { checkboxRadioContainer: 'rounded-xs', checkboxRadioInput: 'rounded' },
     },
     {
       clearButton: true,
@@ -348,10 +395,42 @@ const inputFieldStyles = tv({
         inputElement: 'pr-8',
       },
     },
+    // Size-specific padding for checkbox/radio input containers
+    {
+      inputType: 'checkbox',
+      size: 'sm',
+      class: { label: 'sm:pt-0', inputContainer: 'pt-0' },
+    },
+    {
+      inputType: 'checkbox',
+      size: 'md',
+      class: { label: 'sm:pt-1.5', inputContainer: 'pt-1.5' },
+    },
+    {
+      inputType: 'checkbox',
+      size: 'lg',
+      class: { label: 'sm:pt-1.75', inputContainer: 'pt-2' },
+    },
+    {
+      inputType: 'radio',
+      size: 'sm',
+      class: { label: 'sm:pt-0', inputContainer: 'pt-1', checkboxRadioDescriptionWrapper: 'ml-1' },
+    },
+    {
+      inputType: 'radio',
+      size: 'md',
+      class: { label: 'sm:pt-1.5', inputContainer: 'pt-1.5', checkboxRadioDescriptionWrapper: 'ml-1.5' },
+    },
+    {
+      inputType: 'radio',
+      size: 'lg',
+      class: { label: 'sm:pt-1.75', inputContainer: 'pt-2', checkboxRadioDescriptionWrapper: 'ml-2' },
+    },
   ],
   defaultVariants: {
     accent: 'sky',
     theme: 'gray', // Matches your component's prop default
+    size: 'md', // Default size is medium
     disabled: false,
     error: false,
     hasPrefix: false,
@@ -417,6 +496,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     fullWidth,
     theme = defaultTheme, // Use context default
     accent = defaultAccent, // Use context default
+    size = 'sm', // Add size prop with default 'md'
     // Class overrides
     labelClassName,
     inputClassName: baseInputClassName, // Renamed for clarity
@@ -600,6 +680,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     fullWidth: fullWidth,
     class: className,
     clearButton: clearButton,
+    size,
   })
 
   const ariaDescribedBy: string[] = []
@@ -714,6 +795,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                       className={styles.checkboxRadioContainer({
                         class: 'dark:has-checked:text-white',
                       })}
+                      data-testid="checkbox-radio-container"
                     >
                       <input
                         id={optionId}
@@ -732,7 +814,10 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                     </label>
                   </div>
                   {opt.description && (
-                    <div className={styles.checkboxRadioLabelWrapper()}>
+                    <div
+                      className={styles.checkboxRadioDescriptionWrapper()}
+                      data-testid="checkbox-radio-description-wrapper"
+                    >
                       <p className={styles.description()}>{opt.description}</p>
                     </div>
                   )}
@@ -791,19 +876,17 @@ const InputField: React.FC<InputFieldProps> = (props) => {
 
   // Return the outer container div with the label and input container
   return (
-    <div className={styles.root()} data-testid="input-field-outer-container">
+    <div className={styles.inputFieldOuterContainer()} data-testid="input-field-outer-container">
       {showOuterLabel && (
         <InputLabel
           htmlFor={idToUse}
           label={label}
           className={styles.label({ class: labelClassName, fullWidth: fullWidth })}
           required={required}
+          data-testid="input-label"
         />
       )}
-      <div
-        className={styles.inputContainer({ class: rawType === 'checkbox' || rawType === 'radio' ? 'pt-1.5' : '' })}
-        data-testid="input-container"
-      >
+      <div className={styles.inputContainer()} data-testid="input-container">
         {(rawType === 'checkbox' || rawType === 'radio') && normalizedOptions.length === 0 ? (
           <>
             {renderInput()}
