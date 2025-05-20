@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import InputField from '../components/InputField' // Assuming InputField is in components
+import FormField from '../components/InputField/FormField'
 import { IconUser, IconAt, IconCurrencyDollar } from '../components/InputField/InputIcons' // Assuming icons might be used as prefixes/suffixes
 
 /*
@@ -115,11 +116,19 @@ export default function ThemeTestPage() {
 
       {/* Standard Text Inputs */}
       <section className="p-6">
+        <div>
+          <InputField name="solo-input" placeholder="Solo Input (No Container" />
+        </div>
+
+        <div>
+          <InputField name="solo-input" placeholder="Solo Input (No Container" type="email" />
+        </div>
+
         <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">
           Standard Text Inputs
         </h2>
         <div className="">
-          <InputField
+          <FormField
             label="Basic Text Input"
             name="text_basic"
             placeholder="Enter some text"
@@ -127,7 +136,7 @@ export default function ThemeTestPage() {
             theme="gray"
           />
 
-          <InputField
+          <FormField
             label="With Clear Button Uncontrolled"
             name="text_clear_button"
             placeholder="Enter some text"
@@ -136,7 +145,7 @@ export default function ThemeTestPage() {
             defaultValue="A value here causes the clear button to be shown at the right."
           />
 
-          <InputField
+          <FormField
             label="With Clear Button Controlled"
             name="text_clear_button_controlled"
             placeholder="Enter some text"
@@ -148,39 +157,33 @@ export default function ThemeTestPage() {
 
           <p>Text Value: {textValue}</p>
 
-          <InputField label="With Default Value" name="text_default" defaultValue="Hello World" fullWidth={true} />
-          <InputField
+          <FormField label="With Default Value" name="text_default" defaultValue="Hello World" fullWidth={true} />
+          <FormField
             label="Controlled Text Input"
             name="text_controlled"
             value={textValue}
             onChange={(e) => setTextValue(e.target.value)}
             theme="gray"
           />
-          <InputField
+          <FormField
             label="With Error"
             name="text_error"
             error="This field has an error."
             value="Incorrect Value"
             readOnly
           />
-          <InputField label="With Description" name="text_desc" description="This is a helpful description." />
-          <InputField label="Disabled" name="text_disabled" placeholder="Cannot type here" disabled />
-          <InputField label="Read Only" name="text_readonly" value="You can only read this" readOnly />
-          <InputField
-            label="With Prefix"
-            name="text_prefix"
-            prefix={<IconUser />}
-            placeholder="Username"
-            theme="gray"
-          />
-          <InputField
+          <FormField label="With Description" name="text_desc" description="This is a helpful description." />
+          <FormField label="Disabled" name="text_disabled" placeholder="Cannot type here" disabled />
+          <FormField label="Read Only" name="text_readonly" value="You can only read this" readOnly />
+          <FormField label="With Prefix" name="text_prefix" prefix={<IconUser />} placeholder="Username" theme="gray" />
+          <FormField
             label="With Suffix (Icon)"
             name="text_suffix_icon"
             suffix={<IconAt />}
             placeholder="Email segment"
           />
-          <InputField label="With Suffix (Text)" name="text_suffix_text" suffix=".com" placeholder="Domain" />
-          <InputField
+          <FormField label="With Suffix (Text)" name="text_suffix_text" suffix=".com" placeholder="Domain" />
+          <FormField
             label="With Prefix & Suffix"
             name="text_prefix_suffix"
             prefix="$"
@@ -188,23 +191,17 @@ export default function ThemeTestPage() {
             placeholder="Amount"
             type="number"
           />
-          <InputField label="Required Field" name="text_required" placeholder="Must be filled" required />
-          <InputField
-            type="email"
-            label="Stone Theme"
-            name="text_stone"
-            theme="stone"
-            placeholder="Stone theme input"
-          />
-          <InputField label="Full Width" name="text_full_width" fullWidth placeholder="Takes up more space" />
-          <InputField
+          <FormField label="Required Field" name="text_required" placeholder="Must be filled" required />
+          <FormField type="email" label="Stone Theme" name="text_stone" theme="stone" placeholder="Stone theme input" />
+          <FormField label="Full Width" name="text_full_width" fullWidth placeholder="Takes up more space" />
+          <FormField
             label="No Error Element"
             name="text_no_error_el"
             error="Error hidden (check console)"
             noErrorEl
             placeholder="Error is present but not shown"
           />
-          <InputField label="With Max Length (10)" name="text_maxlength" maxLength={10} placeholder="Max 10 chars" />
+          <FormField label="With Max Length (10)" name="text_maxlength" maxLength={10} placeholder="Max 10 chars" />
         </div>
       </section>
 
@@ -214,7 +211,7 @@ export default function ThemeTestPage() {
           Specialized Text Inputs
         </h2>
         <div className="">
-          <InputField
+          <FormField
             fullWidth={true}
             type="email"
             label="Email Input"
@@ -223,14 +220,14 @@ export default function ThemeTestPage() {
             onChange={(e) => setEmailValue(e.target.value)}
             description="Auto prefix & placeholder"
           />
-          <InputField
+          <FormField
             type="password"
             label="Password Input"
             name="password_input"
             value={passwordValue}
             onChange={(e) => setPasswordValue(e.target.value)}
           />
-          <InputField
+          <FormField
             type="search"
             label="Search Input"
             name="search_input"
@@ -238,21 +235,21 @@ export default function ThemeTestPage() {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
           />
-          <InputField
+          <FormField
             type="tel"
             label="Telephone Input"
             name="tel_input"
             value={telValue}
             onChange={(e) => setTelValue(e.target.value)}
           />
-          <InputField
+          <FormField
             type="url"
             label="URL Input"
             name="url_input"
             value={urlValue}
             onChange={(e) => setUrlValue(e.target.value)}
           />
-          <InputField
+          <FormField
             type="number"
             label="Number Input"
             name="number_input"
@@ -261,7 +258,7 @@ export default function ThemeTestPage() {
             placeholder="e.g., 123"
             suffix="Units"
           />
-          <InputField
+          <FormField
             type="decimal"
             label="Decimal Input (text)"
             name="decimal_input"
@@ -270,7 +267,7 @@ export default function ThemeTestPage() {
             placeholder="e.g., 123.45"
             prefix={<IconCurrencyDollar />}
           />
-          <InputField
+          <FormField
             type="integer"
             label="Integer Input (text)"
             name="integer_input"
@@ -279,7 +276,7 @@ export default function ThemeTestPage() {
             placeholder="e.g., 100"
             error="Only integers allowed"
           />
-          <InputField
+          <FormField
             type="postal"
             label="Postal Code (text)"
             name="postal_input"
@@ -300,7 +297,7 @@ export default function ThemeTestPage() {
           `data-fp-options`.
         </p>
         <div className="">
-          <InputField
+          <FormField
             type="date"
             label="Date Input"
             name="date_input"
@@ -308,7 +305,7 @@ export default function ThemeTestPage() {
             onChange={(e) => setDateValue(e.target.value)}
             description="YYYY-MM-DD"
           />
-          <InputField
+          <FormField
             type="datetime"
             label="Date-Time Input"
             name="datetime_input"
@@ -316,7 +313,7 @@ export default function ThemeTestPage() {
             onChange={(e) => setDatetimeValue(e.target.value)}
             placeholder="YYYY-MM-DD HH:MM"
           />
-          <InputField
+          <FormField
             type="time"
             label="Time Input"
             name="time_input"
@@ -324,7 +321,7 @@ export default function ThemeTestPage() {
             onChange={(e) => setTimeValue(e.target.value)}
             prefix="Event&nbsp;at:"
           />
-          <InputField
+          <FormField
             type="color"
             label="Color Input (text part)"
             name="color_text_input"
@@ -332,7 +329,7 @@ export default function ThemeTestPage() {
             onChange={(e) => setColorValue(e.target.value)}
             description="Component shows icon; actual color picker UI is separate or via native type='color' if not overridden."
           />
-          <InputField
+          <FormField
             type="text"
             label="Date with Flatpickr (conceptual)"
             name="date_fp"
@@ -347,7 +344,7 @@ export default function ThemeTestPage() {
       <section className="p-6">
         <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">Select Input</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <InputField
+          <FormField
             type="select"
             label="Basic Select"
             name="select_basic"
@@ -355,22 +352,22 @@ export default function ThemeTestPage() {
             value={selectValue}
             onChange={(e) => setSelectValue(e.target.value)}
           />
-          <InputField
+          <FormField
             type="select"
             label="Select with Empty Option (default)"
             name="select_empty"
             options={selectOptions}
             description="First option is empty"
           />
-          <InputField
+          <FormField
             type="select"
             label="Select with Custom Placeholder"
             name="select_placeholder"
             options={selectOptions}
             emptyOption="-- Please Choose --"
           />
-          <InputField type="select" label="Select Disabled" name="select_disabled" options={selectOptions} disabled />
-          <InputField
+          <FormField type="select" label="Select Disabled" name="select_disabled" options={selectOptions} disabled />
+          <FormField
             type="select"
             label="Select with Error"
             name="select_error"
@@ -380,7 +377,7 @@ export default function ThemeTestPage() {
             required
             readOnly
           />
-          <InputField
+          <FormField
             type="select"
             label="Select Stone Theme"
             name="select_stone"
@@ -394,23 +391,23 @@ export default function ThemeTestPage() {
         <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">Gray Themes</h2>
 
         <div className="py-1 bg-slate-50 dark:bg-slate-900">
-          <InputField type="email" label="Slate Theme" name="text_slate" theme="slate" placeholder="Slate" />
+          <FormField type="email" label="Slate Theme" name="text_slate" theme="slate" placeholder="Slate" />
         </div>
 
         <div className="py-1 bg-gray-50 dark:bg-gray-900">
-          <InputField type="email" label="Gray Theme" name="text_gray" theme="gray" placeholder="Gray" />
+          <FormField type="email" label="Gray Theme" name="text_gray" theme="gray" placeholder="Gray" />
         </div>
 
         <div className="py-1 bg-zinc-50 dark:bg-zinc-900">
-          <InputField type="email" label="Zinc Theme" name="text_zinc" theme="zinc" placeholder="Zinc" />
+          <FormField type="email" label="Zinc Theme" name="text_zinc" theme="zinc" placeholder="Zinc" />
         </div>
 
         <div className="py-1 bg-neutral-50 dark:bg-neutral-900">
-          <InputField type="email" label="Neutral Theme" name="text_neutral" theme="neutral" placeholder="Neutral" />
+          <FormField type="email" label="Neutral Theme" name="text_neutral" theme="neutral" placeholder="Neutral" />
         </div>
 
         <div className="py-1 bg-stone-50 dark:bg-stone-900">
-          <InputField type="email" label="Stone Theme" name="text_stone" theme="stone" placeholder="Stone" />
+          <FormField type="email" label="Stone Theme" name="text_stone" theme="stone" placeholder="Stone" />
         </div>
       </section>
 
@@ -420,7 +417,7 @@ export default function ThemeTestPage() {
           Textarea & Markdown
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <InputField
+          <FormField
             type="textarea"
             label="Textarea"
             name="textarea_basic"
@@ -428,21 +425,21 @@ export default function ThemeTestPage() {
             onChange={(e) => setTextareaValue(e.target.value)}
             placeholder="Enter longer text here..."
           />
-          <InputField
+          <FormField
             type="textarea"
             label="Textarea with Description"
             name="textarea_desc"
             description="Max 200 characters."
             maxLength={200}
           />
-          <InputField
+          <FormField
             type="textarea"
             label="Textarea Disabled"
             name="textarea_disabled"
             value="Cannot edit this content"
             disabled
           />
-          <InputField
+          <FormField
             type="markdown"
             label="Markdown Editor (textarea)"
             name="markdown_editor"
@@ -459,7 +456,7 @@ export default function ThemeTestPage() {
           Checkbox Inputs
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          <InputField
+          <FormField
             type="checkbox"
             label="Single Checkbox"
             name="single_check"
@@ -467,11 +464,11 @@ export default function ThemeTestPage() {
             onChange={(e) => setSingleCheckbox((e.target as HTMLInputElement).checked)}
             description="A standalone checkbox option"
           />
-          <InputField type="checkbox" label="Single Checkbox (Stone)" name="single_check_stone" theme="stone" />
-          <InputField type="checkbox" label="Disabled Checked" name="single_check_disabled_checked" checked disabled />
-          <InputField type="checkbox" label="Disabled Unchecked" name="single_check_disabled_unchecked" disabled />
+          <FormField type="checkbox" label="Single Checkbox (Stone)" name="single_check_stone" theme="stone" />
+          <FormField type="checkbox" label="Disabled Checked" name="single_check_disabled_checked" checked disabled />
+          <FormField type="checkbox" label="Disabled Unchecked" name="single_check_disabled_unchecked" disabled />
           <div className="md:col-span-2">
-            <InputField
+            <FormField
               type="checkbox"
               label="Checkbox Group (Vertical)"
               name="checkbox_group_vertical"
@@ -482,7 +479,7 @@ export default function ThemeTestPage() {
             />
           </div>
           <div className="md:col-span-2">
-            <InputField
+            <FormField
               type="checkbox"
               label="Checkbox Group (Horizontal)"
               name="checkbox_group_horizontal"
@@ -495,7 +492,7 @@ export default function ThemeTestPage() {
           </div>
 
           <div className="md:col-span-2">
-            <InputField
+            <FormField
               type="checkbox"
               label="Checkbox Group (Horizontal, No Desc)"
               name="checkbox_group_horizontal"
@@ -509,7 +506,7 @@ export default function ThemeTestPage() {
         </div>
 
         <div className="md:col-span-2">
-          <InputField
+          <FormField
             type="radio"
             label="Radio Group (Horizontal, No Desc)"
             name="radio_group_horizontal_no_desc"
@@ -526,7 +523,7 @@ export default function ThemeTestPage() {
       <section className="p-6">
         <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">Radio Inputs</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          <InputField
+          <FormField
             type="radio"
             label="Radio Group (Vertical)"
             name="radio_group_vertical"
@@ -535,7 +532,7 @@ export default function ThemeTestPage() {
             onChange={(e) => setRadioValue(e.target.value)}
             description="Select one option."
           />
-          <InputField
+          <FormField
             type="radio"
             label="Radio Group (Horizontal)"
             name="radio_group_horizontal"
@@ -546,7 +543,7 @@ export default function ThemeTestPage() {
             error="A selection is mandatory."
             required
           />
-          <InputField
+          <FormField
             type="radio"
             label="Radio Group (Stone Theme)"
             name="radio_group_stone"
@@ -555,7 +552,7 @@ export default function ThemeTestPage() {
             onChange={(e) => setRadioValue(e.target.value)}
             theme="stone"
           />
-          <InputField
+          <FormField
             type="radio"
             label="Radio Group Disabled"
             name="radio_group_disabled"
@@ -570,14 +567,14 @@ export default function ThemeTestPage() {
       <section className="p-6">
         <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">Other Types</h2>
         <div className="">
-          <InputField
+          <FormField
             type="display"
             label="Display Only Field"
             name="display_field"
             value="This is static display text."
             description="Cannot be edited by user."
           />
-          <InputField
+          <FormField
             type="display"
             label="Display (Stone)"
             name="display_stone"
