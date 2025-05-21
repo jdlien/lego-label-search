@@ -93,3 +93,5 @@ The caching system ensures fast API responses while keeping count data up-to-dat
 - Refactor \_app.js to include header/footer, etc. The structure of this app is abysmal.
 - Fix overscroll colors in both dark and light mode in PWA and browser
   - This can partly be solved by changing html color and implementing a sticky footer with an bespoke overscroll element.
+- There are parts that have categories from BrickArchitect (and thus labels on that site) that I don't have images for. I need to add those images, perhaps by scraping the BrickArchitect site. Examples: 80497, 24204
+- Create a find-as-you-type ui for the categories search. I may consider using headlessui combobox for this.
