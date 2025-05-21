@@ -4,7 +4,7 @@ import React from 'react'
 // Icons adapted from Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com
 // License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc
 
-const IconEnvelope = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconEnvelope = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 512 512">
     <path
       fill="currentColor"
@@ -13,7 +13,7 @@ const IconEnvelope = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconMapMarker = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconMapMarker = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 384 512">
     <path
       fill="currentColor"
@@ -22,7 +22,7 @@ const IconMapMarker = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconLink = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconLink = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 640 512">
     <path
       fill="currentColor"
@@ -31,7 +31,7 @@ const IconLink = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconPhone = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconPhone = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 512 512">
     <path
       fill="currentColor"
@@ -40,7 +40,7 @@ const IconPhone = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconCalendar = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconCalendar = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 448 512">
     <path
       fill="currentColor"
@@ -49,7 +49,7 @@ const IconCalendar = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconCalendarDay = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconCalendarDay = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 448 512">
     <path
       fill="currentColor"
@@ -58,7 +58,7 @@ const IconCalendarDay = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconClock = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconClock = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 512 512">
     <path
       fill="currentColor"
@@ -67,7 +67,7 @@ const IconClock = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconLock = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconLock = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 448 512">
     <path
       fill="currentColor"
@@ -76,7 +76,7 @@ const IconLock = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconPalette = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconPalette = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 512 512">
     <path
       fill="currentColor"
@@ -85,7 +85,7 @@ const IconPalette = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconUser = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconUser = ({ className = '' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 448 512">
     <path
       fill="currentColor"
@@ -94,7 +94,7 @@ const IconUser = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconAt = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconAt = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 512 512">
     <path
       fill="currentColor"
@@ -103,7 +103,7 @@ const IconAt = ({ className = 'w-4 h-4' }: { className?: string }) => (
   </svg>
 )
 
-const IconCurrencyDollar = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconCurrencyDollar = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 320 512">
     <path
       fill="currentColor"
@@ -112,7 +112,7 @@ const IconCurrencyDollar = ({ className = 'w-4 h-4' }: { className?: string }) =
   </svg>
 )
 
-const IconMagnifyingGlass = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconMagnifyingGlass = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 512 512">
     <path
       fill="currentColor"
@@ -121,7 +121,7 @@ const IconMagnifyingGlass = ({ className = 'w-4 h-4' }: { className?: string }) 
   </svg>
 )
 
-const IconXMark = ({ className = 'w-4 h-4' }: { className?: string }) => (
+const IconXMark = ({ className = 'aspect-square' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 384 512">
     <path
       fill="currentColor"
