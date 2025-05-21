@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import clsx from 'clsx'
+import { tv } from 'tailwind-variants'
 
 // --- TYPE DEFINITIONS ---
 interface InputAffixProps {
@@ -9,16 +9,26 @@ interface InputAffixProps {
   isPrefix?: boolean
 }
 
+const inputAffixVariants = tv({
+  base: 'inline-flex items-center justify-center border px-1',
+  variants: {
+    isPrefix: {
+      true: 'rounded-l-md border-r-0',
+      false: 'rounded-r-md border-l-0',
+    },
+    defaultVariants: {
+      isPrefix: true,
+    },
+  },
+})
+
 const InputAffix: React.FC<InputAffixProps> = ({ htmlFor, children, className, isPrefix }) => {
   if (!children) return null
   return (
     <label // Using label for clickable area, similar to original
       htmlFor={htmlFor}
-      className={clsx(
-        'inline-flex min-w-[30px] items-center justify-center border px-1',
-        isPrefix ? 'rounded-l-md border-r-0' : 'rounded-r-md border-l-0',
-        className
-      )}
+      className={inputAffixVariants({ isPrefix, className })}
+      data-testid={`input-affix-${isPrefix ? 'prefix' : 'suffix'}`}
     >
       {children}
     </label>

@@ -79,7 +79,7 @@ const inputFieldStyles = tv({
         checkboxRadioInput: 'size-4',
         checkboxRadioDescriptionWrapper: 'text-sm',
         checkedLabelText: 'ml-1 mr-0.5',
-        affix: 'px-2 text-xs',
+        affix: 'px-2 min-w-[29px]',
         clearButtonIcon: 'size-3',
         selectArrowIcon: 'size-5',
         error: 'text-sm',
@@ -94,7 +94,7 @@ const inputFieldStyles = tv({
         checkboxRadioInput: 'size-5',
         checkboxRadioDescriptionWrapper: 'text-sm',
         checkedLabelText: 'ml-1.5 mr-1',
-        affix: 'px-3 text-sm',
+        affix: 'px-3 min-w-[42px]',
         clearButtonIcon: 'size-4',
         selectArrowIcon: 'size-6',
         error: 'text-sm',
@@ -109,7 +109,7 @@ const inputFieldStyles = tv({
         checkboxRadioInput: 'size-6',
         checkboxRadioDescriptionWrapper: 'text-base',
         checkedLabelText: 'ml-2 mr-1.5',
-        affix: 'px-4 text-base',
+        affix: 'px-3.5 text-lg min-w-[52px]',
         clearButtonIcon: 'size-5',
         selectArrowIcon: 'size-7',
         error: 'text-base',
@@ -443,6 +443,9 @@ const inputFieldStyles = tv({
 
 export type InputFieldStyleProps = VariantProps<typeof inputFieldStyles>
 
+// Define the valid types for the tailwind-variants inputType variant
+type TVStyleInputType = keyof typeof inputFieldStyles.variants.inputType
+
 const normalizeOptions = (options?: OptionType[]): NormalizedOptionType[] => {
   if (!options) return []
   return options
@@ -562,6 +565,9 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     }
   }
 
+  // Determine the inputType for styling variants (tv expects one of its defined inputType values)
+  let styleInputType: TVStyleInputType = 'text' // Default to 'text'
+
   // Process type and derive related attributes
   let inputType = rawType
   let currentDataType = rawDataType
@@ -575,12 +581,17 @@ const InputField: React.FC<InputFieldProps> = (props) => {
 
   switch (rawType) {
     case 'select':
+      styleInputType = 'select'
       currentPlaceholder = rawPlaceholder || (typeof emptyOption === 'string' ? emptyOption : undefined)
       break
     case 'textarea':
+      styleInputType = 'textarea'
       break
     case 'checkbox':
+      styleInputType = 'checkbox'
+      break
     case 'radio':
+      styleInputType = 'radio'
       break
     case 'decimal':
       inputType = 'text'
@@ -646,26 +657,14 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     case 'markdown':
       isMarkdown = true
       inputType = 'textarea'
+      styleInputType = 'textarea'
       break
     case 'display':
+      styleInputType = 'display'
       break
   }
 
   const normalizedOptions = normalizeOptions(rawOptions)
-
-  // Determine the inputType for styling variants (tv expects one of its defined inputType values)
-  let styleInputType: InputFieldStyleProps['inputType']
-  if (
-    rawType === 'select' ||
-    rawType === 'textarea' ||
-    rawType === 'checkbox' ||
-    rawType === 'radio' ||
-    rawType === 'display'
-  ) {
-    styleInputType = rawType as InputFieldStyleProps['inputType']
-  } else if (isMarkdown) {
-    styleInputType = 'textarea'
-  }
 
   const styles = inputFieldStyles({
     theme,

@@ -175,7 +175,31 @@ export default function ThemeTestPage() {
           <FormField label="With Description" name="text_desc" description="This is a helpful description." />
           <FormField label="Disabled" name="text_disabled" placeholder="Cannot type here" disabled />
           <FormField label="Read Only" name="text_readonly" value="You can only read this" readOnly />
-          <FormField label="With Prefix" name="text_prefix" prefix={<IconUser />} placeholder="Username" theme="gray" />
+          <FormField
+            size="sm"
+            label="With Prefix"
+            name="text_prefix"
+            prefix={<IconUser />}
+            placeholder="Username"
+            theme="gray"
+          />
+          <FormField
+            size="md"
+            label="With Prefix"
+            name="text_prefix"
+            prefix={<IconUser />}
+            placeholder="Username"
+            theme="gray"
+          />
+          <FormField
+            size="lg"
+            label="With Prefix"
+            name="text_prefix"
+            prefix={<IconUser />}
+            placeholder="Username"
+            theme="gray"
+          />
+
           <FormField
             label="With Suffix (Icon)"
             name="text_suffix_icon"
@@ -186,7 +210,7 @@ export default function ThemeTestPage() {
           <FormField
             label="With Prefix & Suffix"
             name="text_prefix_suffix"
-            prefix="$"
+            prefix={<span>$</span>}
             suffix=".00"
             placeholder="Amount"
             type="number"
