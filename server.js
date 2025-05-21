@@ -5,7 +5,10 @@ const next = require('next')
 const cron = require('node-cron')
 
 const dev = process.env.NODE_ENV !== 'production'
-const app = next({ dev })
+const app = next({
+  dev,
+  turbo: process.env.USE_TURBOPACK === 'true' || dev, // Enable Turbopack based on env var or dev mode
+})
 const handle = app.getRequestHandler()
 
 // These now only run in production
