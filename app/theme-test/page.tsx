@@ -157,7 +157,13 @@ export default function ThemeTestPage() {
 
           <p>Text Value: {textValue}</p>
 
-          <FormField label="With Default Value" name="text_default" defaultValue="Hello World" fullWidth={true} />
+          <FormField
+            label="With Default Value"
+            name="text_default"
+            defaultValue="Hello World"
+            error="This field has an error that is fairly long so we can see if colspan is set correctly. It probably is working."
+            fullWidth
+          />
           <FormField
             label="Controlled Text Input"
             name="text_controlled"

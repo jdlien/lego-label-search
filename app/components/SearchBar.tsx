@@ -2,20 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-// Search icon component
-const SearchIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-  </svg>
-)
+import InputField from './InputField'
+import { IconMagnifyingGlass } from './InputField/InputIcons'
 
 type SearchBarProps = {
   onImageSearch?: () => void
@@ -82,8 +70,9 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
         if (parentCategories.length > 0 && childCategories.length > 0) {
           combinedCategories.push({
             id: 'separator',
-            name: '──── Sub Categories ────',
+            name: '── Sub Categories ──',
             isParent: false,
+            disabled: true,
           })
         }
 
@@ -174,45 +163,26 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col md:flex-row gap-2 items-end flex-wrap">
           <div className="w-full md:flex-1 min-w-0">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <SearchIcon />
-              </div>
-              <input
-                type="text"
-                className="w-full h-12 pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                placeholder="Search for part number or name..."
-                value={query}
-                onChange={handleInputChange}
-              />
-              {query && (
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <button
-                    type="button"
-                    className="p-1 rounded-full text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none"
-                    onClick={() => {
-                      setQuery('')
-                      if (searchTimeout.current) {
-                        clearTimeout(searchTimeout.current)
-                      }
-                      const params = new URLSearchParams()
-                      if (category) params.append('category', category)
-                      router.push(`/?${params.toString()}`)
-                    }}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </button>
-                </div>
-              )}
-            </div>
+            <InputField
+              value={query}
+              onChange={handleInputChange}
+              placeholder="Search for part number or name..."
+              clearButton
+              noErrorEl
+            />
           </div>
 
           <div className="flex flex-row gap-2 w-full md:w-auto">
             <div className="flex-1 min-w-0">
-              {/* TODO: pre-style input elements in the global.css */}
-              <select
+              <InputField
+                type="select"
+                value={category}
+                onChange={handleCategoryChange}
+                placeholder="Select a category"
+                options={categoriesForDropdown}
+                noErrorEl
+              />
+              {/* <select
                 className="w-full h-12 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                 value={category}
                 onChange={handleCategoryChange}
@@ -230,7 +200,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
                     </option>
                   )
                 )}
-              </select>
+              </select> */}
             </div>
             <button type="submit" className="btn btn-primary min-w-[64px]">
               Go

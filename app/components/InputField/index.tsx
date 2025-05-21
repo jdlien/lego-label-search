@@ -19,8 +19,6 @@ import {
 } from './InputIcons' // Adjusted path
 
 // Import sub-components
-import InputLabel from './InputLabel' // Adjusted path
-import InputError from './InputError' // Adjusted path
 import InputDescription from './InputDescription' // Adjusted path
 import InputAffix from './InputAffix' // Adjusted path
 
@@ -34,7 +32,7 @@ const inputFieldStyles = tv({
     // Applied to the outermost div, formerly form-item (this is now the InputFieldContainer)
     inputFieldOuterContainer: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5',
     label: 'block text-sm sm:text-base font-medium', // For InputLabel component and its text color
-    inputContainer: 'sm:mt-0 pt-1.5', // Wrapper for the input group or standalone checkbox/radio
+    inputContainer: 'sm:mt-0', // Wrapper for the input group or standalone checkbox/radio
     inputGroup: 'relative flex shadow-sm', // Wraps prefix, input, suffix. Base rounding via compound variants.
     clearButton:
       'absolute p-1.5 top-1/2 -translate-y-1/2 justify-center group outline-none focus:inset-ring-sky-500/40 focus:inset-ring-2 rounded-full',
@@ -71,7 +69,7 @@ const inputFieldStyles = tv({
     size: {
       sm: {
         inputFieldOuterContainer: 'my-2',
-        label: 'sm:text-sm sm:mt-0.25 sm:pt-2',
+        label: 'sm:text-sm sm:mt-0.25 sm:pt-0.5',
         inputElement: 'px-2 py-1 text-sm leading-4',
         clearButton: 'right-0.5',
         checkboxRadioInputWrapper: '',
@@ -86,7 +84,7 @@ const inputFieldStyles = tv({
       },
       md: {
         inputFieldOuterContainer: 'my-3',
-        label: 'text-sm sm:text-base sm:mt-px sm:pt-3',
+        label: 'text-sm sm:text-base sm:mt-px sm:pt-1.5',
         inputElement: 'px-4 py-2 text-sm sm:text-base sm:leading-5',
         clearButton: 'right-1',
         checkboxRadioInputWrapper: '',
@@ -101,7 +99,7 @@ const inputFieldStyles = tv({
       },
       lg: {
         inputFieldOuterContainer: 'my-4',
-        label: 'text-base sm:text-lg sm:mt-0.25 sm:pt-3.75',
+        label: 'text-base sm:text-lg sm:mt-0.25 sm:pt-2.5',
         inputElement: 'px-5 py-3 text-base sm:text-lg leading-6',
         clearButton: 'right-1.5',
         checkboxRadioInputWrapper: '',
@@ -451,17 +449,38 @@ const normalizeOptions = (options?: OptionType[]): NormalizedOptionType[] => {
   return options
     .map((opt) => {
       if (typeof opt === 'string') return { value: opt, label: opt }
-      if (opt === undefined || opt.value === undefined) {
-        console.warn('Option must have a value. Filtering out undefined/NULL values.', opt)
+      if (opt === undefined) {
+        console.warn('Option must be defined. Filtering out undefined values.', opt)
         return null // Will be filtered out
       }
 
-      const value = opt.value.length > 1 && opt.value.endsWith(',') ? opt.value.replace(/,$/, '') : opt.value
-      const label = 'label' in opt && opt.label !== undefined ? opt.label : value
-      const normalized: NormalizedOptionType = { value, label }
+      // Handle both 'value' and 'id' fields, prioritizing 'value' if both exist
+      const optObj = opt as Record<string, any>
+      const rawValue = 'value' in optObj ? optObj.value : 'id' in optObj ? optObj.id : undefined
 
-      if (opt.description !== undefined) normalized.description = opt.description
-      if (opt.selected !== undefined) normalized.selected = opt.selected // Keep for initial state if needed
+      if (rawValue === undefined) {
+        console.warn('Option must have a value or id property. Filtering out undefined/NULL values.', opt)
+        return null // Will be filtered out
+      }
+
+      const value =
+        typeof rawValue === 'string' && rawValue.length > 1 && rawValue.endsWith(',')
+          ? rawValue.replace(/,$/, '')
+          : rawValue
+
+      // Handle both 'label' and 'name' fields, prioritizing 'label' if both exist
+      const rawLabel =
+        'label' in optObj && optObj.label !== undefined
+          ? optObj.label
+          : 'name' in optObj && optObj.name !== undefined
+          ? optObj.name
+          : value
+
+      const normalized: NormalizedOptionType = { value, label: rawLabel }
+
+      if (optObj.description !== undefined) normalized.description = optObj.description
+      if (optObj.selected !== undefined) normalized.selected = optObj.selected // Keep for initial state if needed
+      if (optObj.disabled !== undefined && optObj.disabled !== false) normalized.disabled = optObj.disabled
 
       return normalized
     })
@@ -485,7 +504,6 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     onChange: propOnChange,
     onBlur: propOnBlur,
     placeholder: rawPlaceholder,
-    label,
     error,
     description,
     prefix: rawPrefix,
@@ -494,13 +512,10 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     options: rawOptions,
     emptyOption = true,
     horizontal,
-    noErrorEl,
     fullWidth,
     theme = defaultTheme, // Use context default
     accent = defaultAccent, // Use context default
     size = defaultUISize, // Use context default
-    // Class overrides
-    labelClassName,
     inputClassName: baseInputClassName, // Renamed for clarity
     errorClassName,
     descriptionClassName,
@@ -683,7 +698,6 @@ const InputField: React.FC<InputFieldProps> = (props) => {
 
   const ariaDescribedBy: string[] = []
   if (description) ariaDescribedBy.push(`${idToUse}-description`)
-  if (error && !noErrorEl) ariaDescribedBy.push(`${idToUse}-error`)
 
   const nativeInputProps: Record<string, any> = {
     id: idToUse,
@@ -703,7 +717,6 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     'data-markdown': isMarkdown,
     'aria-invalid': error ? true : undefined,
     'aria-describedby': ariaDescribedBy.length > 0 ? ariaDescribedBy.join(' ') : undefined,
-    'aria-labelledby': label ? `${idToUse}-label` : undefined,
     ...restHtmlAttributes, // Spread any remaining valid HTML attributes
   }
 
@@ -730,7 +743,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
               return <option value="">{text}</option>
             })()}
             {normalizedOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+              <option key={opt.value} value={opt.value} disabled={opt?.disabled}>
                 {opt.label}
               </option>
             ))}
@@ -842,7 +855,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                   defaultChecked={propDefaultChecked}
                   className={styles.checkboxRadioInput({ class: baseInputClassName })}
                 />
-                {label && <span className={styles.checkedLabelText()}>{label}</span>}
+                {/* No label rendering here as it's handled by FormField */}
               </label>
             </div>
           </div>
@@ -882,9 +895,6 @@ const InputField: React.FC<InputFieldProps> = (props) => {
             description={description}
             className={styles.description({ class: descriptionClassName })}
           />
-          {!noErrorEl && (
-            <InputError id={`${idToUse}-error`} error={error} className={styles.error({ class: errorClassName })} />
-          )}
         </>
       ) : (
         <>
@@ -945,9 +955,6 @@ const InputField: React.FC<InputFieldProps> = (props) => {
             description={description}
             className={styles.description({ class: descriptionClassName })}
           />
-          {!noErrorEl && (
-            <InputError id={`${idToUse}-error`} error={error} className={styles.error({ class: errorClassName })} />
-          )}
         </>
       )}
     </div>

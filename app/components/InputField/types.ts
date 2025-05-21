@@ -17,6 +17,7 @@ export type NormalizedOptionType = {
   label: string
   description?: string
   selected?: boolean // Retained for data structure, but 'checked' or 'value' prop will manage state
+  disabled?: boolean
 }
 
 export interface BaseInputProps {
@@ -49,7 +50,6 @@ export interface BaseInputProps {
   pattern?: string
   autoFocus?: boolean
   // Custom attributes from original class
-  label?: ReactNode
   error?: ReactNode
   description?: ReactNode
   prefix?: ReactNode
@@ -72,7 +72,6 @@ export interface BaseInputProps {
   accent?: AccentColor // Allow any accent color in props, even if not all are implemented yet
   size?: UISize
   // Classes for sub-elements (optional overrides)
-  labelClassName?: string
   inputClassName?: string // Specifically for the <input>, <select>, <textarea>
   errorClassName?: string
   descriptionClassName?: string
@@ -87,3 +86,9 @@ export type InputFieldProps = BaseInputProps &
   Omit<React.InputHTMLAttributes<HTMLInputElement>, keyof BaseInputProps | 'size'> &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, keyof BaseInputProps | 'size'> &
   Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, keyof BaseInputProps>
+
+// FormFieldProps extends InputFieldProps to add label-related properties
+export interface FormFieldProps extends InputFieldProps {
+  label?: ReactNode
+  labelClassName?: string
+}

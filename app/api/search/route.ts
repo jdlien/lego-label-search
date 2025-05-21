@@ -458,23 +458,28 @@ function buildCombinedSearch(
 function addCategoryFilter(queryData: QueryData, categoryIds: string[]): QueryData {
   let { query, params, countQuery, countParams } = queryData
 
+  // First, create the category filter SQL
+  let categoryFilter: string
+  let categoryParams: any[]
+
   if (categoryIds.length === 1) {
-    // Single category filter
-    query = query.replace('WHERE', 'WHERE p.ba_cat_id = ? AND ')
-    params.unshift(categoryIds[0])
-
-    countQuery = countQuery.replace('WHERE', 'WHERE p.ba_cat_id = ? AND ')
-    countParams.unshift(categoryIds[0])
+    categoryFilter = `p.ba_cat_id = '${categoryIds[0]}'`
+    categoryParams = []
   } else {
-    // Multiple categories filter
-    const placeholders = categoryIds.map(() => '?').join(',')
-    query = query.replace('WHERE', `WHERE p.ba_cat_id IN (${placeholders}) AND `)
-    params.unshift(...categoryIds)
-
-    countQuery = countQuery.replace('WHERE', `WHERE p.ba_cat_id IN (${placeholders}) AND `)
-    countParams.unshift(...categoryIds)
+    // For multiple categories, use IN with literal values instead of parameters
+    // to avoid parameter binding issues with complex queries
+    const categoryValues = categoryIds.map((id) => `'${id}'`).join(',')
+    categoryFilter = `p.ba_cat_id IN (${categoryValues})`
+    categoryParams = []
   }
 
+  // Add category filter to each subquery by directly replacing in the WHERE clauses
+  query = query.replace(/WHERE\s+/gi, `WHERE ${categoryFilter} AND `)
+
+  // For count query, use the same approach
+  countQuery = countQuery.replace(/WHERE\s+/gi, `WHERE ${categoryFilter} AND `)
+
+  // Return the modified queries with unchanged parameter arrays
   return { query, params, countQuery, countParams }
 }
 
