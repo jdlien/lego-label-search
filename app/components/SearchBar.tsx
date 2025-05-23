@@ -161,7 +161,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit}>
-        <div className="flex flex-col md:flex-row gap-2 items-end flex-wrap">
+        <div className="flex flex-col md:flex-row gap-3 items-end flex-wrap">
           <div className="w-full md:flex-1 min-w-0">
             <InputField
               value={query}
@@ -171,7 +171,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
             />
           </div>
 
-          <div className="flex flex-row gap-2 w-full md:w-auto">
+          <div className="flex flex-row gap-3 w-full md:w-auto">
             <div className="flex-1 min-w-0">
               <InputField
                 type="select"
