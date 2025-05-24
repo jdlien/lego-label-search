@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import PillContainer from './PillContainer'
-import { useToastHelpers } from './Toast'
+import { useToastHelpers } from './ToastPop'
 
 // SVG icon for fallback when image fails to load
 const BrickPlaceholder = () => (
