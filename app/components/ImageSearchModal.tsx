@@ -4,6 +4,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Dialog from './Dialog'
 
+// Import heic-convert for HEIC to JPEG conversion
+import convert from 'heic-convert'
+
 type ImageSearchModalProps = {
   isOpen: boolean
   onClose: () => void
@@ -28,10 +31,12 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [cameraError, setCameraError] = useState<string | null>(null)
   const [showCamera, setShowCamera] = useState(false)
   const [isStreamActive, setIsStreamActive] = useState(false)
   const [apiStatus, setApiStatus] = useState({ isChecking: false, isAvailable: true })
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null)
+  const [isConverting, setIsConverting] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -47,6 +52,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
         setPreviewUrl(null)
       }
       setError(null)
+      setCameraError(null)
       setIsLoading(false)
       setShowCamera(true)
     } else {
@@ -59,6 +65,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
         setPreviewUrl(null)
       }
       setError(null)
+      setCameraError(null)
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
@@ -102,16 +109,72 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
     }
   }
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Helper function to check if a file is HEIC
+  const isHeicFile = (file: File): boolean => {
+    const heicExtensions = ['.heic', '.heif', '.HEIC', '.HEIF']
+    return heicExtensions.some((ext) => file.name.toLowerCase().endsWith(ext.toLowerCase()))
+  }
+
+  // Function to convert HEIC to JPEG
+  const convertHeicToJpeg = async (file: File): Promise<File> => {
+    try {
+      setIsConverting(true)
+
+      // Convert file to buffer
+      const buffer = await file.arrayBuffer()
+      const inputBuffer = new Uint8Array(buffer)
+
+      // Convert HEIC to JPEG for smaller file size
+      const outputBuffer = await convert({
+        buffer: inputBuffer,
+        format: 'JPEG',
+        quality: 0.85, // Good balance between quality and file size
+      })
+
+      // Create a new File object with the converted data
+      const jpegBlob = new Blob([outputBuffer], { type: 'image/jpeg' })
+      const originalNameWithoutExt = file.name.replace(/\.(heic|heif)$/i, '')
+      const convertedFile = new File([jpegBlob], `${originalNameWithoutExt}_converted.jpg`, {
+        type: 'image/jpeg',
+        lastModified: Date.now(),
+      })
+
+      return convertedFile
+    } catch (err) {
+      console.error('Error converting HEIC to JPEG:', err)
+      throw new Error('Failed to convert HEIC image. Please try a different image format.')
+    } finally {
+      setIsConverting(false)
+    }
+  }
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       // Only stop camera and change view state if a file was actually selected
       stopCameraStream()
       setShowCamera(false)
-      setSelectedImage(file)
-      if (previewUrl) URL.revokeObjectURL(previewUrl)
-      setPreviewUrl(URL.createObjectURL(file))
       setError(null)
+
+      try {
+        let fileForPreview = file
+        let fileForSubmission = file
+
+        // Check if it's a HEIC file and convert it
+        if (isHeicFile(file)) {
+          console.log('HEIC file detected, converting to JPEG for preview and submission...')
+          const convertedFile = await convertHeicToJpeg(file)
+          fileForPreview = convertedFile
+          fileForSubmission = convertedFile // Use converted file for submission too
+        }
+
+        setSelectedImage(fileForSubmission)
+        if (previewUrl) URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(URL.createObjectURL(fileForPreview))
+      } catch (err) {
+        console.error('Error processing file:', err)
+        setError(err instanceof Error ? err.message : 'Failed to process the selected image.')
+      }
     }
     // Reset the input value to allow selecting the same file again
     // and to ensure clean state after cancel
@@ -129,6 +192,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
     }
     setShowCamera(true)
     setError(null)
+    setCameraError(null)
     setIsStreamActive(false)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -144,7 +208,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
       }
     } catch (err) {
       console.error('Error accessing camera:', err)
-      setError('Could not access camera. Please ensure permissions are granted and a camera is available.')
+      setCameraError('Could not access camera. Please ensure permissions are granted and a camera is available.')
       setShowCamera(false)
       setIsStreamActive(false)
     }
@@ -181,7 +245,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
       }
     } else {
       console.warn('Take picture called but stream not active or refs not set')
-      setError('Could not take picture. Camera not ready.')
+      setCameraError('Could not take picture. Camera not ready.')
     }
   }
 
@@ -221,6 +285,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
     }
     if (fileInputRef.current) fileInputRef.current.value = ''
     setError(null)
+    setCameraError(null)
 
     // Use setTimeout to ensure cleanup is complete before restarting
     setTimeout(() => {
@@ -430,10 +495,37 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
           </div>
         )}
 
+        {cameraError && (
+          <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-900/20">
+            <div className="flex items-center">
+              <svg
+                className="mr-2 h-5 w-5 text-orange-600 dark:text-orange-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-orange-800 dark:text-orange-200">{cameraError}</span>
+            </div>
+            <button onClick={startCamera} className="btn mt-3 w-full py-2 font-medium">
+              Retry Camera
+            </button>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="flex items-center justify-center py-6">
             <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-sky-600"></div>
             <span className="ml-3 font-medium">Processing image...</span>
+          </div>
+        ) : isConverting ? (
+          <div className="flex items-center justify-center py-6">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-orange-600"></div>
+            <span className="ml-3 font-medium">Converting HEIC image to JPEG...</span>
           </div>
         ) : searchResults ? (
           renderResultsView()
@@ -444,10 +536,14 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             </div>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
             <div className="space-y-6">
-              <button onClick={takePicture} disabled={!isStreamActive} className="btn btn-primary w-full py-2">
+              <button
+                onClick={takePicture}
+                disabled={!isStreamActive || isConverting}
+                className="btn btn-primary w-full py-2"
+              >
                 Take Picture
               </button>
-              <button onClick={handleUploadClick} className="btn w-full py-2">
+              <button onClick={handleUploadClick} disabled={isConverting} className="btn w-full py-2">
                 Upload Image
               </button>
             </div>
@@ -472,20 +568,17 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
           </div>
         ) : (
           <div className="space-y-6 py-4 text-center">
-            {!error && (
+            {!cameraError && (
               <div className="flex items-center justify-center">
                 <div className="mr-3 h-6 w-6 animate-spin rounded-full border-b-2 border-blue-600"></div>
                 <span className="text-gray-600 dark:text-gray-400">Starting camera...</span>
               </div>
             )}
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              If the camera doesn&apos;t start, or you prefer to upload:
+              {cameraError ? 'Camera unavailable.' : 'If you prefer to upload an image:'}
             </p>
-            <button onClick={handleUploadClick} className="btn w-full py-2">
+            <button onClick={handleUploadClick} disabled={isConverting} className="btn w-full py-2">
               Upload Image
-            </button>
-            <button onClick={startCamera} className="btn w-full py-2">
-              Retry Camera
             </button>
           </div>
         )}
