@@ -14,7 +14,6 @@ interface AccordionProps {
   allowMultiple?: boolean
   defaultOpenIds?: string[]
   className?: string
-  itemClassName?: string
   titleClassName?: string
   contentClassName?: string
   icon?: ReactNode
@@ -92,7 +91,6 @@ const Accordion: React.FC<AccordionProps> = ({
   allowMultiple = true,
   defaultOpenIds = [],
   className,
-  itemClassName,
   titleClassName,
   contentClassName,
   icon,

@@ -6,6 +6,14 @@ import { promisify } from 'util'
 
 const execAsync = promisify(exec)
 
+// Interface for exec error with additional properties
+interface ExecError extends Error {
+  stdout?: string
+  stderr?: string
+  code?: number
+  cmd?: string
+}
+
 // Get LBX_UTILS_PATH from environment variable with fallback
 const LBX_UTILS_PATH = process.env.LBX_UTILS_PATH || '../lbx-utils'
 // Path to Python virtual environment
@@ -192,20 +200,21 @@ export async function GET(request: NextRequest) {
           { status: 500 }
         )
       }
-    } catch (execError: any) {
+    } catch (execError: unknown) {
       // Catch errors from execAsync (e.g., command fails, non-zero exit)
-      console.error('Error executing Python script via execAsync:', execError.message)
-      if (execError.stdout) {
-        console.error('execAsync stdout on error:', execError.stdout)
+      const error = execError as ExecError
+      console.error('Error executing Python script via execAsync:', error.message)
+      if (error.stdout) {
+        console.error('execAsync stdout on error:', error.stdout)
       }
-      if (execError.stderr) {
-        console.error('execAsync stderr on error:', execError.stderr) // This will contain the ModuleNotFoundError
+      if (error.stderr) {
+        console.error('execAsync stderr on error:', error.stderr) // This will contain the ModuleNotFoundError
       }
       // For more detailed diagnostics, log the command that was attempted if available on the error object
-      if (execError.cmd) {
-        console.error('Failed command (from execError.cmd):', execError.cmd)
+      if (error.cmd) {
+        console.error('Failed command (from execError.cmd):', error.cmd)
       }
-      console.error('Full execAsync error object:', execError) // Log the whole error object for more details
+      console.error('Full execAsync error object:', error) // Log the whole error object for more details
 
       // Clean up any partial output file that might have been created
       try {
@@ -220,25 +229,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message:
-            'Execution of conversion script failed: ' + (execError.stderr || execError.message || 'Unknown error'),
+          message: 'Execution of conversion script failed: ' + (error.stderr || error.message || 'Unknown error'),
           details: {
             // Provide some non-sensitive details back if helpful
-            stdout: execError.stdout || null,
-            stderr: execError.stderr || null,
-            exitCode: execError.code || null,
+            stdout: error.stdout || null,
+            stderr: error.stderr || null,
+            exitCode: error.code || null,
           },
         },
         { status: 500 }
       )
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Catch other synchronous errors in the handler logic
-    console.error('Unhandled error in /api/convert-label handler:', error)
+    const err = error instanceof Error ? error : new Error(String(error))
+    console.error('Unhandled error in /api/convert-label handler:', err)
     return NextResponse.json(
       {
         success: false,
-        message: 'An unexpected server error occurred: ' + (error.message || 'Unknown error'),
+        message: 'An unexpected server error occurred: ' + err.message,
       },
       { status: 500 }
     )

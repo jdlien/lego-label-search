@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import PillContainer from './PillContainer'
 
 // SVG icon for fallback when image fails to load
 const BrickPlaceholder = () => (
-  <svg viewBox="0 0 24 24" className="w-10 h-10 text-gray-400 dark:text-gray-500" fill="currentColor">
+  <svg viewBox="0 0 24 24" className="h-10 w-10 text-gray-400 dark:text-gray-500" fill="currentColor">
     <circle cx="6" cy="12" r="2" />
     <circle cx="12" cy="12" r="2" />
     <circle cx="18" cy="12" r="2" />
@@ -15,7 +15,7 @@ const BrickPlaceholder = () => (
 
 // Download icon for the download button
 const DownloadIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -39,21 +39,17 @@ type Part = {
   ba_cat_id?: string
   category_name?: string
   example_design_id?: string
-  [key: string]: any
+  [key: string]: string | number | boolean | undefined | null
 }
 
 type PartCardProps = {
   part: Part
-  isSelected?: boolean
-  onToggleSelect: (partId: string) => void
   onPartClick: (partId: string) => void
 }
 
-export default function PartCard({ part, isSelected = false, onToggleSelect, onPartClick }: PartCardProps) {
+export default function PartCard({ part, onPartClick }: PartCardProps) {
   // Strip leading zeros for image filename
   const normalizedPartId = part.id.replace(/^0+/, '')
-  // Prefer design_id if available, otherwise use normalized part_id
-  const imageId = part.example_design_id || part.id.replace(/^0+/, '')
 
   // Image paths - with WebP as primary and PNG as fallback
   const webpPath = `/data/images/${normalizedPartId}.webp`
@@ -221,12 +217,11 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
 
   return (
     <div
-      className="flex space-between flex-col p-2 border rounded-md overflow-hidden transition-all bg-white dark:bg-gray-700
-      border-gray-200 dark:border-gray-600 shadow-sm"
+      className="space-between flex flex-col overflow-hidden rounded-md border border-gray-200 bg-white p-2 shadow-sm transition-all dark:border-gray-600 dark:bg-gray-700"
       data-testid="part-card"
     >
-      <div className="flex flex-col justify-between h-full">
-        <div className="flex mb-2 flex-wrap">
+      <div className="flex h-full flex-col justify-between">
+        <div className="mb-2 flex flex-wrap">
           {/* Part Image */}
           <a
             href="#"
@@ -234,13 +229,13 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
               e.preventDefault()
               onPartClick(part.id)
             }}
-            className="mr-3 flex-shrink-0 w-40 h-32 border border-gray-200 dark:border-gray-600 rounded-sm bg-white flex items-center justify-center p-1 overflow-hidden"
+            className="mr-3 flex h-32 w-40 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm border border-gray-200 bg-white p-1 dark:border-gray-600"
           >
             {!imageError ? (
               <img
                 src={imageSrc}
                 alt={part.name || part.id}
-                className="max-w-full max-h-full object-contain"
+                className="max-h-full max-w-full object-contain"
                 onError={handleImageError}
               />
             ) : (
@@ -249,14 +244,14 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
           </a>
 
           {/* Part Details */}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <a
               href="#"
               onClick={(e) => {
                 e.preventDefault()
                 onPartClick(part.id)
               }}
-              className="link font-semibold text-2xl font-mono"
+              className="link font-mono text-2xl font-semibold"
             >
               {part.id}
             </a>
@@ -268,29 +263,29 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
               }}
               className="block"
             >
-              <h3 className="text-lg leading-tight text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400">
+              <h3 className="text-lg leading-tight text-gray-900 hover:text-sky-600 dark:text-white dark:hover:text-sky-400">
                 {part.name || 'Unnamed Part'}
               </h3>
             </a>
             {part.category_name && (
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{part.category_name}</p>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{part.category_name}</p>
             )}
           </div>
 
           {/* Category Pills */}
-          <div className="space-y-2 w-full mt-3">
+          <div className="mt-4 w-full space-y-2">
             {categoryPills.length > 0 && <PillContainer pills={categoryPills} size={21} />}
           </div>
         </div>
 
         {/* Label download buttons */}
-        <div className="flex justify-center items-center mt-2 -mx-2 pt-2 border-t border-gray-100 dark:border-gray-600">
+        <div className="-mx-2 mt-2 flex items-center justify-center border-t border-gray-100 pt-2 dark:border-gray-600">
           {labelExists === false ? (
             <div className="text-sm text-gray-500 dark:text-gray-400">No label available</div>
           ) : (
             <div className="flex space-x-8">
               <button
-                className="link text-sm flex items-center space-x-1"
+                className="link flex items-center space-x-1 text-sm"
                 onClick={handleLabelDownload}
                 disabled={isDownloading}
                 title="Download 12mm Label"
@@ -300,7 +295,7 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
                 <span>{isDownloading ? 'Downloading...' : 'LBX 12mm'}</span>
               </button>
               <button
-                className="link text-sm flex items-center space-x-1"
+                className="link flex items-center space-x-1 text-sm"
                 onClick={handle24mmLabelDownload}
                 disabled={isConverting}
                 title="Download 24mm Label"

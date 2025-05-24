@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import path from 'path'
 import sqlite3 from 'sqlite3'
-import { open } from 'sqlite'
+import { open, Database } from 'sqlite'
 
 // Database connection pool
-let dbPromise: Promise<any> | null = null
+let dbPromise: Promise<Database> | null = null
 
 // Create a database connection
 async function openDb() {
@@ -135,13 +135,14 @@ export async function GET(request: NextRequest) {
 
     // Return the part details
     return NextResponse.json(part)
-  } catch (error: any) {
-    console.error('Error retrieving part:', error)
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error : new Error(String(error))
+    console.error('Error retrieving part:', err)
     return NextResponse.json(
       {
         error: 'Internal server error',
-        message: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        message: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
       },
       { status: 500 }
     )

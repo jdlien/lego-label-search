@@ -15,7 +15,7 @@ function NavLink({ href, children, onClick = () => {} }) {
   return (
     <Link
       href={href}
-      className={`px-3 py-2 rounded transition-colors ${
+      className={`rounded px-3 py-2 transition-colors ${
         isActive ? 'bg-sky-200/30' : 'hover:bg-sky-600/80 dark:hover:bg-gray-700/80'
       }`}
       onClick={onClick}
@@ -26,13 +26,12 @@ function NavLink({ href, children, onClick = () => {} }) {
 }
 
 export function Header() {
-  const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
-    <header className="bg-sky-700 dark:bg-gray-800 text-white px-4 py-2 shadow-md">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <h1 className="text-xl sm:text-2xl font-semibold">
+    <header className="bg-sky-700 px-4 py-2 text-white shadow-md dark:bg-gray-800">
+      <div className="mx-auto flex max-w-6xl items-center justify-between">
+        <h1 className="text-xl font-semibold sm:text-2xl">
           <Link href="/" className="flex items-center gap-3">
             <BrckLogo className="w-12" />
             <div>Brck Label Search</div>
@@ -40,20 +39,20 @@ export function Header() {
         </h1>
 
         {/* Desktop Navigation */}
-        <nav className="hidden sm:flex items-center gap-3">
+        <nav className="hidden items-center gap-3 sm:flex">
           <NavLink href="/">Search</NavLink>
           <NavLink href="/categories">Categories</NavLink>
           <NavLink href="/about">About</NavLink>
           <DarkModeToggle />
         </nav>
-        <div className="flex sm:hidden items-center gap-2">
+        <div className="flex items-center gap-2 sm:hidden">
           <DarkModeToggle />
 
           <button
             type="button"
             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 rounded-md hover:bg-sky-600 dark:hover:bg-gray-700 transition-colors"
+            className="rounded-md p-2 transition-colors hover:bg-sky-600 dark:hover:bg-gray-700"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -61,7 +60,7 @@ export function Header() {
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="currentColor"
-              className="w-6 h-6"
+              className="h-6 w-6"
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
@@ -71,18 +70,18 @@ export function Header() {
 
       {/* Mobile Menu Drawer */}
       {isMenuOpen && (
-        <div className="sm:hidden fixed inset-0 z-50 flex">
+        <div className="fixed inset-0 z-50 flex sm:hidden">
           {/* Backdrop */}
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} aria-hidden="true" />
 
           {/* Drawer panel */}
-          <div className="fixed right-0 top-0 h-full w-64 bg-sky-700 dark:bg-gray-800 p-4 shadow-xl">
+          <div className="fixed top-0 right-0 h-full w-64 bg-sky-700 p-4 shadow-xl dark:bg-gray-800">
             <div className="flex justify-end">
               <button
                 type="button"
                 aria-label="Close menu"
                 onClick={() => setIsMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-sky-600 dark:hover:bg-gray-700 transition-colors"
+                className="rounded-md p-2 transition-colors hover:bg-sky-600 dark:hover:bg-gray-700"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +89,7 @@ export function Header() {
                   viewBox="0 0 24 24"
                   strokeWidth="2"
                   stroke="currentColor"
-                  className="w-6 h-6"
+                  className="h-6 w-6"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>

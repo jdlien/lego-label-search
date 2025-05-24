@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import path from 'path'
 import sqlite3 from 'sqlite3'
-import { open } from 'sqlite'
+import { open, Database } from 'sqlite'
 
 // Database connection pool
-let dbPromise: Promise<any> | null = null
+let dbPromise: Promise<Database> | null = null
 
 // Create a database connection
 async function openDb() {
@@ -46,14 +46,17 @@ export async function GET() {
       categories,
       total: categories.length,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Categories error:', error)
     // Return more detailed error information
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+    const errorStack = error instanceof Error ? error.stack : undefined
+
     return NextResponse.json(
       {
         message: 'An error occurred while fetching categories',
-        error: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        error: errorMessage,
+        stack: process.env.NODE_ENV === 'development' ? errorStack : undefined,
       },
       { status: 500 }
     )

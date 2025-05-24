@@ -23,7 +23,6 @@ export default function Dialog({
 }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const lastFocusedElement = useRef<HTMLElement | null>(null)
-  const [isAnimating, setIsAnimating] = useState(false)
   const [shouldShow, setShouldShow] = useState(false)
 
   // Size mapping for the dialog
@@ -51,18 +50,15 @@ export default function Dialog({
       dialog.showModal()
       // Start the opening animation
       setShouldShow(true)
-      setIsAnimating(true)
       // Allow animation to complete
-      const timer = setTimeout(() => setIsAnimating(false), 300)
+      const timer = setTimeout(() => {}, 300)
       return () => clearTimeout(timer)
     } else if (dialog.open) {
       // Start the closing animation
-      setIsAnimating(true)
       setShouldShow(false)
       // Close the dialog after animation completes
       const timer = setTimeout(() => {
         dialog.close()
-        setIsAnimating(false)
       }, 300)
       return () => clearTimeout(timer)
     }
