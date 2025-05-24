@@ -1,56 +1,477 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Dialog from './Dialog'
 
 type ImageSearchModalProps = {
   isOpen: boolean
   onClose: () => void
-  onImageSubmit?: (imageData: string | File, options?: { keepModalOpen?: boolean }) => void
+  onImageSubmit?: (searchResults: SearchResponse, options?: { keepModalOpen?: boolean }) => void
+}
+
+type SearchResult = {
+  id: string
+  name: string
+  img_url?: string
+  category?: string
+  score?: number
+  external_sites?: Array<{ name: string; url: string }>
+}
+
+type SearchResponse = {
+  items: SearchResult[]
 }
 
 export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: ImageSearchModalProps) {
-  const [isUploading, setIsUploading] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showCamera, setShowCamera] = useState(false)
+  const [isStreamActive, setIsStreamActive] = useState(false)
+  const [apiStatus, setApiStatus] = useState({ isChecking: false, isAvailable: true })
+  const [searchResults, setSearchResults] = useState<SearchResponse | null>(null)
 
-  const handleSubmit = () => {
-    // This would normally process the image data
-    if (onImageSubmit) {
-      onImageSubmit('placeholder-data', { keepModalOpen: false })
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      checkApiHealth()
+      setSelectedImage(null)
+      setSearchResults(null)
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(null)
+      }
+      setError(null)
+      setIsLoading(false)
+      setShowCamera(true)
+    } else {
+      stopCameraStream()
+      setShowCamera(false)
+      setSelectedImage(null)
+      setSearchResults(null)
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(null)
+      }
+      setError(null)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
+
+  useEffect(() => {
+    if (isOpen && showCamera) {
+      startCamera()
+    } else if (isOpen && !showCamera) {
+      stopCameraStream()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, showCamera])
+
+  const checkApiHealth = async () => {
+    setApiStatus({ isChecking: true, isAvailable: false })
+    try {
+      const healthResponse = await fetch('/api/health', {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+        },
+      })
+
+      if (!healthResponse.ok) {
+        throw new Error(`API service is unavailable: ${healthResponse.status} ${healthResponse.statusText}`)
+      }
+
+      const healthData = await healthResponse.json()
+      if (!healthData.success) {
+        throw new Error('API service is currently experiencing issues. Please try again later.')
+      }
+
+      setApiStatus({ isChecking: false, isAvailable: true })
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+      console.error('API Health check failed:', errorMessage)
+      setApiStatus({ isChecking: false, isAvailable: false })
     }
   }
 
-  const actionButtons = (
-    <>
-      <button
-        onClick={onClose}
-        className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-      >
-        Cancel
-      </button>
-      <button onClick={handleSubmit} disabled={isUploading} className="btn btn-primary">
-        {isUploading ? 'Processing...' : 'Search'}
-      </button>
-    </>
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    stopCameraStream()
+    setShowCamera(false)
+    const file = event.target.files?.[0]
+    if (file) {
+      setSelectedImage(file)
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(URL.createObjectURL(file))
+      setError(null)
+    }
+  }
+
+  const startCamera = async () => {
+    setSelectedImage(null)
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
+    }
+    setShowCamera(true)
+    setError(null)
+    setIsStreamActive(false)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      })
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        await videoRef.current.play()
+        setIsStreamActive(true)
+      } else {
+        stream.getTracks().forEach((track) => track.stop())
+        throw new Error('Video element not available.')
+      }
+    } catch (err) {
+      console.error('Error accessing camera:', err)
+      setError('Could not access camera. Please ensure permissions are granted and a camera is available.')
+      setShowCamera(false)
+      setIsStreamActive(false)
+    }
+  }
+
+  const stopCameraStream = () => {
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream
+      stream.getTracks().forEach((track) => track.stop())
+      videoRef.current.srcObject = null
+    }
+    setIsStreamActive(false)
+  }
+
+  const takePicture = () => {
+    if (videoRef.current && canvasRef.current && isStreamActive) {
+      const video = videoRef.current
+      const canvas = canvasRef.current
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      const context = canvas.getContext('2d')
+      if (context) {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height)
+        stopCameraStream()
+        setShowCamera(false)
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], `captured_image_${Date.now()}.jpg`, { type: 'image/jpeg' })
+            setSelectedImage(file)
+            if (previewUrl) URL.revokeObjectURL(previewUrl)
+            setPreviewUrl(URL.createObjectURL(file))
+          }
+        }, 'image/jpeg')
+      }
+    } else {
+      console.warn('Take picture called but stream not active or refs not set')
+      setError('Could not take picture. Camera not ready.')
+    }
+  }
+
+  const switchToUpload = () => {
+    stopCameraStream()
+    setShowCamera(false)
+    setError(null)
+    fileInputRef.current?.click()
+  }
+
+  const clearSelectionAndRestartCamera = () => {
+    setSelectedImage(null)
+    setSearchResults(null)
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
+    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
+    setError(null)
+    startCamera()
+  }
+
+  const handleImageSubmit = async () => {
+    if (!selectedImage) {
+      setError('Please select or capture an image first.')
+      return
+    }
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('query_image', selectedImage)
+
+      const response = await fetch('/api/predict/parts', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorBodyText = await response.text()
+        let errorMessage = `API Error: ${response.status} ${response.statusText}`
+        try {
+          const errorData = JSON.parse(errorBodyText)
+          if (errorData?.detail) {
+            if (Array.isArray(errorData.detail) && errorData.detail.length > 0 && errorData.detail[0].msg) {
+              errorMessage = errorData.detail[0].msg
+            } else if (typeof errorData.detail === 'string') {
+              errorMessage = errorData.detail
+            }
+          }
+        } catch {
+          if (errorBodyText && errorBodyText.length < 500) {
+            errorMessage += ` - ${errorBodyText}`
+          }
+        }
+        throw new Error(errorMessage)
+      }
+
+      const results = await response.json()
+      setSearchResults(results)
+
+      if (onImageSubmit) {
+        onImageSubmit(results, { keepModalOpen: true })
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Image submission error:', err)
+      setError(errorMessage || 'Failed to submit image. Check console for more details.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const SearchIcon = () => (
+    <svg
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
   )
 
-  return (
-    <Dialog open={isOpen} onClose={onClose} title="Image Search" size="lg" actions={actionButtons}>
-      <p className="mb-4 text-gray-600 dark:text-gray-300">
-        You can upload an image or take a photo to search for LEGO parts.
-      </p>
+  const renderResultsView = () => {
+    if (!searchResults || !searchResults.items || searchResults.items.length === 0) {
+      return (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+          <div className="flex items-center">
+            <svg className="mr-2 h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="text-yellow-800 dark:text-yellow-200">No matching items found</span>
+          </div>
+        </div>
+      )
+    }
 
-      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center text-center">
-        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          Drag and drop an image here, or click to select a file
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {searchResults.items.length} item{searchResults.items.length !== 1 ? 's' : ''} found
         </p>
+
+        {searchResults.items.map((item, index) => (
+          <div
+            key={`${item.id}-${index}`}
+            className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700"
+          >
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[100px_1fr]">
+              {item.img_url && (
+                <div className="flex justify-center">
+                  <img
+                    src={item.img_url}
+                    alt={item.name}
+                    className="max-h-24 w-auto rounded object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                    }}
+                  />
+                </div>
+              )}
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{item.name}</h3>
+
+                <div className="mt-1 flex items-center gap-1">
+                  <span className="text-md font-bold text-gray-700 dark:text-gray-300">Part</span>
+                  <a
+                    href={`?q=${item.id}`}
+                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    <SearchIcon />
+                    <span className="font-mono text-lg">{item.id}</span>
+                  </a>
+                </div>
+
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {item.category && (
+                    <span className="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                      {item.category}
+                    </span>
+                  )}
+
+                  {item.score && (
+                    <span className="text-xs text-gray-600 dark:text-gray-400">
+                      <strong>{Math.round(item.score * 100)}%</strong> Match
+                    </span>
+                  )}
+
+                  {item.external_sites && item.external_sites.length > 0 && (
+                    <>
+                      {item.external_sites.map((site, siteIndex) => (
+                        <a
+                          key={siteIndex}
+                          href={site.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          {site.name === 'bricklink' ? 'BrickLink' : site.name}
+                        </a>
+                      ))}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <button onClick={clearSelectionAndRestartCamera} className="btn mt-4 w-full py-2 font-medium">
+          Search New Image
+        </button>
+      </div>
+    )
+  }
+
+  const modalTitle = searchResults ? 'Search Results' : 'Search by Image'
+
+  const actionButtons = !searchResults ? (
+    <>
+      {selectedImage && !showCamera && (
+        <button onClick={handleImageSubmit} disabled={isLoading} className="btn btn-primary">
+          {isLoading ? 'Processing...' : 'Search'}
+        </button>
+      )}
+    </>
+  ) : null
+
+  return (
+    <Dialog open={isOpen} onClose={onClose} title={modalTitle} size="3xl" actions={actionButtons}>
+      <div className="space-y-4">
+        {!apiStatus.isAvailable && !apiStatus.isChecking && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+            <div className="text-center">
+              <p className="font-medium text-red-800 dark:text-red-200">
+                The image search service is currently unavailable
+              </p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-300">
+                Please try again later or contact support if the issue persists.
+              </p>
+              <button onClick={checkApiHealth} className="btn mt-2">
+                Retry Connection
+              </button>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+            <div className="flex items-center">
+              <svg className="mr-2 h-5 w-5 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-red-800 dark:text-red-200">{error}</span>
+            </div>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="flex items-center justify-center py-6">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+            <span className="ml-3 font-medium">Processing image...</span>
+          </div>
+        ) : searchResults ? (
+          renderResultsView()
+        ) : showCamera ? (
+          <div className="flex flex-col">
+            <div className="relative mb-6 w-full">
+              <video ref={videoRef} autoPlay playsInline muted className="h-full w-full rounded-lg object-contain" />
+            </div>
+            <canvas ref={canvasRef} style={{ display: 'none' }} />
+            <div className="space-y-6">
+              <button onClick={takePicture} disabled={!isStreamActive} className="btn btn-primary w-full py-2">
+                Take Picture
+              </button>
+              <button onClick={switchToUpload} className="btn w-full py-2">
+                Upload Image
+              </button>
+            </div>
+          </div>
+        ) : previewUrl ? (
+          <div className="text-center">
+            <p className="mb-2 font-medium">Preview:</p>
+            <img
+              src={previewUrl}
+              alt="Selected preview"
+              className="mx-auto max-h-72 max-w-full rounded-lg border border-gray-200 object-contain dark:border-gray-600"
+            />
+            <div className="mt-4 space-y-2">
+              <button onClick={handleImageSubmit} disabled={isLoading} className="btn w-full py-2">
+                {isLoading ? 'Processing...' : 'Search with this Image'}
+              </button>
+              <button onClick={clearSelectionAndRestartCamera} className="btn w-full py-2">
+                Choose Different Image
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3 py-4 text-center">
+            {!error && (
+              <div className="flex items-center justify-center">
+                <div className="mr-3 h-6 w-6 animate-spin rounded-full border-b-2 border-blue-600"></div>
+                <span className="text-gray-600 dark:text-gray-400">Starting camera...</span>
+              </div>
+            )}
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              If the camera doesn&apos;t start, or you prefer to upload:
+            </p>
+            <button onClick={() => fileInputRef.current?.click()} className="btn w-full py-2">
+              Upload Image
+            </button>
+            <button onClick={startCamera} className="btn w-full py-2">
+              Retry Camera
+            </button>
+          </div>
+        )}
+
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
       </div>
     </Dialog>
   )
