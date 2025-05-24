@@ -3,9 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import * as Popover from '@radix-ui/react-popover'
 import { Command } from 'cmdk'
-import { Check, ChevronsUpDown } from 'lucide-react'
 import { tv, type VariantProps } from 'tailwind-variants'
-import { IconXMark, IconMagnifyingGlass } from './InputIcons'
+import { IconXMark, IconMagnifyingGlass, IconCheck, IconAngleDown } from './InputIcons'
 import type { NormalizedOptionType } from './types'
 
 const comboboxStyles = tv({
@@ -318,7 +317,7 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
                 <IconXMark className={styles.clearButtonIcon()} />
               </div>
             )}
-            <ChevronsUpDown className={styles.comboboxChevron()} />
+            <IconAngleDown className={styles.comboboxChevron()} />
           </div>
         </button>
       </Popover.Trigger>
@@ -356,7 +355,7 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
                       {option.description && <div className="text-xs opacity-70">{option.description}</div>}
                     </div>
                   </div>
-                  <Check
+                  <IconCheck
                     className={`${styles.comboboxCheck()} ${
                       String(comboboxValue) === String(option.value) ? 'opacity-100' : 'opacity-0'
                     }`}

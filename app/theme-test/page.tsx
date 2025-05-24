@@ -4,16 +4,69 @@ import React, { useState } from 'react'
 import InputField from '../components/InputField' // Assuming InputField is in components
 import FormField from '../components/InputField/FormField'
 import { IconUser, IconAt, IconCurrencyDollar } from '../components/InputField/InputIcons' // Assuming icons might be used as prefixes/suffixes
+import { ToastProvider, useToastHelpers } from '../components/Toast'
 // This page is an important page used to test the InputField component and its various states and features.
 // Do not delete this page until we have confirmed that InputField has been extracted to its own package.
 
-/*
-  TODO:
-  - Allow a global theme to be set for the app so we don't have to set theme="gray" on every input field
-  - Add size options to have jumbo inputs for an app where that aesthetic makes sense
-*/
+// Toast test section component
+function ToastTestSection() {
+  const { success, error, warning, info } = useToastHelpers()
 
-export default function ThemeTestPage() {
+  return (
+    <div className="border-b border-gray-300 pb-6 dark:border-gray-700">
+      <h2 className="mb-4 text-2xl font-semibold">Toast Components</h2>
+      <p className="mb-4 text-gray-600 dark:text-gray-300">
+        Test the toast notification system with different types and options.
+      </p>
+      <div className="flex flex-wrap gap-4">
+        <button className="btn btn-primary" onClick={() => success('Operation completed successfully!')}>
+          Success Toast
+        </button>
+        <button className="btn btn-danger" onClick={() => error('Something went wrong. Please try again.')}>
+          Error Toast
+        </button>
+        <button className="btn" onClick={() => warning('This action cannot be undone.')}>
+          Warning Toast
+        </button>
+        <button className="btn" onClick={() => info('Here is some useful information.')}>
+          Info Toast
+        </button>
+        <button
+          className="btn btn-green"
+          onClick={() =>
+            success('File saved successfully! (1s)', {
+              title: 'Success',
+              duration: 500,
+              action: {
+                label: 'View File',
+                onClick: () => alert('View file clicked!'),
+              },
+            })
+          }
+        >
+          Success with Action
+        </button>
+        <button
+          className="btn btn-ghost"
+          onClick={() =>
+            error('Failed to upload file. Network connection lost.', {
+              title: 'Upload Failed',
+              duration: 10000,
+              action: {
+                label: 'Retry',
+                onClick: () => alert('Retry clicked!'),
+              },
+            })
+          }
+        >
+          Error with Action
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function ThemeTestPageContent() {
   const [textValue, setTextValue] = useState('Initial Text')
   const [emailValue, setEmailValue] = useState('test@example.com')
   const [passwordValue, setPasswordValue] = useState('password123')
@@ -76,6 +129,10 @@ export default function ThemeTestPage() {
         <p className="text-gray-600 dark:text-gray-300">
           Use this page to test new UI components and themes in isolation.
         </p>
+
+        {/* Toast test section */}
+        <ToastTestSection />
+
         <div className="flex gap-4">
           <button className="btn">Default Button</button>
           <button className="btn btn-primary">Primary Button</button>
@@ -657,5 +714,13 @@ export default function ThemeTestPage() {
         <p>End of InputField component showcase.</p>
       </footer>
     </div>
+  )
+}
+
+export default function ThemeTestPage() {
+  return (
+    <ToastProvider>
+      <ThemeTestPageContent />
+    </ToastProvider>
   )
 }

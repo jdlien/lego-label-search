@@ -130,6 +130,24 @@ const IconXMark = ({ className = 'aspect-square' }: { className?: string }) => (
   </svg>
 )
 
+const IconCheck = ({ className = 'aspect-square' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 448 512">
+    <path
+      fill="currentColor"
+      d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"
+    />
+  </svg>
+)
+
+const IconAngleDown = ({ className = 'aspect-square' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 448 512">
+    <path
+      fill="currentColor"
+      d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"
+    />
+  </svg>
+)
+
 export {
   IconEnvelope,
   IconMapMarker,
@@ -145,4 +163,6 @@ export {
   IconCurrencyDollar,
   IconXMark,
   IconMagnifyingGlass,
+  IconCheck,
+  IconAngleDown,
 }
