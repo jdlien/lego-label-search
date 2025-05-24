@@ -5,6 +5,16 @@
 
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
   /* Uncomment when ready for production
   output: 'export',
   images: { unoptimized: true },
