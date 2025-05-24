@@ -2,13 +2,29 @@
 
 import React, { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
 import SearchBar from './components/SearchBar'
 import ImageSearchModal from './components/ImageSearchModal'
 import SearchResults from './components/SearchResults'
 
 // Constants
 const MAX_DISPLAY_RESULTS = 200
+
+type Part = {
+  id: string
+  name: string
+  [key: string]: unknown
+}
+
+type SearchResponse = {
+  items: Array<{
+    id: string
+    name: string
+    img_url?: string
+    category?: string
+    score?: number
+    external_sites?: Array<{ name: string; url: string }>
+  }>
+}
 
 export default function Home() {
   const searchParams = useSearchParams()
@@ -17,7 +33,7 @@ export default function Home() {
   // State management
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [results, setResults] = useState<any[]>([])
+  const [results, setResults] = useState<Part[]>([])
   const [totalResultCount, setTotalResultCount] = useState(0)
   const [hasSearched, setHasSearched] = useState(false)
   const [isImageSearchModalOpen, setIsImageSearchModalOpen] = useState(false)
@@ -56,8 +72,9 @@ export default function Home() {
 
         // Limit displayed results
         setResults(allResults.slice(0, MAX_DISPLAY_RESULTS))
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch results')
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch results'
+        setError(errorMessage)
       } finally {
         setIsLoading(false)
       }
@@ -75,12 +92,26 @@ export default function Home() {
     setIsImageSearchModalOpen(false)
   }
 
-  const handleImageSubmit = (imageData: string | File, options?: { keepModalOpen?: boolean }) => {
-    console.log('Image submitted:', imageData)
+  const handleImageSubmit = (searchResults: SearchResponse, options?: { keepModalOpen?: boolean }) => {
+    console.log('Image search results:', searchResults)
     if (!options?.keepModalOpen) {
       setIsImageSearchModalOpen(false)
     }
-    // Additional processing would go here
+
+    // If we have search results, we can process them here
+    // For example, display them or perform additional searches
+    if (searchResults?.items && searchResults.items.length > 0) {
+      // You could set these as results or navigate to a search for the first result
+      console.log(`Found ${searchResults.items.length} items from image search`)
+
+      // Optional: Automatically search for the first result's part ID
+      const firstResult = searchResults.items[0]
+      if (firstResult?.id) {
+        const params = new URLSearchParams()
+        params.append('q', firstResult.id)
+        router.push(`/?${params.toString()}`)
+      }
+    }
   }
 
   const handlePartSearch = (partId: string) => {
