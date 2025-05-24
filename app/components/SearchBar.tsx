@@ -166,16 +166,18 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
             <InputField
               value={query}
               onChange={handleInputChange}
+              prefix={<IconMagnifyingGlass className="w-4 h-4" />}
               placeholder="Search for part number or name..."
               clearButton
             />
           </div>
 
           <div className="flex flex-row gap-3 w-full md:w-auto">
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-72">
               <InputField
-                type="select"
+                type="combobox"
                 value={category}
+                clearButton
                 onChange={handleCategoryChange}
                 placeholder="Select a category"
                 options={categoriesForDropdown}

@@ -21,6 +21,7 @@ import {
 // Import sub-components
 import InputDescription from './InputDescription' // Adjusted path
 import InputAffix from './InputAffix' // Adjusted path
+import ComboboxField from './ComboboxField' // New extracted component
 
 // Import types
 import type { OptionType, NormalizedOptionType, InputFieldProps } from './types'
@@ -31,16 +32,16 @@ const inputFieldStyles = tv({
   slots: {
     // Applied to the outermost div, formerly form-item (this is now the InputFieldContainer)
     inputFieldOuterContainer: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5',
-    label: 'block text-sm sm:text-base font-medium', // For InputLabel component and its text color
     inputContainer: 'sm:mt-0', // Wrapper for the input group or standalone checkbox/radio
     inputGroup: 'relative flex shadow-sm', // Wraps prefix, input, suffix. Base rounding via compound variants.
     clearButton:
-      'absolute p-1.5 top-1/2 -translate-y-1/2 justify-center group outline-none focus:inset-ring-sky-500/40 focus:inset-ring-2 rounded-full',
+      'absolute p-1.5 top-1/2 -translate-y-1/2 justify-center group outline-none focus-visible:inset-ring-sky-500/40 focus-visible:inset-ring-2 rounded-full',
     clearButtonIcon: 'size-4', // Base size, theme variants will handle colors
     inputElement: `
-      block w-full border transition duration-150 ease-in-out bg-white/90 hover:enabled:bg-white focus:enabled:bg-white
-      focus:outline-none focus:ring-2 inset-shadow-sm dark:hover:enabled:bg-black/40 dark:enabled:focus:bg-black/50
+      block w-full border transition duration-150 ease-in-out bg-white/90 hover:enabled:bg-white focus-visible:enabled:bg-white
+      focus:outline-none focus:ring-0 focus-visible:ring-2 inset-shadow-sm dark:hover:enabled:bg-black/40 dark:enabled:focus-visible:bg-black/50
       `,
+
     // Specific slots for checkbox/radio elements
     checkboxRadioGroup: 'space-y-2', // Container for multiple checkboxes/radios
     checkboxRadioItem: '',
@@ -69,7 +70,6 @@ const inputFieldStyles = tv({
     size: {
       sm: {
         inputFieldOuterContainer: 'my-2',
-        label: 'sm:text-sm sm:mt-0.25 sm:pt-0.5',
         inputElement: 'px-2 py-1 text-sm leading-4',
         clearButton: 'right-0.5',
         checkboxRadioInputWrapper: '',
@@ -84,7 +84,6 @@ const inputFieldStyles = tv({
       },
       md: {
         inputFieldOuterContainer: 'my-3',
-        label: 'text-sm sm:text-base sm:mt-px sm:pt-1.5',
         inputElement: 'px-4 py-2 text-sm sm:text-base sm:leading-5',
         clearButton: 'right-1',
         checkboxRadioInputWrapper: '',
@@ -99,7 +98,6 @@ const inputFieldStyles = tv({
       },
       lg: {
         inputFieldOuterContainer: 'my-4',
-        label: 'text-base sm:text-lg sm:mt-0.25 sm:pt-2.5',
         inputElement: 'px-5 py-3 text-base sm:text-lg leading-6',
         clearButton: 'right-1.5',
         checkboxRadioInputWrapper: '',
@@ -115,82 +113,82 @@ const inputFieldStyles = tv({
     },
     accent: {
       blue: {
-        inputElement: 'focus:ring-blue-500/40',
+        inputElement: 'focus-visible:ring-blue-500/40',
         checkboxRadioInput: 'accent-blue-600',
         checkboxRadioContainer: 'has-checked:border-blue-600',
       },
       sky: {
-        inputElement: 'focus:ring-sky-500/40',
+        inputElement: 'focus-visible:ring-sky-500/40',
         checkboxRadioInput: 'accent-sky-600',
         checkboxRadioContainer: 'has-checked:border-sky-600',
       },
       red: {
-        inputElement: 'focus:ring-red-500/40',
+        inputElement: 'focus-visible:ring-red-500/40',
         checkboxRadioInput: 'accent-red-600',
         checkboxRadioContainer: 'has-checked:border-red-600',
       },
       green: {
-        inputElement: 'focus:ring-green-500/40',
+        inputElement: 'focus-visible:ring-green-500/40',
         checkboxRadioInput: 'accent-green-600',
         checkboxRadioContainer: 'has-checked:border-green-600',
       },
       indigo: {
-        inputElement: 'focus:ring-indigo-500/40',
+        inputElement: 'focus-visible:ring-indigo-500/40',
         checkboxRadioInput: 'accent-indigo-600',
         checkboxRadioContainer: 'has-checked:border-indigo-600',
       },
       violet: {
-        inputElement: 'focus:ring-violet-500/40',
+        inputElement: 'focus-visible:ring-violet-500/40',
         checkboxRadioInput: 'accent-violet-600',
         checkboxRadioContainer: 'has-checked:border-violet-600',
       },
       purple: {
-        inputElement: 'focus:ring-purple-500/40',
+        inputElement: 'focus-visible:ring-purple-500/40',
         checkboxRadioInput: 'accent-purple-600',
         checkboxRadioContainer: 'has-checked:border-purple-600',
       },
       fuchsia: {
-        inputElement: 'focus:ring-fuchsia-500/40',
+        inputElement: 'focus-visible:ring-fuchsia-500/40',
         checkboxRadioInput: 'accent-fuchsia-600',
         checkboxRadioContainer: 'has-checked:border-fuchsia-600',
       },
       pink: {
-        inputElement: 'focus:ring-pink-500/40',
+        inputElement: 'focus-visible:ring-pink-500/40',
         checkboxRadioInput: 'accent-pink-600',
         checkboxRadioContainer: 'has-checked:border-pink-600',
       },
       rose: {
-        inputElement: 'focus:ring-rose-500/40',
+        inputElement: 'focus-visible:ring-rose-500/40',
         checkboxRadioInput: 'accent-rose-600',
         checkboxRadioContainer: 'has-checked:border-rose-600',
       },
       amber: {
-        inputElement: 'focus:ring-amber-500/40',
+        inputElement: 'focus-visible:ring-amber-500/40',
         checkboxRadioInput: 'accent-amber-600',
         checkboxRadioContainer: 'has-checked:border-amber-600',
       },
       yellow: {
-        inputElement: 'focus:ring-yellow-500/40',
+        inputElement: 'focus-visible:ring-yellow-500/40',
         checkboxRadioInput: 'accent-yellow-600',
         checkboxRadioContainer: 'has-checked:border-yellow-600',
       },
       lime: {
-        inputElement: 'focus:ring-lime-500/40',
+        inputElement: 'focus-visible:ring-lime-500/40',
         checkboxRadioInput: 'accent-lime-600',
         checkboxRadioContainer: 'has-checked:border-lime-600',
       },
       emerald: {
-        inputElement: 'focus:ring-emerald-500/40',
+        inputElement: 'focus-visible:ring-emerald-500/40',
         checkboxRadioInput: 'accent-emerald-600',
         checkboxRadioContainer: 'has-checked:border-emerald-600',
       },
       teal: {
-        inputElement: 'focus:ring-teal-500/40',
+        inputElement: 'focus-visible:ring-teal-500/40',
         checkboxRadioInput: 'accent-teal-600',
         checkboxRadioContainer: 'has-checked:border-teal-600',
       },
       cyan: {
-        inputElement: 'focus:ring-cyan-500/40',
+        inputElement: 'focus-visible:ring-cyan-500/40',
         checkboxRadioInput: 'accent-cyan-600',
         checkboxRadioContainer: 'has-checked:border-cyan-600',
       },
@@ -201,7 +199,6 @@ const inputFieldStyles = tv({
         inputElement: `border-slate-400/80 bg-slate-50 dark:bg-slate-950/50 text-slate-700 dark:text-slate-200
           placeholder-slate-400 dark:placeholder-slate-500
         `,
-        label: 'text-slate-700 dark:text-slate-100',
         description: 'text-slate-500 dark:text-slate-400',
         affix: 'border-slate-400/80 bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
         checkboxRadioInput: 'border-slate-400/80',
@@ -216,7 +213,6 @@ const inputFieldStyles = tv({
         inputElement: `border-gray-400/80 bg-gray-50 dark:bg-gray-950/50 text-gray-700 dark:text-gray-200
           placeholder-gray-400 dark:placeholder-gray-500
         `,
-        label: 'text-gray-700 dark:text-gray-100',
         description: 'text-gray-500 dark:text-gray-400',
         affix: 'border-gray-400/80 bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
         checkboxRadioInput: 'border-gray-400/80',
@@ -230,7 +226,6 @@ const inputFieldStyles = tv({
         inputElement: `border-zinc-400/80 bg-zinc-50 dark:bg-zinc-950/50 text-zinc-700 dark:text-zinc-200
           placeholder-zinc-400 dark:placeholder-zinc-500
           `,
-        label: 'text-zinc-700 dark:text-zinc-100',
         description: 'text-zinc-500 dark:text-zinc-400',
         affix: 'border-zinc-400/80 bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
         checkboxRadioInput: 'border-zinc-400/80',
@@ -244,7 +239,6 @@ const inputFieldStyles = tv({
         inputElement: `border-neutral-400/80 bg-neutral-50 dark:bg-neutral-950/50 text-neutral-700 dark:text-neutral-200
           placeholder-neutral-400 dark:placeholder-neutral-500
         `,
-        label: 'text-neutral-700 dark:text-neutral-100',
         description: 'text-neutral-500 dark:text-neutral-400',
         affix: 'border-neutral-400/80 bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400',
         checkboxRadioInput: 'border-neutral-400/80',
@@ -259,7 +253,6 @@ const inputFieldStyles = tv({
         inputElement: `border-stone-400/80 bg-stone-50 dark:bg-stone-950/50 text-stone-700 dark:text-stone-200
         placeholder-stone-400 dark:placeholder-stone-500
         `,
-        label: 'text-stone-700 dark:text-stone-100',
         description: 'text-stone-500 dark:text-stone-400',
         affix: 'border-stone-400/80 bg-stone-200 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
         checkboxRadioInput: 'border-stone-400/80',
@@ -277,6 +270,7 @@ const inputFieldStyles = tv({
       select: {
         inputElement: `pr-8 appearance-none`, // We use a separate element for the select arrow icon
       },
+      combobox: {}, // Radix-based combobox with find-as-you-type functionality
       textarea: {},
       // For checkbox/radio, their specific slots (checkboxRadioInput, etc.) are primary. inputElement slot is often not used or cleared.
       checkbox: {},
@@ -297,9 +291,8 @@ const inputFieldStyles = tv({
     error: {
       true: {
         inputElement:
-          'border-red-500 dark:border-red-400 focus:border-red-500 dark:focus:border-red-400 focus:ring-red-500/40',
+          'border-red-500 dark:border-red-400 focus-visible:border-red-500 dark:focus-visible:border-red-400 focus-visible:ring-red-500/40',
         error: 'text-red-600 dark:text-red-500', // Ensures error text color
-        // label: "text-red-600 dark:text-red-500", // Optional: make label red on error
       },
     },
     // Boolean variants for structural changes, used in compoundVariants primarily
@@ -311,11 +304,9 @@ const inputFieldStyles = tv({
     },
     fullWidth: {
       true: {
-        label: 'sm:col-span-3',
         inputContainer: 'sm:col-span-3',
       },
       false: {
-        // label: 'sm:col-span-2',
         inputContainer: 'sm:col-span-2',
       },
     },
@@ -599,6 +590,10 @@ const InputField: React.FC<InputFieldProps> = (props) => {
       styleInputType = 'select'
       currentPlaceholder = rawPlaceholder || (typeof emptyOption === 'string' ? emptyOption : undefined)
       break
+    case 'combobox':
+      styleInputType = 'combobox'
+      currentPlaceholder = rawPlaceholder || (typeof emptyOption === 'string' ? emptyOption : 'Search options...')
+      break
     case 'textarea':
       styleInputType = 'textarea'
       break
@@ -758,6 +753,31 @@ const InputField: React.FC<InputFieldProps> = (props) => {
       )
     }
 
+    if (rawType === 'combobox') {
+      return (
+        <ComboboxField
+          id={idToUse}
+          name={propName}
+          value={typeof propValue === 'string' ? propValue : ''}
+          onChange={handleInputChange}
+          onBlur={propOnBlur}
+          placeholder={currentPlaceholder}
+          disabled={disabled}
+          readOnly={readOnly}
+          options={normalizedOptions}
+          emptyOption={emptyOption}
+          clearButton={clearButton}
+          className={baseInputClassName}
+          size={size}
+          accent={accent}
+          theme={theme}
+          parentStyles={{
+            inputElement: styles.inputElement,
+          }}
+        />
+      )
+    }
+
     if (rawType === 'textarea' || isMarkdown) {
       return (
         <textarea
@@ -898,56 +918,55 @@ const InputField: React.FC<InputFieldProps> = (props) => {
         </>
       ) : (
         <>
-          {(rawType !== 'checkbox' && rawType !== 'radio') || normalizedOptions.length === 0 ? (
-            rawType !== 'checkbox' && rawType !== 'radio' && rawType !== 'display' ? (
-              <div className={styles.inputGroup()}>
-                {currentPrefix && (
-                  <InputAffix isPrefix htmlFor={idToUse} className={styles.affix({ class: prefixClassName })}>
-                    {currentPrefix}
-                  </InputAffix>
-                )}
-                <div className="relative w-full">
-                  {renderInput()}
-                  {clearButton && inputHasValue && !disabled && !readOnly && (
-                    <button
-                      type="button"
-                      className={styles.clearButton()}
-                      onClick={handleClearButtonClick}
-                      aria-label="Clear input"
-                      data-testid="clear-button"
-                    >
-                      <IconXMark className={styles.clearButtonIcon()} />
-                    </button>
-                  )}
-                </div>
-                {rawType === 'color' && false && (
-                  <label
-                    htmlFor={`${idToUse}-colorpicker`}
-                    className="min-w-[30px] cursor-pointer border border-l-0"
-                    style={{
-                      backgroundColor: (typeof propValue === 'string' ? propValue : '#888888') as string,
-                    }}
+          {rawType === 'combobox' ||
+          (rawType === 'checkbox' && normalizedOptions.length > 0) ||
+          (rawType === 'radio' && normalizedOptions.length > 0) ||
+          rawType === 'display' ? (
+            renderInput()
+          ) : (
+            <div className={styles.inputGroup()}>
+              {currentPrefix && (
+                <InputAffix isPrefix htmlFor={idToUse} className={styles.affix({ class: prefixClassName })}>
+                  {currentPrefix}
+                </InputAffix>
+              )}
+              <div className="relative w-full">
+                {renderInput()}
+                {clearButton && inputHasValue && !disabled && !readOnly && (
+                  <button
+                    type="button"
+                    className={styles.clearButton()}
+                    onClick={handleClearButtonClick}
+                    aria-label="Clear input"
+                    data-testid="clear-button"
                   >
-                    <input
-                      type="color"
-                      id={`${idToUse}-colorpicker`}
-                      className="invisible h-full w-full"
-                      value={typeof propValue === 'string' ? propValue : '#888888'}
-                      onChange={propOnChange}
-                    />
-                  </label>
-                )}
-                {currentSuffix && (
-                  <InputAffix isPrefix={false} className={styles.affix({ class: suffixClassName })} htmlFor={idToUse}>
-                    {currentSuffix}
-                  </InputAffix>
+                    <IconXMark className={styles.clearButtonIcon()} />
+                  </button>
                 )}
               </div>
-            ) : (
-              renderInput()
-            )
-          ) : (
-            renderInput()
+              {rawType === 'color' && false && (
+                <label
+                  htmlFor={`${idToUse}-colorpicker`}
+                  className="min-w-[30px] cursor-pointer border border-l-0"
+                  style={{
+                    backgroundColor: (typeof propValue === 'string' ? propValue : '#888888') as string,
+                  }}
+                >
+                  <input
+                    type="color"
+                    id={`${idToUse}-colorpicker`}
+                    className="invisible h-full w-full"
+                    value={typeof propValue === 'string' ? propValue : '#888888'}
+                    onChange={propOnChange}
+                  />
+                </label>
+              )}
+              {currentSuffix && (
+                <InputAffix isPrefix={false} className={styles.affix({ class: suffixClassName })} htmlFor={idToUse}>
+                  {currentSuffix}
+                </InputAffix>
+              )}
+            </div>
           )}
 
           <InputDescription
