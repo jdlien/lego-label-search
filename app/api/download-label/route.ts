@@ -137,8 +137,9 @@ export async function GET(request: NextRequest) {
 
     console.log(`Successfully downloaded label: ${labelPath} (${stats.size} bytes)`)
     return NextResponse.json({ success: true })
-  } catch (error: any) {
-    console.error('Error downloading label:', error)
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error : new Error(String(error))
+    console.error('Error downloading label:', err)
 
     // Remove any partial or invalid files
     try {
@@ -153,7 +154,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: false,
-      message: 'Label not available: ' + (error.message || 'Unknown error'),
+      message: 'Label not available: ' + err.message,
     })
   }
 }

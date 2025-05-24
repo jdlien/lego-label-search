@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5'
@@ -30,7 +32,7 @@ export const PWATopBar = () => {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 bg-sky-600 dark:bg-gray-800 backdrop-blur-md z-[1500] pointer-events-none"
+      className="pointer-events-none fixed top-0 right-0 left-0 z-[1500] bg-sky-600 backdrop-blur-md dark:bg-gray-800"
       style={{ height: 'env(safe-area-inset-top)' }}
     />
   )
@@ -45,25 +47,25 @@ export const PWABottomNav = () => {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 bg-white/75 dark:bg-gray-800/75 backdrop-blur-md z-[2000] flex items-center justify-between"
+      className="fixed right-0 bottom-0 left-0 z-[2000] flex items-center justify-between bg-white/75 backdrop-blur-md dark:bg-gray-800/75"
       style={{
-        height: 'calc(env(safe-area-inset-bottom) + 30px)',
+        height: 'calc(env(safe-area-inset-bottom) + 50px)',
         paddingLeft: 'calc(1rem + env(safe-area-inset-left))',
         paddingRight: 'calc(1rem + env(safe-area-inset-right))',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) - 24px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom) - 50px)',
       }}
     >
       <button
         aria-label="Back"
         onClick={() => router.back()}
-        className="p-3 rounded-full text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+        className="rounded-full p-3 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
       >
         <IoChevronBackOutline size="28px" />
       </button>
       <button
         aria-label="Forward"
         onClick={() => router.forward()}
-        className="p-3 rounded-full text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+        className="rounded-full p-3 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
       >
         <IoChevronForwardOutline size="28px" />
       </button>

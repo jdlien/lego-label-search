@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import NextLink from 'next/link'
 import Accordion, { AccordionItemDef } from '../components/Accordion' // Assuming Accordion.tsx is in ../components
 
@@ -15,26 +15,43 @@ interface Category {
   children?: Category[] // Added for tree structure
 }
 
-interface BreadcrumbLink {
-  id: string
-  name: string
-  href: string
-}
-
 // Header and Footer components are typically handled by app/layout.tsx
 // No need for placeholders here if you have a global layout.
 
+// Move this function outside the component to avoid dependency issues
+const transformCategoriesToAccordionItems = (categories: Category[]): AccordionItemDef[] => {
+  return categories.map((cat) => ({
+    id: cat.id,
+    title: (
+      <div className="flex w-full items-center justify-between">
+        <span>
+          {cat.name}
+          <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(ID: {cat.id})</span>
+        </span>
+        {cat.parts_count > 0 && (
+          <NextLink
+            href={`/?category=${cat.id}`}
+            onClick={(e) => e.stopPropagation()} // Prevent accordion toggle when clicking badge/link
+            className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800 hover:bg-green-200 dark:bg-green-700 dark:text-green-100 dark:hover:bg-green-600"
+          >
+            {cat.parts_count.toLocaleString()} parts
+          </NextLink>
+        )}
+      </div>
+    ),
+    childrenItems:
+      cat.children && cat.children.length > 0 ? transformCategoriesToAccordionItems(cat.children) : undefined,
+  }))
+}
+
 export default function CategoriesPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const categoryId = searchParams.get('id')
 
-  const [allCategories, setAllCategories] = useState<Category[]>([])
   const [categoryTree, setCategoryTree] = useState<Record<string, Category>>({})
   const [topLevelCategories, setTopLevelCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbLink[]>([])
 
   useEffect(() => {
     const fetchCategoriesData = async () => {
@@ -48,8 +65,6 @@ export default function CategoriesPage() {
         }
         const data = await response.json()
         const fetchedCategories: Category[] = data.categories
-
-        setAllCategories(fetchedCategories)
 
         const tree: Record<string, Category> = {}
         const topLevel: Category[] = []
@@ -100,24 +115,6 @@ export default function CategoriesPage() {
     fetchCategoriesData()
   }, []) // Fetch once on mount
 
-  useEffect(() => {
-    if (Object.keys(categoryTree).length === 0) return
-
-    const newBreadcrumbs: BreadcrumbLink[] = [{ id: '', name: 'All Categories', href: '/categories' }]
-    if (categoryId && categoryTree[categoryId]) {
-      let current: Category | undefined = categoryTree[categoryId]
-      const path: Category[] = []
-      while (current) {
-        path.unshift(current)
-        current = current.parent_id ? categoryTree[current.parent_id] : undefined
-      }
-      path.forEach((cat) => {
-        newBreadcrumbs.push({ id: cat.id, name: cat.name, href: `/categories?id=${cat.id}` })
-      })
-    }
-    setBreadcrumbs(newBreadcrumbs)
-  }, [categoryId, categoryTree])
-
   const currentCategory = useMemo(() => {
     if (!categoryId || Object.keys(categoryTree).length === 0) return null
     return categoryTree[categoryId] || null
@@ -127,31 +124,6 @@ export default function CategoriesPage() {
     if (!currentCategory || !currentCategory.children) return []
     return currentCategory.children
   }, [currentCategory])
-
-  const transformCategoriesToAccordionItems = (categories: Category[]): AccordionItemDef[] => {
-    return categories.map((cat) => ({
-      id: cat.id,
-      title: (
-        <div className="flex w-full items-center justify-between">
-          <span>
-            {cat.name}
-            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(ID: {cat.id})</span>
-          </span>
-          {cat.parts_count > 0 && (
-            <NextLink
-              href={`/?category=${cat.id}`}
-              onClick={(e) => e.stopPropagation()} // Prevent accordion toggle when clicking badge/link
-              className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800 hover:bg-green-200 dark:bg-green-700 dark:text-green-100 dark:hover:bg-green-600"
-            >
-              {cat.parts_count.toLocaleString()} parts
-            </NextLink>
-          )}
-        </div>
-      ),
-      childrenItems:
-        cat.children && cat.children.length > 0 ? transformCategoriesToAccordionItems(cat.children) : undefined,
-    }))
-  }
 
   const accordionItems = useMemo(() => {
     if (isLoading || error || categoryId) return [] // Only show top-level accordion if no category selected

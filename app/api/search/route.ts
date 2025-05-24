@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import path from 'path'
 import sqlite3 from 'sqlite3'
-import { open } from 'sqlite'
+import { open, Database } from 'sqlite'
 
 // Types
 interface Part {
@@ -31,9 +31,9 @@ interface SearchResult {
 
 interface QueryData {
   query: string
-  params: any[]
+  params: (string | number)[]
   countQuery: string
-  countParams: any[]
+  countParams: (string | number)[]
 }
 
 interface MultiWordSearch {
@@ -61,7 +61,7 @@ interface SearchAnalysis {
 }
 
 // Database connection pool
-let dbPromise: Promise<any> | null = null
+let dbPromise: Promise<Database> | null = null
 
 // Create a database connection
 async function openDb() {
@@ -200,7 +200,7 @@ function combineSearchWithDimensions(
 // =================== CATEGORY UTILITIES ===================
 
 // Function to get a category and all its subcategories recursively
-async function getAllSubcategories(db: any, categoryId: string): Promise<string[]> {
+async function getAllSubcategories(db: Database, categoryId: string): Promise<string[]> {
   // Using a single efficient query with recursive Common Table Expression (CTE)
   // This gets the category itself and all of its subcategories at any level of depth
   const results = await db.all(
@@ -279,9 +279,9 @@ function buildDimensionSearch(baseQuery: string, searchTerm: string, q: string, 
   const hasPossiblePartNum = terms.length > 1
 
   let query: string
-  let params: any[]
+  let params: (string | number)[]
   let countQuery: string
-  let countParams: any[]
+  let countParams: (string | number)[]
 
   if (hasPossiblePartNum) {
     // Enhanced search that allows matching dimensions AND other terms (potentially part numbers)
@@ -457,31 +457,28 @@ function buildCombinedSearch(
 
 // Add category filters to a query
 function addCategoryFilter(queryData: QueryData, categoryIds: string[]): QueryData {
-  let { query, params, countQuery, countParams } = queryData
+  const { query, params, countQuery, countParams } = queryData
 
   // First, create the category filter SQL
   let categoryFilter: string
-  let categoryParams: any[]
 
   if (categoryIds.length === 1) {
     categoryFilter = `p.ba_cat_id = '${categoryIds[0]}'`
-    categoryParams = []
   } else {
     // For multiple categories, use IN with literal values instead of parameters
     // to avoid parameter binding issues with complex queries
     const categoryValues = categoryIds.map((id) => `'${id}'`).join(',')
     categoryFilter = `p.ba_cat_id IN (${categoryValues})`
-    categoryParams = []
   }
 
   // Add category filter to each subquery by directly replacing in the WHERE clauses
-  query = query.replace(/WHERE\s+/gi, `WHERE ${categoryFilter} AND `)
+  const newQuery = query.replace(/WHERE\s+/gi, `WHERE ${categoryFilter} AND `)
 
   // For count query, use the same approach
-  countQuery = countQuery.replace(/WHERE\s+/gi, `WHERE ${categoryFilter} AND `)
+  const newCountQuery = countQuery.replace(/WHERE\s+/gi, `WHERE ${categoryFilter} AND `)
 
   // Return the modified queries with unchanged parameter arrays
-  return { query, params, countQuery, countParams }
+  return { query: newQuery, params, countQuery: newCountQuery, countParams }
 }
 
 // Build category-only filter query (no search term)
@@ -541,7 +538,11 @@ function applySorting(query: string, sort?: string): string {
 }
 
 // Apply limit to query
-function applyLimit(query: string, params: any[], limit?: string): { query: string; params: any[] } {
+function applyLimit(
+  query: string,
+  params: (string | number)[],
+  limit?: string
+): { query: string; params: (string | number)[] } {
   if (limit) {
     return {
       query: query + ` LIMIT ?`,
@@ -580,8 +581,8 @@ function analyzeSearchTerm(q: string): SearchAnalysis {
   const allDimensionFormats = isExactDimension
     ? (dimensionFormats as string[])
     : hasDimensionsWithin
-    ? extractedDimensions
-    : null
+      ? extractedDimensions
+      : null
 
   // Special case: if it's multiple words and contains a dimension pattern,
   // treat it as a multi-word search rather than a dimension search
@@ -680,12 +681,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     // Wrap the query in a subquery to apply sorting consistently and eliminate duplicates
-    let { query, params, countQuery, countParams } = queryData
-    query = `SELECT DISTINCT * FROM (${query}) results_with_alt_ids`
+    const { query, params, countQuery, countParams } = queryData
+    const wrappedQuery = `SELECT DISTINCT * FROM (${query}) results_with_alt_ids`
 
     // Apply sorting and limit
-    query = applySorting(query, sort)
-    const { query: finalQuery, params: finalParams } = applyLimit(query, params, limit)
+    const sortedQuery = applySorting(wrappedQuery, sort)
+    const { query: finalQuery, params: finalParams } = applyLimit(sortedQuery, params, limit)
 
     // Execute query
     const results = await db.all(finalQuery, ...finalParams)
@@ -702,12 +703,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     return NextResponse.json(response)
-  } catch (error: any) {
-    console.error('Search error:', error)
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error : new Error(String(error))
+    console.error('Search error:', err)
     return NextResponse.json(
       {
         message: 'An error occurred during search',
-        error: error.message,
+        error: err.message,
       },
       { status: 500 }
     )

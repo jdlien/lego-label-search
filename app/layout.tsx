@@ -4,6 +4,7 @@ import React from 'react'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
 import { ThemeProvider } from './context/ThemeContext'
+import { PWABottomNav, PWATopBar, PWAViewportAdjuster } from './components/PWAHandler'
 
 export const metadata: Metadata = {
   title: 'LEGO Part Label Search',
@@ -50,13 +51,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="dark:bg-gray-900 dark:text-white">
-        <div className="">
-          <ThemeProvider defaultTheme="gray" defaultAccent="sky" defaultUISize="lg">
-            <Header />
-            <main className="">{children}</main>
-            <Footer />
-          </ThemeProvider>
-        </div>
+        <PWATopBar />
+        <PWAViewportAdjuster>
+          <div className="">
+            <ThemeProvider defaultTheme="gray" defaultAccent="sky" defaultUISize="lg">
+              <Header />
+              <main className="">{children}</main>
+              <Footer />
+            </ThemeProvider>
+          </div>
+        </PWAViewportAdjuster>
+        <PWABottomNav />
       </body>
     </html>
   )

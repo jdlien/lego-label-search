@@ -5,6 +5,19 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import InputField from './InputField'
 import { IconMagnifyingGlass } from './InputField/InputIcons'
 
+interface Category {
+  id: string
+  name: string
+  parent_id?: string
+  parts_count?: number
+}
+
+interface CategoryForDropdown {
+  value: string
+  label: string
+  disabled?: boolean
+}
+
 type SearchBarProps = {
   onImageSearch?: () => void
 }
@@ -17,7 +30,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
 
   const [query, setQuery] = useState(initialQuery)
   const [category, setCategory] = useState(initialCategory)
-  const [categoriesForDropdown, setCategoriesForDropdown] = useState<any[]>([])
+  const [categoriesForDropdown, setCategoriesForDropdown] = useState<CategoryForDropdown[]>([])
   const searchTimeout = useRef<NodeJS.Timeout | null>(null)
 
   // Update state when URL parameters change
@@ -38,27 +51,23 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
 
         // Split categories into parent and child categories
         const parentCategories = data.categories
-          .filter((cat: any) => !cat.parent_id || cat.parent_id === '')
-          .map((cat: any) => ({
-            id: cat.id,
-            name: cat.name,
-            isParent: true,
-            parts_count: cat.parts_count || 0,
+          .filter((cat: Category) => !cat.parent_id || cat.parent_id === '')
+          .map((cat: Category) => ({
+            value: cat.id,
+            label: cat.name,
           }))
 
         const childCategories = data.categories
-          .filter((cat: any) => cat.parent_id && cat.parent_id !== '')
-          .map((cat: any) => ({
-            id: cat.id,
-            name: cat.name,
-            isParent: false,
-            parts_count: cat.parts_count || 0,
+          .filter((cat: Category) => cat.parent_id && cat.parent_id !== '')
+          .map((cat: Category) => ({
+            value: cat.id,
+            label: cat.name,
           }))
 
         // Sort both groups using natural sort
-        const naturalSort = (a: any, b: any) => {
+        const naturalSort = (a: CategoryForDropdown, b: CategoryForDropdown) => {
           const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
-          return collator.compare(a.name, b.name)
+          return collator.compare(a.label, b.label)
         }
 
         parentCategories.sort(naturalSort)
@@ -69,9 +78,8 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
 
         if (parentCategories.length > 0 && childCategories.length > 0) {
           combinedCategories.push({
-            id: 'separator',
-            name: '── Sub Categories ──',
-            isParent: false,
+            value: 'separator',
+            label: '── Sub Categories ──',
             disabled: true,
           })
         }
@@ -161,19 +169,19 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit}>
-        <div className="flex flex-col md:flex-row gap-3 items-end flex-wrap">
-          <div className="w-full md:flex-1 min-w-0">
+        <div className="flex flex-col flex-wrap items-end gap-3 md:flex-row">
+          <div className="w-full min-w-0 md:flex-1">
             <InputField
               value={query}
               onChange={handleInputChange}
-              prefix={<IconMagnifyingGlass className="w-4 h-4" />}
+              prefix={<IconMagnifyingGlass className="h-4 w-4" />}
               placeholder="Search for part number or name..."
               clearButton
             />
           </div>
 
-          <div className="flex flex-row gap-3 w-full md:w-auto">
-            <div className="flex-1 min-w-72">
+          <div className="flex w-full flex-row gap-3 md:w-auto">
+            <div className="min-w-72 flex-1">
               <InputField
                 type="combobox"
                 value={category}
@@ -189,13 +197,13 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
               >
                 <option value="">All Categories</option>
                 {categoriesForDropdown.map((cat) =>
-                  cat.id === 'separator' ? (
+                  cat.value === 'separator' ? (
                     <option key="separator" disabled>
                       ──── Sub Categories ────
                     </option>
                   ) : (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
                       {cat.parts_count > 0 ? ` (${cat.parts_count.toLocaleString()} parts)` : ''}
                     </option>
                   )
@@ -211,9 +219,9 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
             <button
               type="button"
               onClick={onImageSearch}
-              className="link w-full flex items-center justify-center gap-2 mt-0"
+              className="link mt-0 flex w-full items-center justify-center gap-2"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="w-5 h-5" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-5 w-5" fill="currentColor">
                 <path d="M149.1 64.8L138.7 96 64 96C28.7 96 0 124.7 0 160L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64l-74.7 0L362.9 64.8C356.4 45.2 338.1 32 317.4 32L194.6 32c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 1 1 0 192 96 96 0 1 1 0-192z" />
               </svg>
               <span>Image Search</span>
