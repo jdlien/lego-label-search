@@ -19,6 +19,7 @@ interface Part {
   grandparent_cat_id: string
   grandparent_category: string
   alt_part_ids: string
+  example_design_id: string
 }
 
 interface SearchResult {
@@ -227,7 +228,7 @@ function getBaseQueries() {
            c.name as category_name, b.name as ba_category_name,
            parent.id as parent_cat_id, parent.name as parent_category,
            grandparent.id as grandparent_cat_id, grandparent.name as grandparent_category,
-           p.alt_part_ids
+           p.alt_part_ids, p.example_design_id
     FROM parts p
     LEFT JOIN part_categories c ON p.part_cat_id = c.id
     LEFT JOIN ba_categories b ON p.ba_cat_id = b.id

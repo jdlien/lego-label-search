@@ -19,6 +19,7 @@ type SearchResultsProps = {
   totalResults?: number
   subcategoryCount?: number
   onPartClick?: (partId: string) => void
+  onPartSearch?: (partId: string) => void
 }
 
 export default function SearchResults({
@@ -26,6 +27,7 @@ export default function SearchResults({
   totalResults = 0,
   subcategoryCount = 0,
   onPartClick,
+  onPartSearch,
 }: SearchResultsProps) {
   const [selectedParts, setSelectedParts] = useState<Record<string, boolean>>({})
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null)
@@ -77,10 +79,10 @@ export default function SearchResults({
   // If no results, show a message and a reset button if applicable
   if (results.length === 0) {
     return (
-      <div className="text-center py-10">
-        <h3 className="text-md font-medium text-gray-500 dark:text-gray-400 mb-4">No results found</h3>
+      <div className="py-10 text-center">
+        <h3 className="text-md mb-4 font-medium text-gray-500 dark:text-gray-400">No results found</h3>
         {(searchParams.get('category') || searchParams.get('q')) && (
-          <button onClick={() => router.push('/')} className="text-sm link">
+          <button onClick={() => router.push('/')} className="link text-sm">
             Reset Search
           </button>
         )}
@@ -93,7 +95,7 @@ export default function SearchResults({
   return (
     <div>
       <div className="mt-2 mb-4">
-        <div className="flex justify-center items-center">
+        <div className="flex items-center justify-center">
           <p className="text-gray-600 dark:text-gray-300">
             {totalResults} result{totalResults !== 1 ? 's' : ''} found
           </p>
@@ -103,7 +105,7 @@ export default function SearchResults({
             </p>
           )}
         </div>
-        <div className="flex justify-center items-center mt-0 mb-2">
+        <div className="mt-0 mb-2 flex items-center justify-center">
           {searchParams.get('category') && (
             <button
               className="link ml-2 text-sm"
@@ -120,7 +122,7 @@ export default function SearchResults({
         </div>
         {/* Display selected count and actions if any parts are selected */}
         {selectedCount > 0 && (
-          <div className="flex justify-center items-center gap-4 mt-2 mb-4">
+          <div className="mt-2 mb-4 flex items-center justify-center gap-4">
             <span className="text-sm text-gray-600 dark:text-gray-300">
               {selectedCount} part{selectedCount !== 1 ? 's' : ''} selected
             </span>
@@ -131,7 +133,7 @@ export default function SearchResults({
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
         {results.map((part) => (
           <PartCard
             key={part.id}
@@ -144,7 +146,14 @@ export default function SearchResults({
       </div>
 
       {/* Part Detail Modal - only render if we're not using the parent's modal */}
-      {!onPartClick && <PartDetailModal isOpen={isModalOpen} onClose={closeModal} partId={selectedPartId} />}
+      {!onPartClick && (
+        <PartDetailModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          partId={selectedPartId}
+          onPartSearch={onPartSearch}
+        />
+      )}
     </div>
   )
 }

@@ -5,9 +5,11 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import PillContainer from './PillContainer'
 
 // SVG icon for fallback when image fails to load
-const BrickIcon = () => (
+const BrickPlaceholder = () => (
   <svg viewBox="0 0 24 24" className="w-10 h-10 text-gray-400 dark:text-gray-500" fill="currentColor">
-    <path d="M19 6V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v1h-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v1H3v14h18V6h-2zM7 5h2v1H7V5zm10 0h2v1h-2V5zm2 9h-6v-2h6v2z" />
+    <circle cx="6" cy="12" r="2" />
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="18" cy="12" r="2" />
   </svg>
 )
 
@@ -36,6 +38,7 @@ type Part = {
   ba_category_name?: string
   ba_cat_id?: string
   category_name?: string
+  example_design_id?: string
   [key: string]: any
 }
 
@@ -49,12 +52,16 @@ type PartCardProps = {
 export default function PartCard({ part, isSelected = false, onToggleSelect, onPartClick }: PartCardProps) {
   // Strip leading zeros for image filename
   const normalizedPartId = part.id.replace(/^0+/, '')
+  // Prefer design_id if available, otherwise use normalized part_id
+  const imageId = part.example_design_id || part.id.replace(/^0+/, '')
 
   // Image paths - with WebP as primary and PNG as fallback
   const webpPath = `/data/images/${normalizedPartId}.webp`
   const pngPath = `/data/images/${normalizedPartId}.png`
+  //Experimental attempt to use Rebrickable CDN, this isn't working yet
+  // const rebrickablePath = `https://cdn.rebrickable.com/media/thumbs/parts/elements/${imageId}.jpg/250x250p`
 
-  // Start with WebP, fallback to PNG
+  // Start with WebP, fallback to PNG, then Rebrickable
   const [imageSrc, setImageSrc] = useState<string>(webpPath)
   const [imageError, setImageError] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
@@ -68,7 +75,7 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
       // Try PNG version
       setImageSrc(pngPath)
     } else {
-      // If PNG also fails
+      // If all sources fail, show placeholder
       setImageError(true)
     }
   }
@@ -213,9 +220,13 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
   ].filter(Boolean) as { text: string; value?: string; onClick?: (e: React.MouseEvent) => void }[]
 
   return (
-    <div className="border rounded-md overflow-hidden transition-all bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:shadow-md">
-      <div className="flex flex-col p-4">
-        <div className="flex mb-3">
+    <div
+      className="flex space-between flex-col p-2 border rounded-md overflow-hidden transition-all bg-white dark:bg-gray-700
+      border-gray-200 dark:border-gray-600 shadow-sm"
+      data-testid="part-card"
+    >
+      <div className="flex flex-col justify-between h-full">
+        <div className="flex mb-2 flex-wrap">
           {/* Part Image */}
           <a
             href="#"
@@ -223,7 +234,7 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
               e.preventDefault()
               onPartClick(part.id)
             }}
-            className="mr-3 flex-shrink-0 w-20 h-20 border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 flex items-center justify-center p-1 overflow-hidden"
+            className="mr-3 flex-shrink-0 w-40 h-32 border border-gray-200 dark:border-gray-600 rounded-sm bg-white flex items-center justify-center p-1 overflow-hidden"
           >
             {!imageError ? (
               <img
@@ -233,7 +244,7 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
                 onError={handleImageError}
               />
             ) : (
-              <BrickIcon />
+              <BrickPlaceholder />
             )}
           </a>
 
@@ -245,33 +256,39 @@ export default function PartCard({ part, isSelected = false, onToggleSelect, onP
                 e.preventDefault()
                 onPartClick(part.id)
               }}
+              className="link font-semibold text-2xl font-mono"
+            >
+              {part.id}
+            </a>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                onPartClick(part.id)
+              }}
               className="block"
             >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 truncate">
+              <h3 className="text-lg leading-tight text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400">
                 {part.name || 'Unnamed Part'}
               </h3>
-              <p className="text-sm font-mono text-gray-500 dark:text-gray-400">{part.id}</p>
             </a>
-
             {part.category_name && (
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 truncate">{part.category_name}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{part.category_name}</p>
             )}
+          </div>
+
+          {/* Category Pills */}
+          <div className="space-y-2 w-full mt-3">
+            {categoryPills.length > 0 && <PillContainer pills={categoryPills} size={21} />}
           </div>
         </div>
 
-        {/* Category Pills */}
-        {categoryPills.length > 0 && (
-          <div className="my-2 w-full">
-            <PillContainer pills={categoryPills} size={21} />
-          </div>
-        )}
-
-        {/* Selection button and Actions */}
-        <div className="flex justify-center items-center mt-2 pt-2 border-t border-gray-100 dark:border-gray-600">
+        {/* Label download buttons */}
+        <div className="flex justify-center items-center mt-2 -mx-2 pt-2 border-t border-gray-100 dark:border-gray-600">
           {labelExists === false ? (
             <div className="text-sm text-gray-500 dark:text-gray-400">No label available</div>
           ) : (
-            <div className="flex space-x-2">
+            <div className="flex space-x-8">
               <button
                 className="link text-sm flex items-center space-x-1"
                 onClick={handleLabelDownload}
