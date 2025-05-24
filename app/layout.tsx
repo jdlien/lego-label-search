@@ -22,6 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         <link rel="manifest" href="/icons/manifest.json" />
 
+        {/* Theme color for Safari status bar */}
+        <meta name="theme-color" content="#0369a1" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1f2937" media="(prefers-color-scheme: dark)" />
+
         {/* Prevent FOUC in dark mode */}
         <script
           dangerouslySetInnerHTML={{
