@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import PillContainer from './PillContainer'
+import { useToastHelpers } from './Toast'
 
 // SVG icon for fallback when image fails to load
 const BrickPlaceholder = () => (
@@ -65,6 +66,7 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
   const router = useRouter()
+  const { success, error, warning } = useToastHelpers()
 
   // Handle image error - try to load PNG if WebP fails
   const handleImageError = () => {
@@ -92,9 +94,9 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(link.href)
-    } catch (error) {
-      console.error('Error triggering download:', error)
-      alert('Download failed: Could not start the file download.')
+    } catch (err) {
+      console.error('Error triggering download:', err)
+      error('Could not start the file download.')
     }
   }
 
@@ -116,11 +118,11 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
         setLabelExists(true)
       } else {
         setLabelExists(false)
-        alert('Label not available: This part does not have a label available.')
+        warning('This part does not have a label available.')
       }
-    } catch (error) {
-      console.error('Error downloading label:', error)
-      alert('Download failed: There was an error downloading the label.')
+    } catch (err) {
+      console.error('Error downloading label:', err)
+      error('There was an error downloading the label.')
     } finally {
       setIsDownloading(false)
     }
@@ -141,7 +143,7 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
 
       if (!downloadData.success) {
         setLabelExists(false)
-        alert('Label not available: The original label is not available for conversion.')
+        warning('The original label is not available for conversion.')
         return
       }
 
@@ -166,16 +168,14 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
           await new Promise((resolve) => setTimeout(resolve, 300))
           // Try one more time - the script might have executed properly despite the warning
           await triggerDownload(`/data/labels/${part.id}-24mm.lbx`, `${part.id}-24mm.lbx`)
-          alert(
-            'Conversion completed with warnings: There were some warnings during conversion, but your file should be ready.'
-          )
+          warning('There were some warnings during conversion, but your file should be ready.')
         } else {
-          alert(`Conversion failed: ${data.message || 'There was an error converting the label to 24mm format.'}`)
+          error(data.message || 'There was an error converting the label to 24mm format.')
         }
       }
-    } catch (error) {
-      console.error('Error converting label:', error)
-      alert('Conversion failed: There was an error converting the label.')
+    } catch (err) {
+      console.error('Error converting label:', err)
+      error('There was an error converting the label.')
     } finally {
       setIsConverting(false)
     }

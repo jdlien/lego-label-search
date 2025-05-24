@@ -62,7 +62,7 @@ export function ToastProvider({ children, swipeDirection = 'right' }: ToastProvi
         {toasts.map((toast) => (
           <Toast key={toast.id} toast={toast} onRemove={removeToast} />
         ))}
-        <ToastPrimitive.Viewport className="fixed right-0 bottom-0 z-50 m-0 flex max-h-screen w-full max-w-[420px] list-none flex-col-reverse gap-2 p-4 outline-none" />
+        <ToastPrimitive.Viewport className="fixed right-0 bottom-0 z-[9999] m-0 flex max-h-screen w-full max-w-[420px] list-none flex-col-reverse gap-2 p-4 outline-none" />
       </ToastPrimitive.Provider>
     </ToastContext.Provider>
   )
@@ -107,14 +107,14 @@ function Toast({ toast, onRemove }: ToastProps) {
       }}
     >
       <div className="grid gap-1">
-        {toast.title && <ToastPrimitive.Title className="text-sm font-semibold">{toast.title}</ToastPrimitive.Title>}
-        <ToastPrimitive.Description className="text-sm">{toast.description}</ToastPrimitive.Description>
+        {toast.title && <ToastPrimitive.Title className="font-semibold">{toast.title}</ToastPrimitive.Title>}
+        <ToastPrimitive.Description className="text-base">{toast.description}</ToastPrimitive.Description>
       </div>
 
       {toast.action && (
         <ToastPrimitive.Action
           altText={toast.action.label}
-          className="hover:bg-opacity-10 inline-flex h-8 shrink-0 items-center justify-center rounded-md border border-current bg-transparent px-3 text-xs font-medium transition-colors hover:bg-current focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
+          className="hover:bg-opacity-10 inline-flex h-8 shrink-0 items-center justify-center rounded-md border border-current bg-transparent px-3 text-sm font-medium transition-colors hover:bg-current focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
           onClick={toast.action.onClick}
         >
           {toast.action.label}
