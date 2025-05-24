@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import Dialog from './Dialog'
 
 type ImageSearchModalProps = {
@@ -327,10 +328,12 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[100px_1fr]">
               {item.img_url && (
                 <div className="flex justify-center rounded bg-white p-1">
-                  <img
+                  <Image
                     src={item.img_url}
                     alt={item.name}
-                    className="w-full"
+                    width={100}
+                    height={100}
+                    className="h-auto w-full object-contain"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement
                       target.style.display = 'none'
@@ -451,9 +454,11 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
           </div>
         ) : previewUrl ? (
           <div className="text-center">
-            <img
+            <Image
               src={previewUrl}
               alt="Selected preview"
+              width={300}
+              height={300}
               className="mx-auto max-h-72 max-w-full rounded-lg border border-gray-200 object-contain dark:border-gray-600"
             />
             <div className="mt-6 space-y-6">
