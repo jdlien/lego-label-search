@@ -74,7 +74,7 @@ export default async function handler(req, res) {
       const relationshipDescriptions = {
         R: {
           heading: 'Replacement',
-          description: 'LEGO replacement part that supersedes this one.',
+          description: 'Parts that work with this one.',
         },
         M: {
           heading: 'Mold Variant',

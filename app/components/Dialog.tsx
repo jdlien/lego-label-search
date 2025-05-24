@@ -1,13 +1,13 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 
 interface DialogProps {
   open: boolean
   onClose: () => void
   title?: string
   children: React.ReactNode
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | '8xl'
   hideCloseButton?: boolean
   actions?: React.ReactNode
 }
@@ -17,12 +17,14 @@ export default function Dialog({
   onClose,
   title,
   children,
-  size = 'md',
+  size = '2xl',
   hideCloseButton = false,
   actions,
 }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const lastFocusedElement = useRef<HTMLElement | null>(null)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [shouldShow, setShouldShow] = useState(false)
 
   // Size mapping for the dialog
   const sizeClasses = {
@@ -30,6 +32,13 @@ export default function Dialog({
     md: 'max-w-md',
     lg: 'max-w-lg',
     xl: 'max-w-xl',
+    '2xl': 'max-w-2xl',
+    '3xl': 'max-w-3xl',
+    '4xl': 'max-w-4xl',
+    '5xl': 'max-w-5xl',
+    '6xl': 'max-w-6xl',
+    '7xl': 'max-w-7xl',
+    '8xl': 'max-w-8xl',
   }
 
   // Open or close the dialog when the open prop changes
@@ -40,8 +49,22 @@ export default function Dialog({
     if (open) {
       lastFocusedElement.current = document.activeElement as HTMLElement
       dialog.showModal()
+      // Start the opening animation
+      setShouldShow(true)
+      setIsAnimating(true)
+      // Allow animation to complete
+      const timer = setTimeout(() => setIsAnimating(false), 300)
+      return () => clearTimeout(timer)
     } else if (dialog.open) {
-      dialog.close()
+      // Start the closing animation
+      setIsAnimating(true)
+      setShouldShow(false)
+      // Close the dialog after animation completes
+      const timer = setTimeout(() => {
+        dialog.close()
+        setIsAnimating(false)
+      }, 300)
+      return () => clearTimeout(timer)
     }
   }, [open])
 
@@ -81,15 +104,17 @@ export default function Dialog({
   return (
     <dialog
       ref={dialogRef}
-      className={`rounded-lg border-none p-0 w-[90vw] ${sizeClasses[size]} max-h-[90vh] bg-white dark:bg-gray-800 shadow-xl backdrop:bg-black/50 backdrop:backdrop-blur-sm`}
+      className={`w-[92vw] rounded-lg border p-0 ${sizeClasses[size]} mx-auto mt-6 max-h-[90vh] border border-gray-200 bg-white shadow-3xl transition-all duration-300 ease-out backdrop:duration-400 sm:mt-28 dark:border-gray-700 dark:border-t-gray-600 dark:bg-gray-800 ${
+        shouldShow ? 'opacity-100 backdrop:bg-black/50' : 'opacity-0 backdrop:bg-transparent'
+      }`}
     >
       {title && (
-        <div className="flex items-center justify-between py-3 px-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">{title}</h3>
+        <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700/70">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h3>
           {!hideCloseButton && (
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-full text-gray-400 transition-colors duration-150 hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/30 dark:text-gray-400 dark:hover:text-gray-300"
             >
               <span className="sr-only">Close</span>
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -100,22 +125,10 @@ export default function Dialog({
         </div>
       )}
 
-      <div className="p-4 md:p-6 overflow-y-auto max-h-[calc(90vh-6rem)]">{children}</div>
+      <div className="max-h-[calc(90vh-6rem)] overflow-y-auto p-4 md:p-6">{children}</div>
 
       {actions && (
-        <div className="flex justify-end gap-2 p-4 pt-2 border-t border-gray-200 dark:border-gray-600">{actions}</div>
-      )}
-
-      {/* Default close button if no actions are provided */}
-      {!actions && (
-        <div className="flex justify-end p-4 pt-2 border-t border-gray-200 dark:border-gray-600">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            Close
-          </button>
-        </div>
+        <div className="flex justify-end gap-2 border-t border-gray-200 p-4 pt-2 dark:border-gray-600">{actions}</div>
       )}
     </dialog>
   )

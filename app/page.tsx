@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import SearchBar from './components/SearchBar'
 import ImageSearchModal from './components/ImageSearchModal'
@@ -12,6 +12,7 @@ const MAX_DISPLAY_RESULTS = 200
 
 export default function Home() {
   const searchParams = useSearchParams()
+  const router = useRouter()
 
   // State management
   const [isLoading, setIsLoading] = useState(false)
@@ -82,27 +83,34 @@ export default function Home() {
     // Additional processing would go here
   }
 
+  const handlePartSearch = (partId: string) => {
+    // Navigate to perform a search for the alternate part ID
+    const params = new URLSearchParams()
+    params.append('q', partId)
+    router.push(`/?${params.toString()}`)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto max-w-screen-2xl px-4 pt-4 pb-3">
         <div className="flex flex-col items-stretch">
           {/* SearchBar component */}
-          <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+          <div className="mb-4 border-b border-gray-200 pb-4 dark:border-gray-700">
             <SearchBar onImageSearch={handleImageSearchModalOpen} />
           </div>
 
           {/* Loading state */}
           {isLoading && (
-            <div className="flex justify-center items-center py-6">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-500"></div>
+            <div className="flex items-center justify-center py-6">
+              <div className="h-12 w-12 animate-spin rounded-full border-t-2 border-b-2 border-sky-500"></div>
             </div>
           )}
 
           {/* Error state */}
           {error && (
-            <div className="bg-red-100 dark:bg-red-900/40 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-md my-4">
+            <div className="my-4 rounded-md border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-300">
               <div className="flex">
-                <svg className="h-6 w-6 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="mr-2 h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -122,9 +130,9 @@ export default function Home() {
           {!isLoading && !error && hasSearched && (
             <>
               {totalResultCount > MAX_DISPLAY_RESULTS && (
-                <div className="bg-sky-50 dark:bg-sky-900/30 border border-sky-300 dark:border-sky-800 text-sky-800 dark:text-sky-300 px-4 py-2 rounded-md mb-4">
+                <div className="mb-4 rounded-md border border-sky-300 bg-sky-50 px-4 py-2 text-sky-800 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300">
                   <div className="flex items-center">
-                    <svg className="h-5 w-5 text-sky-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="mr-2 h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -132,6 +140,7 @@ export default function Home() {
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
+                    {/* This is my lazy ass way of avoiding building a pagination system. */}
                     <p>
                       Showing {results.length} of {totalResultCount} total results
                     </p>
@@ -142,14 +151,15 @@ export default function Home() {
                 results={results}
                 totalResults={totalResultCount}
                 subcategoryCount={results.length > 0 ? 0 : 0}
+                onPartSearch={handlePartSearch}
               />
             </>
           )}
 
           {/* Initial state - welcome message */}
           {!isLoading && !error && !hasSearched && (
-            <div className="text-center pt-4 pb-32">
-              <p className="text-gray-600 dark:text-gray-300 text-lg">
+            <div className="pt-4 pb-32 text-center">
+              <p className="text-lg text-gray-600 dark:text-gray-300">
                 Enter a search term, select a category,
                 <br />
                 or&nbsp;
