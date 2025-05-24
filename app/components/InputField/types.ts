@@ -78,7 +78,7 @@ export interface BaseInputProps {
   prefixClassName?: string
   suffixClassName?: string
   // Allow any other data-* attributes
-  [key: `data-${string}`]: any
+  [key: `data-${string}`]: string | number | boolean | undefined
 }
 
 // Making all standard HTML input props available, plus our custom ones.

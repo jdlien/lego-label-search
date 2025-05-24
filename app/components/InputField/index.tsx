@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useId, ChangeEvent, FocusEvent, HTMLInputTypeAttribute, ReactNode, useState, useEffect } from 'react'
+import React, { useId, HTMLInputTypeAttribute, useState, useEffect } from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
 // Import the useTheme hook and types
 import { useTheme } from '../../context/ThemeContext'
@@ -446,7 +446,7 @@ const normalizeOptions = (options?: OptionType[]): NormalizedOptionType[] => {
       }
 
       // Handle both 'value' and 'id' fields, prioritizing 'value' if both exist
-      const optObj = opt as Record<string, any>
+      const optObj = opt as Record<string, unknown>
       const rawValue = 'value' in optObj ? optObj.value : 'id' in optObj ? optObj.id : undefined
 
       if (rawValue === undefined) {
@@ -461,17 +461,19 @@ const normalizeOptions = (options?: OptionType[]): NormalizedOptionType[] => {
 
       // Handle both 'label' and 'name' fields, prioritizing 'label' if both exist
       const rawLabel =
-        'label' in optObj && optObj.label !== undefined
+        'label' in optObj && typeof optObj.label === 'string'
           ? optObj.label
-          : 'name' in optObj && optObj.name !== undefined
-          ? optObj.name
-          : value
+          : 'name' in optObj && typeof optObj.name === 'string'
+            ? optObj.name
+            : String(value)
 
-      const normalized: NormalizedOptionType = { value, label: rawLabel }
+      const normalized: NormalizedOptionType = { value: String(value), label: rawLabel }
 
-      if (optObj.description !== undefined) normalized.description = optObj.description
-      if (optObj.selected !== undefined) normalized.selected = optObj.selected // Keep for initial state if needed
-      if (optObj.disabled !== undefined && optObj.disabled !== false) normalized.disabled = optObj.disabled
+      if (optObj.description !== undefined && typeof optObj.description === 'string')
+        normalized.description = optObj.description
+      if (optObj.selected !== undefined && typeof optObj.selected === 'boolean') normalized.selected = optObj.selected // Keep for initial state if needed
+      if (optObj.disabled !== undefined && typeof optObj.disabled === 'boolean' && optObj.disabled !== false)
+        normalized.disabled = optObj.disabled
 
       return normalized
     })
@@ -508,7 +510,6 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     accent = defaultAccent, // Use context default
     size = defaultUISize, // Use context default
     inputClassName: baseInputClassName, // Renamed for clarity
-    errorClassName,
     descriptionClassName,
     prefixClassName,
     suffixClassName,
@@ -527,7 +528,8 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     ...restHtmlAttributes // Spread rest for additional HTML attributes for the input tag
   } = props
 
-  const idToUse = propId || useId()
+  const generatedId = useId()
+  const idToUse = propId || generatedId
 
   // Add this - Track input value for clear button visibility
   const [inputHasValue, setInputHasValue] = useState(!!propValue || !!propDefaultValue)
@@ -579,7 +581,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
   let currentDataType = rawDataType
   let currentInputMode = rawInputMode
   let currentPrefix = rawPrefix
-  let currentSuffix = rawSuffix // Added for completeness
+  const currentSuffix = rawSuffix // Added for completeness
   let currentPlaceholder = rawPlaceholder
   let isMarkdown = dataMarkdown
 
@@ -694,7 +696,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
   const ariaDescribedBy: string[] = []
   if (description) ariaDescribedBy.push(`${idToUse}-description`)
 
-  const nativeInputProps: Record<string, any> = {
+  const nativeInputProps: Record<string, unknown> = {
     id: idToUse,
     name: propName,
     onChange: handleInputChange, // Use our wrapped handler instead of direct propOnChange
@@ -784,7 +786,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
           {...nativeInputProps}
           value={propValue}
           defaultValue={propDefaultValue}
-          rows={(nativeInputProps as any).rows || 3}
+          rows={typeof nativeInputProps.rows === 'number' ? nativeInputProps.rows : 3}
           className={styles.inputElement({ class: baseInputClassName })}
         />
       )
@@ -803,8 +805,8 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                   rawType === 'radio'
                     ? propValue === opt.value
                     : Array.isArray(propValue)
-                    ? propValue.includes(opt.value)
-                    : propValue === opt.value // For single value checkbox group
+                      ? propValue.includes(opt.value)
+                      : propValue === opt.value // For single value checkbox group
               }
 
               let isOptionDefaultChecked: boolean | undefined = undefined
@@ -813,8 +815,8 @@ const InputField: React.FC<InputFieldProps> = (props) => {
                   rawType === 'radio'
                     ? propDefaultValue === opt.value
                     : Array.isArray(propDefaultValue)
-                    ? propDefaultValue.includes(opt.value)
-                    : propDefaultValue === opt.value
+                      ? propDefaultValue.includes(opt.value)
+                      : propDefaultValue === opt.value
               }
 
               return (

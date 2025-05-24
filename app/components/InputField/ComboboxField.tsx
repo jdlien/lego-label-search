@@ -201,7 +201,6 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
   disabled,
   readOnly,
   options,
-  emptyOption = true,
   clearButton,
   className,
   size = 'md',
@@ -292,7 +291,7 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
           onBlur={handleComboboxBlur}
           data-testid="combobox-trigger"
         >
-          <span className="truncate flex-1 text-left">
+          <span className="flex-1 truncate text-left">
             {displayValue || <span className={styles.comboboxPlaceholder()}>{placeholder}</span>}
           </span>
           <div className="flex items-center">
@@ -300,12 +299,17 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
               <div
                 role="button"
                 tabIndex={0}
-                className={styles.clearButton({ class: 'relative p-0 translate-none cursor-pointer' })}
+                className={styles.clearButton({ class: 'relative translate-none cursor-pointer p-0' })}
                 onClick={handleClearButtonClick}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault()
-                    handleClearButtonClick(e as any)
+                    // Create a synthetic mouse event for the clear button click
+                    const syntheticMouseEvent = {
+                      preventDefault: () => {},
+                      stopPropagation: () => {},
+                    } as React.MouseEvent
+                    handleClearButtonClick(syntheticMouseEvent)
                   }
                 }}
                 aria-label="Clear selection"
@@ -322,14 +326,14 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
         <Command className={styles.comboboxCommand()}>
           <div
             className={styles.comboboxPlaceholder({
-              class: 'flex items-center gap-1 text-gray-400 dark:text-gray-500 border-b relative',
+              class: 'relative flex items-center gap-1 border-b text-gray-400 dark:text-gray-500',
             })}
           >
-            <IconMagnifyingGlass className="size-4 absolute left-3 top-1/2 -translate-y-1/2" />
+            <IconMagnifyingGlass className="absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Command.Input
               placeholder="Search&hellip;"
               className={parentStyles?.inputElement?.({
-                class: 'border-none py-2 pl-9 m-0 focus-visible:ring-0 w-full',
+                class: 'm-0 w-full border-none py-2 pl-9 focus-visible:ring-0',
               })}
             />
           </div>

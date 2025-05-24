@@ -1,11 +1,11 @@
 'use client'
 
 import React, { ReactNode } from 'react'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv } from 'tailwind-variants'
 import { useTheme } from '../../context/ThemeContext'
 import InputLabel from './InputLabel'
 import InputError from './InputError'
-import type { ThemeColor, UISize } from '../../types/theme'
+import type { ThemeColor } from '../../types/theme'
 
 // Import just what we need from the existing inputFieldStyles
 const containerStyles = tv({

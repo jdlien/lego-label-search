@@ -11,7 +11,7 @@ import PartCard from './PartCard'
 type Part = {
   id: string
   name: string
-  [key: string]: any
+  [key: string]: string | number | boolean | null | undefined
 }
 
 type SearchResultsProps = {
@@ -29,37 +29,11 @@ export default function SearchResults({
   onPartClick,
   onPartSearch,
 }: SearchResultsProps) {
-  const [selectedParts, setSelectedParts] = useState<Record<string, boolean>>({})
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const router = useRouter()
   const searchParams = useSearchParams()
-
-  // Handler functions
-  const handleToggleSelect = (partId: string) => {
-    setSelectedParts((prev) => {
-      const newSelected = { ...prev }
-      if (newSelected[partId]) {
-        delete newSelected[partId]
-      } else {
-        newSelected[partId] = true
-      }
-      return newSelected
-    })
-  }
-
-  const handleSelectAll = () => {
-    const newSelected: Record<string, boolean> = {}
-    results.forEach((part) => {
-      newSelected[part.id] = true
-    })
-    setSelectedParts(newSelected)
-  }
-
-  const handleClearSelection = () => {
-    setSelectedParts({})
-  }
 
   const handlePartClick = (partId: string) => {
     // If parent provided a click handler, use that
@@ -70,10 +44,6 @@ export default function SearchResults({
       setSelectedPartId(partId)
       setIsModalOpen(true)
     }
-  }
-
-  const closeModal = () => {
-    setIsModalOpen(false)
   }
 
   // If no results, show a message and a reset button if applicable
@@ -89,8 +59,6 @@ export default function SearchResults({
       </div>
     )
   }
-
-  const selectedCount = Object.keys(selectedParts).length
 
   return (
     <div>
@@ -120,28 +88,11 @@ export default function SearchResults({
             </button>
           )}
         </div>
-        {/* Display selected count and actions if any parts are selected */}
-        {selectedCount > 0 && (
-          <div className="mt-2 mb-4 flex items-center justify-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-              {selectedCount} part{selectedCount !== 1 ? 's' : ''} selected
-            </span>
-            <button className="link text-sm" onClick={handleClearSelection}>
-              Clear Selection
-            </button>
-          </div>
-        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
         {results.map((part) => (
-          <PartCard
-            key={part.id}
-            part={part}
-            isSelected={!!selectedParts[part.id]}
-            onToggleSelect={handleToggleSelect}
-            onPartClick={handlePartClick}
-          />
+          <PartCard key={part.id} part={part} onPartClick={handlePartClick} />
         ))}
       </div>
 
@@ -149,7 +100,7 @@ export default function SearchResults({
       {!onPartClick && (
         <PartDetailModal
           isOpen={isModalOpen}
-          onClose={closeModal}
+          onClose={() => setIsModalOpen(false)}
           partId={selectedPartId}
           onPartSearch={onPartSearch}
         />

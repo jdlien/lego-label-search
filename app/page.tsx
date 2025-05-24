@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import SearchBar from './components/SearchBar'
 import ImageSearchModal from './components/ImageSearchModal'
@@ -12,7 +12,7 @@ const MAX_DISPLAY_RESULTS = 200
 type Part = {
   id: string
   name: string
-  [key: string]: unknown
+  [key: string]: string | number | boolean | null | undefined
 }
 
 type SearchResponse = {
@@ -26,7 +26,7 @@ type SearchResponse = {
   }>
 }
 
-export default function Home() {
+function HomeContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -210,5 +210,30 @@ export default function Home() {
         </div>
       </div>
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto max-w-screen-2xl px-4 pt-4 pb-3">
+        <div className="flex flex-col items-stretch">
+          <div className="mb-4 border-b border-gray-200 pb-4 dark:border-gray-700">
+            <div className="h-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          </div>
+          <div className="flex items-center justify-center py-6">
+            <div className="h-12 w-12 animate-spin rounded-full border-t-2 border-b-2 border-sky-500"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <HomeContent />
+    </Suspense>
   )
 }
