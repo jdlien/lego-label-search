@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Dialog from './Dialog'
+import { useToastHelpers } from './Toast'
 
 type PartData = {
   id: string
@@ -66,6 +67,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
   const [isDownloading, setIsDownloading] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
+  const { success, error: showError, warning } = useToastHelpers()
 
   useEffect(() => {
     if (!isOpen || !partId) {
@@ -165,9 +167,9 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(link.href)
-    } catch (error) {
-      console.error('Error triggering download:', error)
-      alert('Download failed: Could not start the file download.')
+    } catch (err) {
+      console.error('Error triggering download:', err)
+      showError('Could not start the file download.')
     }
   }
 
@@ -189,11 +191,11 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
         setLabelExists(true)
       } else {
         setLabelExists(false)
-        alert('Label not available: This part does not have a label available.')
+        warning('This part does not have a label available.')
       }
-    } catch (error) {
-      console.error('Error downloading label:', error)
-      alert('Download failed: There was an error downloading the label.')
+    } catch (err) {
+      console.error('Error downloading label:', err)
+      showError('There was an error downloading the label.')
     } finally {
       setIsDownloading(false)
     }
@@ -214,7 +216,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
 
       if (!downloadData.success) {
         setLabelExists(false)
-        alert('Label not available: The original label is not available for conversion.')
+        warning('The original label is not available for conversion.')
         return
       }
 
@@ -239,16 +241,14 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
           await new Promise((resolve) => setTimeout(resolve, 300))
           // Try one more time - the script might have executed properly despite the warning
           await triggerDownload(`/data/labels/${partId}-24mm.lbx`, `${partId}-24mm.lbx`)
-          alert(
-            'Conversion completed with warnings: There were some warnings during conversion, but your file should be ready.'
-          )
+          warning('There were some warnings during conversion, but your file should be ready.')
         } else {
-          alert(`Conversion failed: ${data.message || 'There was an error converting the label to 24mm format.'}`)
+          showError(data.message || 'There was an error converting the label to 24mm format.')
         }
       }
-    } catch (error) {
-      console.error('Error converting label:', error)
-      alert('Conversion failed: There was an error converting the label.')
+    } catch (err) {
+      console.error('Error converting label:', err)
+      showError('There was an error converting the label.')
     } finally {
       setIsConverting(false)
     }

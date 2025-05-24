@@ -4,6 +4,7 @@ import React from 'react'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
 import { ThemeProvider } from './context/ThemeContext'
+import { ToastProvider } from './components/Toast'
 import { PWABottomNav, PWATopBar, PWAViewportAdjuster } from './components/PWAHandler'
 
 export const metadata: Metadata = {
@@ -55,9 +56,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PWAViewportAdjuster>
           <div className="">
             <ThemeProvider defaultTheme="gray" defaultAccent="sky" defaultUISize="lg">
-              <Header />
-              <main className="">{children}</main>
-              <Footer />
+              <ToastProvider>
+                <Header />
+                <main className="">{children}</main>
+                <Footer />
+              </ToastProvider>
             </ThemeProvider>
           </div>
         </PWAViewportAdjuster>
