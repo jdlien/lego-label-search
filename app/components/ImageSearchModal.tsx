@@ -102,18 +102,25 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
   }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    stopCameraStream()
-    setShowCamera(false)
     const file = event.target.files?.[0]
     if (file) {
+      // Only stop camera and change view state if a file was actually selected
+      stopCameraStream()
+      setShowCamera(false)
       setSelectedImage(file)
       if (previewUrl) URL.revokeObjectURL(previewUrl)
       setPreviewUrl(URL.createObjectURL(file))
       setError(null)
     }
+    // Reset the input value to allow selecting the same file again
+    // and to ensure clean state after cancel
+    event.target.value = ''
   }
 
   const startCamera = async () => {
+    // Stop any existing stream first
+    stopCameraStream()
+
     setSelectedImage(null)
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl)
@@ -177,14 +184,34 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
     }
   }
 
-  const switchToUpload = () => {
-    stopCameraStream()
-    setShowCamera(false)
-    setError(null)
-    fileInputRef.current?.click()
+  const switchToUpload = (e?: React.MouseEvent) => {
+    // Prevent any event bubbling that might interfere with modal
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    // Clear any existing value first to ensure clean state
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+      // Add a small delay to ensure the input is ready
+      setTimeout(() => {
+        fileInputRef.current?.click()
+      }, 10)
+    }
+  }
+
+  const handleUploadClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    switchToUpload(e)
   }
 
   const clearSelectionAndRestartCamera = () => {
+    // First stop the current camera stream
+    stopCameraStream()
+
+    // Reset all state
     setSelectedImage(null)
     setSearchResults(null)
     if (previewUrl) {
@@ -193,7 +220,11 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
     }
     if (fileInputRef.current) fileInputRef.current.value = ''
     setError(null)
-    startCamera()
+
+    // Use setTimeout to ensure cleanup is complete before restarting
+    setTimeout(() => {
+      setShowCamera(true) // This will trigger the useEffect to call startCamera()
+    }, 100)
   }
 
   const handleImageSubmit = async () => {
@@ -275,28 +306,31 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             </svg>
             <span className="text-yellow-800 dark:text-yellow-200">No matching items found</span>
           </div>
+          <button onClick={clearSelectionAndRestartCamera} className="btn mt-3 w-full py-2 font-medium">
+            Try Again
+          </button>
         </div>
       )
     }
 
     return (
-      <div className="space-y-4">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {searchResults.items.length} item{searchResults.items.length !== 1 ? 's' : ''} found
+      <div className="">
+        <p className="mb-2 text-center text-base text-gray-600 dark:text-gray-400">
+          {searchResults.items.length} Item{searchResults.items.length !== 1 ? 's' : ''} Found
         </p>
 
         {searchResults.items.map((item, index) => (
           <div
             key={`${item.id}-${index}`}
-            className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700"
+            className="rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-gray-600 dark:bg-gray-700"
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[100px_1fr]">
               {item.img_url && (
-                <div className="flex justify-center">
+                <div className="flex justify-center rounded bg-white p-1">
                   <img
                     src={item.img_url}
                     alt={item.name}
-                    className="max-h-24 w-auto rounded object-contain"
+                    className="w-full"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement
                       target.style.display = 'none'
@@ -310,10 +344,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
 
                 <div className="mt-1 flex items-center gap-1">
                   <span className="text-md font-bold text-gray-700 dark:text-gray-300">Part</span>
-                  <a
-                    href={`?q=${item.id}`}
-                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                  >
+                  <a href={`?q=${item.id}`} className="link flex items-center gap-1">
                     <SearchIcon />
                     <span className="font-mono text-lg">{item.id}</span>
                   </a>
@@ -321,7 +352,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
 
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {item.category && (
-                    <span className="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                    <span className="rounded bg-sky-100 px-2 py-1 text-xs font-medium text-sky-800 dark:bg-sky-900 dark:text-sky-300">
                       {item.category}
                     </span>
                   )}
@@ -340,7 +371,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
                           href={site.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                          className="link text-sm"
                         >
                           {site.name === 'bricklink' ? 'BrickLink' : site.name}
                         </a>
@@ -360,21 +391,11 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
     )
   }
 
-  const modalTitle = searchResults ? 'Search Results' : 'Search by Image'
-
-  const actionButtons = !searchResults ? (
-    <>
-      {selectedImage && !showCamera && (
-        <button onClick={handleImageSubmit} disabled={isLoading} className="btn btn-primary">
-          {isLoading ? 'Processing...' : 'Search'}
-        </button>
-      )}
-    </>
-  ) : null
+  const modalTitle = searchResults ? 'Search Results' : 'Image Search'
 
   return (
-    <Dialog open={isOpen} onClose={onClose} title={modalTitle} size="3xl" actions={actionButtons}>
-      <div className="space-y-4">
+    <Dialog open={isOpen} onClose={onClose} title={modalTitle} size="3xl">
+      <div className="">
         {!apiStatus.isAvailable && !apiStatus.isChecking && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <div className="text-center">
@@ -408,7 +429,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
 
         {isLoading ? (
           <div className="flex items-center justify-center py-6">
-            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-sky-600"></div>
             <span className="ml-3 font-medium">Processing image...</span>
           </div>
         ) : searchResults ? (
@@ -423,21 +444,20 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
               <button onClick={takePicture} disabled={!isStreamActive} className="btn btn-primary w-full py-2">
                 Take Picture
               </button>
-              <button onClick={switchToUpload} className="btn w-full py-2">
+              <button onClick={handleUploadClick} className="btn w-full py-2">
                 Upload Image
               </button>
             </div>
           </div>
         ) : previewUrl ? (
           <div className="text-center">
-            <p className="mb-2 font-medium">Preview:</p>
             <img
               src={previewUrl}
               alt="Selected preview"
               className="mx-auto max-h-72 max-w-full rounded-lg border border-gray-200 object-contain dark:border-gray-600"
             />
-            <div className="mt-4 space-y-2">
-              <button onClick={handleImageSubmit} disabled={isLoading} className="btn w-full py-2">
+            <div className="mt-6 space-y-6">
+              <button onClick={handleImageSubmit} disabled={isLoading} className="btn btn-primary w-full py-2">
                 {isLoading ? 'Processing...' : 'Search with this Image'}
               </button>
               <button onClick={clearSelectionAndRestartCamera} className="btn w-full py-2">
@@ -446,7 +466,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             </div>
           </div>
         ) : (
-          <div className="space-y-3 py-4 text-center">
+          <div className="space-y-6 py-4 text-center">
             {!error && (
               <div className="flex items-center justify-center">
                 <div className="mr-3 h-6 w-6 animate-spin rounded-full border-b-2 border-blue-600"></div>
@@ -456,7 +476,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             <p className="text-sm text-gray-600 dark:text-gray-400">
               If the camera doesn&apos;t start, or you prefer to upload:
             </p>
-            <button onClick={() => fileInputRef.current?.click()} className="btn w-full py-2">
+            <button onClick={handleUploadClick} className="btn w-full py-2">
               Upload Image
             </button>
             <button onClick={startCamera} className="btn w-full py-2">
@@ -465,13 +485,34 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
           </div>
         )}
 
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-        />
+        <div
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+          onKeyUp={(e) => e.stopPropagation()}
+          style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            onBlur={(e) => {
+              // Prevent blur events from interfering with dialog
+              e.stopPropagation()
+            }}
+            onFocus={(e) => {
+              // Prevent focus events from interfering with dialog
+              e.stopPropagation()
+            }}
+            onClick={(e) => {
+              // Prevent click events from bubbling to dialog
+              e.stopPropagation()
+            }}
+            style={{ display: 'none', position: 'absolute', left: '-9999px' }}
+          />
+        </div>
       </div>
     </Dialog>
   )

@@ -51,22 +51,24 @@ const AccordionItem: React.FC<{
   const hasContent = !!item.content
 
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+    <div className="border-b border-gray-200 last:border-b-0 dark:border-gray-700">
       <button
         type="button"
         onClick={onToggle}
-        className={`flex items-center justify-between w-full p-3 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75 ${
+        className={`focus-visible:ring-opacity-75 flex w-full items-center justify-between p-3 text-left text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 dark:text-gray-300 dark:hover:bg-gray-800 ${
           titleClassName || ''
         }`}
         aria-expanded={isOpen}
       >
         <span className="flex-1">{item.title}</span>
-        <span className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : 'rotate-0'}`}>
-          {isOpen && openIcon ? openIcon : icon ? icon : <ChevronDownIcon />}
-        </span>
+        {(hasSubItems || hasContent) && (
+          <span className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : 'rotate-0'}`}>
+            {isOpen && openIcon ? openIcon : icon ? icon : <ChevronDownIcon />}
+          </span>
+        )}
       </button>
       {isOpen && (hasSubItems || hasContent) && (
-        <div className={`p-3 bg-white dark:bg-gray-800/50 ${contentClassName || ''}`}>
+        <div className={`bg-white p-3 dark:bg-gray-800/50 ${contentClassName || ''}`}>
           {item.content}
           {hasSubItems && (
             <Accordion
@@ -118,7 +120,7 @@ const Accordion: React.FC<AccordionProps> = ({
   }
 
   return (
-    <div className={`border border-gray-200 dark:border-gray-700 rounded-md ${className || ''}`}>
+    <div className={`rounded-md border border-gray-200 dark:border-gray-700 ${className || ''}`}>
       {items.map((item) => (
         <AccordionItem
           key={item.id}

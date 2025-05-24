@@ -132,24 +132,24 @@ export default function CategoriesPage() {
     return categories.map((cat) => ({
       id: cat.id,
       title: (
-        <div className="flex justify-between items-center w-full">
+        <div className="flex w-full items-center justify-between">
           <span>
             {cat.name}
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(ID: {cat.id})</span>
+            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(ID: {cat.id})</span>
           </span>
           {cat.parts_count > 0 && (
-            <NextLink href={`/?category=${cat.id}`} passHref legacyBehavior>
-              <a
-                onClick={(e) => e.stopPropagation()} // Prevent accordion toggle when clicking badge/link
-                className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100 rounded-full hover:bg-green-200 dark:hover:bg-green-600"
-              >
-                {cat.parts_count.toLocaleString()} parts
-              </a>
+            <NextLink
+              href={`/?category=${cat.id}`}
+              onClick={(e) => e.stopPropagation()} // Prevent accordion toggle when clicking badge/link
+              className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800 hover:bg-green-200 dark:bg-green-700 dark:text-green-100 dark:hover:bg-green-600"
+            >
+              {cat.parts_count.toLocaleString()} parts
             </NextLink>
           )}
         </div>
       ),
-      childrenItems: cat.children ? transformCategoriesToAccordionItems(cat.children) : undefined,
+      childrenItems:
+        cat.children && cat.children.length > 0 ? transformCategoriesToAccordionItems(cat.children) : undefined,
     }))
   }
 
@@ -159,113 +159,99 @@ export default function CategoriesPage() {
   }, [isLoading, error, categoryId, topLevelCategories])
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <div className="min-h-screen bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
       {/* <Header /> */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-4">LEGO Categories</h1>
-          <nav aria-label="breadcrumb">
-            <ol className="flex space-x-2 text-sm text-gray-500 dark:text-gray-400">
-              {breadcrumbs.map((crumb, index) => (
-                <li key={crumb.id || 'home'} className="flex items-center">
-                  {index > 0 && <span className="mx-2">/</span>}
-                  <NextLink
-                    href={crumb.href}
-                    className={`hover:underline ${
-                      index === breadcrumbs.length - 1
-                        ? 'font-semibold text-blue-600 dark:text-blue-400'
-                        : 'text-gray-600 dark:text-gray-300'
-                    }`}
-                  >
-                    {crumb.name}
-                  </NextLink>
-                </li>
-              ))}
-            </ol>
-          </nav>
+          <h1 className="mb-4 text-3xl font-bold">LEGO Categories</h1>
         </div>
 
         {isLoading && (
-          <div className="flex justify-center items-center py-10">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="flex items-center justify-center py-10">
+            <div className="h-12 w-12 animate-spin rounded-full border-t-2 border-b-2 border-blue-500"></div>
             <p className="ml-3">Loading categories...</p>
           </div>
         )}
 
         {error && (
           <div
-            className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded-md relative my-4"
+            className="relative my-4 rounded-md border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:border-red-600 dark:bg-red-900/30 dark:text-red-300"
             role="alert"
           >
             <strong className="font-bold">Error!</strong>
-            <span className="block sm:inline ml-2">{error}</span>
+            <span className="ml-2 block sm:inline">{error}</span>
           </div>
         )}
 
         {!isLoading && !error && (
           <>
             {currentCategory && (
-              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-6 shadow">
-                <h2 className="text-2xl font-semibold mb-2 text-blue-800 dark:text-blue-200">
+              <div className="mb-6 rounded-lg bg-blue-50 p-4 shadow dark:bg-blue-900/30">
+                <h2 className="mb-2 text-2xl font-semibold text-blue-800 dark:text-blue-200">
                   {currentCategory.name}
-                  <span className="text-sm font-normal ml-2 text-gray-600 dark:text-gray-400">
+                  <span className="ml-2 text-sm font-normal text-gray-600 dark:text-gray-400">
                     (ID: {currentCategory.id})
                   </span>
                 </h2>
                 {currentCategory.parts_count > 0 && (
-                  <NextLink href={`/?category=${currentCategory.id}`} passHref legacyBehavior>
-                    <a className="inline-block mb-2 px-3 py-1 text-sm bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100 rounded-full hover:bg-green-200 dark:hover:bg-green-600">
-                      {currentCategory.parts_count.toLocaleString()} parts (includes subcategories)
-                    </a>
+                  <NextLink
+                    href={`/?category=${currentCategory.id}`}
+                    className="mb-2 inline-block rounded-full bg-green-100 px-3 py-1 text-sm text-green-800 hover:bg-green-200 dark:bg-green-700 dark:text-green-100 dark:hover:bg-green-600"
+                  >
+                    {currentCategory.parts_count.toLocaleString()} parts (includes subcategories)
                   </NextLink>
                 )}
-                <NextLink href={`/?category=${currentCategory.id}`} passHref legacyBehavior>
-                  <a className="block sm:inline-block sm:ml-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
-                    View All Parts in {currentCategory.name}
-                  </a>
+                <NextLink
+                  href={`/?category=${currentCategory.id}`}
+                  className="block rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none sm:ml-2 sm:inline-block dark:focus:ring-offset-gray-800"
+                >
+                  View All Parts in {currentCategory.name}
                 </NextLink>
               </div>
             )}
 
             {categoryId ? (
               childCategoriesForGrid.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {childCategoriesForGrid.map((category) => (
                     <div
                       key={category.id}
-                      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all hover:shadow-lg"
+                      className="overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800"
                     >
-                      <div className="p-4 bg-blue-50 dark:bg-blue-900/40">
+                      <div className="bg-blue-50 p-4 dark:bg-blue-900/40">
                         <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-300">
                           {category.name}
-                          <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">(ID: {category.id})</span>
+                          <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">(ID: {category.id})</span>
                         </h3>
                         {category.parts_count > 0 && (
-                          <NextLink href={`/?category=${category.id}`} passHref legacyBehavior>
-                            <a className="mt-1 inline-block px-2 py-0.5 text-xs bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100 rounded-full hover:bg-green-200 dark:hover:bg-green-600">
-                              {category.parts_count.toLocaleString()} parts
-                            </a>
+                          <NextLink
+                            href={`/?category=${category.id}`}
+                            className="mt-1 inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800 hover:bg-green-200 dark:bg-green-700 dark:text-green-100 dark:hover:bg-green-600"
+                          >
+                            {category.parts_count.toLocaleString()} parts
                           </NextLink>
                         )}
                       </div>
-                      <div className="p-4 space-y-2">
+                      <div className="space-y-2 p-4">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {category.children && category.children.length > 0
                             ? `${category.children.length} subcategories`
                             : 'No direct subcategories'}
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                        <div className="flex flex-col gap-2 pt-2 sm:flex-row">
                           {category.children && category.children.length > 0 && (
-                            <NextLink href={`/categories?id=${category.id}`} passHref legacyBehavior>
-                              <a className="flex-1 px-3 py-2 text-sm text-center font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-800/60 rounded-md hover:bg-blue-200 dark:hover:bg-blue-700">
-                                Subcategories
-                              </a>
+                            <NextLink
+                              href={`/categories?id=${category.id}`}
+                              className="flex-1 rounded-md bg-blue-100 px-3 py-2 text-center text-sm font-medium text-blue-600 hover:bg-blue-200 dark:bg-blue-800/60 dark:text-blue-400 dark:hover:bg-blue-700"
+                            >
+                              Subcategories
                             </NextLink>
                           )}
-                          <NextLink href={`/?category=${category.id}`} passHref legacyBehavior>
-                            <a className="flex-1 px-3 py-2 text-sm text-center font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
-                              View Parts
-                            </a>
+                          <NextLink
+                            href={`/?category=${category.id}`}
+                            className="flex-1 rounded-md bg-blue-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-blue-700"
+                          >
+                            View Parts
                           </NextLink>
                         </div>
                       </div>
@@ -273,15 +259,16 @@ export default function CategoriesPage() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg text-center shadow">
-                  <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-4">
+                <div className="rounded-lg bg-gray-100 p-8 text-center shadow dark:bg-gray-800">
+                  <h3 className="mb-4 text-xl font-semibold text-gray-600 dark:text-gray-400">
                     No subcategories found for {currentCategory?.name || 'this category'}.
                   </h3>
                   {currentCategory && (
-                    <NextLink href={`/?category=${currentCategory.id}`} passHref legacyBehavior>
-                      <a className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
-                        View Parts in {currentCategory.name}
-                      </a>
+                    <NextLink
+                      href={`/?category=${currentCategory.id}`}
+                      className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-gray-800"
+                    >
+                      View Parts in {currentCategory.name}
                     </NextLink>
                   )}
                 </div>
@@ -289,13 +276,13 @@ export default function CategoriesPage() {
             ) : (
               accordionItems.length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-semibold mb-3 text-gray-700 dark:text-gray-200">
+                  <h2 className="mb-3 text-2xl font-semibold text-gray-700 dark:text-gray-200">
                     Browse All Categories
                   </h2>
                   <Accordion
                     items={accordionItems}
                     allowMultiple
-                    defaultOpenIds={topLevelCategories.slice(0, 3).map((c) => c.id)}
+                    defaultOpenIds={topLevelCategories.map((c) => c.id)}
                   />
                 </div>
               )
