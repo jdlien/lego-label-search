@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Dialog from './Dialog'
 
@@ -287,9 +288,11 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
         {/* Part image */}
         <div className="flex h-56 w-full items-center justify-center rounded-md border border-gray-200 bg-white p-4 shadow-md md:h-80 md:w-96">
           {!imageError && imageSrc ? (
-            <img
+            <Image
               src={imageSrc}
               alt={part.name || part.id}
+              width={320}
+              height={320}
               className="max-h-full max-w-full object-contain"
               onError={handleImageError}
             />

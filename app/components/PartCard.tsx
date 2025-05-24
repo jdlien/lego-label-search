@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import PillContainer from './PillContainer'
 
@@ -232,9 +233,11 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
             className="mr-3 flex h-32 w-40 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm border border-gray-200 bg-white p-1 dark:border-gray-600"
           >
             {!imageError ? (
-              <img
+              <Image
                 src={imageSrc}
                 alt={part.name || part.id}
+                width={160}
+                height={128}
                 className="max-h-full max-w-full object-contain"
                 onError={handleImageError}
               />
