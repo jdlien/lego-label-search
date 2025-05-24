@@ -1,6 +1,7 @@
 'use client'
 
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import * as ToastPrimitive from '@radix-ui/react-toast'
 import { IconXMark } from './InputField/InputIcons'
 
@@ -28,6 +29,13 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined)
 
+// Stable ID generator to avoid hydration mismatches
+let toastCounter = 0
+const generateToastId = () => {
+  toastCounter += 1
+  return `toast-${toastCounter}-${Date.now()}`
+}
+
 // Hook to use toast context
 export const useToast = () => {
   const context = useContext(ToastContext)
@@ -45,9 +53,27 @@ interface ToastProviderProps {
 
 export function ToastProvider({ children, swipeDirection = 'right' }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastData[]>([])
+  const [isMounted, setIsMounted] = useState(false)
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  // Ensure we only render portal on client side to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // Open dialog when we have toasts, close when we don't
+  useEffect(() => {
+    if (!dialogRef.current) return
+
+    if (toasts.length > 0 && !dialogRef.current.open) {
+      dialogRef.current.show() // Use show() not showModal() for non-modal
+    } else if (toasts.length === 0 && dialogRef.current.open) {
+      dialogRef.current.close()
+    }
+  }, [toasts.length])
 
   const addToast = (toast: Omit<ToastData, 'id'>) => {
-    const id = Math.random().toString(36).substr(2, 9)
+    const id = generateToastId()
     setToasts((prev) => [...prev, { ...toast, id }])
   }
 
@@ -55,15 +81,30 @@ export function ToastProvider({ children, swipeDirection = 'right' }: ToastProvi
     setToasts((prev) => prev.filter((toast) => toast.id !== id))
   }
 
-  return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+  const toastElements = (
+    <dialog
+      ref={dialogRef}
+      className="m-0 h-auto max-h-none w-auto max-w-none overflow-visible border-0 bg-transparent p-0 outline-0 backdrop:bg-transparent"
+      style={{
+        position: 'fixed',
+        right: '1rem',
+        bottom: '1rem',
+        zIndex: 'auto', // Let the top layer handle stacking
+      }}
+    >
       <ToastPrimitive.Provider swipeDirection={swipeDirection}>
-        {children}
         {toasts.map((toast) => (
           <Toast key={toast.id} toast={toast} onRemove={removeToast} />
         ))}
-        <ToastPrimitive.Viewport className="fixed right-0 bottom-0 z-[9999] m-0 flex max-h-screen w-full max-w-[420px] list-none flex-col-reverse gap-2 p-4 outline-none" />
+        <ToastPrimitive.Viewport className="flex max-h-screen w-full max-w-[420px] list-none flex-col-reverse gap-2 outline-none" />
       </ToastPrimitive.Provider>
+    </dialog>
+  )
+
+  return (
+    <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+      {children}
+      {isMounted && createPortal(toastElements, document.body)}
     </ToastContext.Provider>
   )
 }

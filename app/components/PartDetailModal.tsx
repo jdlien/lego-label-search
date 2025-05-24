@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Dialog from './Dialog'
-import { useToastHelpers } from './Toast'
+import { useToastHelpers } from './ToastPop'
 
 type PartData = {
   id: string

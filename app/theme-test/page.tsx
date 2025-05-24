@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import InputField from '../components/InputField' // Assuming InputField is in components
 import FormField from '../components/InputField/FormField'
 import { IconUser, IconAt, IconCurrencyDollar } from '../components/InputField/InputIcons' // Assuming icons might be used as prefixes/suffixes
-import { ToastProvider, useToastHelpers } from '../components/Toast'
+import { useToastHelpers } from '../components/ToastPop'
 // This page is an important page used to test the InputField component and its various states and features.
 // Do not delete this page until we have confirmed that InputField has been extracted to its own package.
 
@@ -718,9 +718,5 @@ function ThemeTestPageContent() {
 }
 
 export default function ThemeTestPage() {
-  return (
-    <ToastProvider>
-      <ThemeTestPageContent />
-    </ToastProvider>
-  )
+  return <ThemeTestPageContent />
 }
