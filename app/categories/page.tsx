@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import NextLink from 'next/link'
 import Accordion, { AccordionItemDef } from '../components/Accordion' // Assuming Accordion.tsx is in ../components
@@ -44,7 +44,7 @@ const transformCategoriesToAccordionItems = (categories: Category[]): AccordionI
   }))
 }
 
-export default function CategoriesPage() {
+function CategoriesPageContent() {
   const searchParams = useSearchParams()
   const categoryId = searchParams.get('id')
 
@@ -264,5 +264,29 @@ export default function CategoriesPage() {
       </main>
       {/* <Footer /> */}
     </div>
+  )
+}
+
+function CategoriesLoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="mb-4 text-3xl font-bold">LEGO Categories</h1>
+        </div>
+        <div className="flex items-center justify-center py-10">
+          <div className="h-12 w-12 animate-spin rounded-full border-t-2 border-b-2 border-blue-500"></div>
+          <p className="ml-3">Loading categories...</p>
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export default function CategoriesPage() {
+  return (
+    <Suspense fallback={<CategoriesLoadingFallback />}>
+      <CategoriesPageContent />
+    </Suspense>
   )
 }

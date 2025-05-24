@@ -4,6 +4,29 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Dialog from './Dialog'
 
+type PartData = {
+  id: string
+  name?: string
+  description?: string
+  category_id?: string
+  grandparent_category?: string
+  grandparent_cat_id?: string
+  parent_category?: string
+  parent_cat_id?: string
+  ba_category_name?: string
+  ba_cat_id?: string
+  part_material?: string
+  image_url?: string
+  alternatesByType?: Record<
+    string,
+    {
+      heading: string
+      description: string
+      ids: string[]
+    }
+  >
+}
+
 type PartDetailModalProps = {
   isOpen: boolean
   onClose: () => void
@@ -34,7 +57,7 @@ const DownloadIcon = () => (
 
 export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch }: PartDetailModalProps) {
   const router = useRouter()
-  const [part, setPart] = useState<any>(null)
+  const [part, setPart] = useState<PartData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imageSrc, setImageSrc] = useState<string>('')
@@ -360,34 +383,33 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
           )}
 
           {/* Alternative part relationships */}
-          {part.alternatesByType &&
-            Object.entries(part.alternatesByType).some(([_, rel]: [string, any]) => rel.ids.length > 0) && (
-              <div>
-                <h4 className="mb-1 text-lg font-semibold text-gray-700 dark:text-gray-300">Alternate Parts</h4>
-                <div className="space-y-3">
-                  {Object.entries(part.alternatesByType).map(
-                    ([type, rel]: [string, any]) =>
-                      rel.ids.length > 0 && (
-                        <div key={type}>
-                          <h5 className="mb-1 font-medium text-gray-600 dark:text-gray-400">{rel.heading}</h5>
-                          <p className="mb-2 text-xs text-gray-500 dark:text-gray-500">{rel.description}</p>
-                          <div className="flex flex-wrap gap-2">
-                            {rel.ids.map((altId: string) => (
-                              <button
-                                key={altId}
-                                onClick={() => onPartSearch?.(altId)}
-                                className="cursor-pointer rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                              >
-                                {altId}
-                              </button>
-                            ))}
-                          </div>
+          {part.alternatesByType && Object.entries(part.alternatesByType).some(([, rel]) => rel.ids.length > 0) && (
+            <div>
+              <h4 className="mb-1 text-lg font-semibold text-gray-700 dark:text-gray-300">Alternate Parts</h4>
+              <div className="space-y-3">
+                {Object.entries(part.alternatesByType).map(
+                  ([type, rel]) =>
+                    rel.ids.length > 0 && (
+                      <div key={type}>
+                        <h5 className="mb-1 font-medium text-gray-600 dark:text-gray-400">{rel.heading}</h5>
+                        <p className="mb-2 text-xs text-gray-500 dark:text-gray-500">{rel.description}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {rel.ids.map((altId: string) => (
+                            <button
+                              key={altId}
+                              onClick={() => onPartSearch?.(altId)}
+                              className="cursor-pointer rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                            >
+                              {altId}
+                            </button>
+                          ))}
                         </div>
-                      )
-                  )}
-                </div>
+                      </div>
+                    )
+                )}
               </div>
-            )}
+            </div>
+          )}
 
           {/* Label download buttons */}
           <div className="border-t border-gray-200 pt-4 dark:border-gray-600">

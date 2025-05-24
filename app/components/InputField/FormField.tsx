@@ -32,7 +32,8 @@ const FormField: React.FC<FormFieldProps> = (props) => {
   const sizeToUse = size || defaultUISize
   const themeToUse = theme || defaultTheme
 
-  const idToUse = propId || useId()
+  const generatedId = useId()
+  const idToUse = propId || generatedId
 
   return (
     <InputFieldContainer
