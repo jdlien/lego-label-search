@@ -195,6 +195,115 @@
   margin-left: calc(-1.5 * var(--notch-radius) + var(--pill-gap));
 }
 
+/* Toast animations */
+@keyframes toast-slide-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes toast-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes toast-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Apply animations to toast elements using multiple selector strategies */
+/* Radix UI Toast Root selectors */
+[data-radix-toast-root],
+[data-radix-toast-root][data-state='open'] {
+  animation: toast-slide-in 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-radix-toast-root][data-state='closed'] {
+  animation: toast-slide-out 200ms ease-in;
+}
+
+/* Alternative selectors for different Radix versions */
+[data-state='open'][role='status'],
+[data-state='open'][role='alert'] {
+  animation: toast-slide-in 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-state='closed'][role='status'],
+[data-state='closed'][role='alert'] {
+  animation: toast-slide-out 200ms ease-in;
+}
+
+/* Generic toast component selectors as fallback */
+.toast-root,
+.toast {
+  animation: toast-slide-in 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-root[data-state='closed'],
+.toast[data-state='closed'] {
+  animation: toast-slide-out 200ms ease-in;
+}
+
+/* Swipe animations */
+[data-radix-toast-root][data-swipe='move'] {
+  transform: translateX(var(--radix-toast-swipe-move-x));
+}
+
+[data-radix-toast-root][data-swipe='cancel'] {
+  transform: translateX(0);
+  transition: transform 200ms ease-out;
+}
+
+[data-radix-toast-root][data-swipe='end'] {
+  animation: toast-slide-out 100ms ease-out;
+}
+
+/* Swipe animations for alternative selector */
+[data-swipe='move'][role='status'],
+[data-swipe='move'][role='alert'] {
+  transform: translateX(var(--radix-toast-swipe-move-x));
+}
+
+[data-swipe='cancel'][role='status'],
+[data-swipe='cancel'][role='alert'] {
+  transform: translateX(0);
+  transition: transform 200ms ease-out;
+}
+
+[data-swipe='end'][role='status'],
+[data-swipe='end'][role='alert'] {
+  animation: toast-slide-out 100ms ease-out;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

@@ -174,7 +174,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
             <InputField
               value={query}
               onChange={handleInputChange}
-              prefix={<IconMagnifyingGlass className="h-4 w-4" />}
+              prefix={<IconMagnifyingGlass />}
               placeholder="Search for part number or name..."
               clearButton
             />
