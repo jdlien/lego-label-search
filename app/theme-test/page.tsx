@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import InputField from '../components/InputField' // Assuming InputField is in components
 import FormField from '../components/InputField/FormField'
 import { IconUser, IconAt, IconCurrencyDollar } from '../components/InputField/InputIcons' // Assuming icons might be used as prefixes/suffixes
+// This page is an important page used to test the InputField component and its various states and features.
+// Do not delete this page until we have confirmed that InputField has been extracted to its own package.
 
 /*
   TODO:
@@ -69,7 +71,7 @@ export default function ThemeTestPage() {
 
   return (
     <div>
-      <div className="p-8 space-y-6">
+      <div className="space-y-6 p-8">
         <h1 className="text-3xl font-bold">Theme & UI Test Page</h1>
         <p className="text-gray-600 dark:text-gray-300">
           Use this page to test new UI components and themes in isolation.
@@ -108,8 +110,8 @@ export default function ThemeTestPage() {
       </div>
 
       <header className="mb-12">
-        <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-white">InputField Component Showcase</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 text-center mt-2">
+        <h1 className="text-center text-4xl font-bold text-gray-900 dark:text-white">InputField Component Showcase</h1>
+        <p className="mt-2 text-center text-lg text-gray-600 dark:text-gray-400">
           Testing various states and types of the InputField component.
         </p>
       </header>
@@ -124,7 +126,7 @@ export default function ThemeTestPage() {
           <InputField name="solo-input" placeholder="Solo Input (No Container" type="email" />
         </div>
 
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">
           Standard Text Inputs
         </h2>
         <div className="">
@@ -237,7 +239,7 @@ export default function ThemeTestPage() {
 
       {/* Specialized Text Inputs */}
       <section className="p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">
           Specialized Text Inputs
         </h2>
         <div className="">
@@ -319,10 +321,10 @@ export default function ThemeTestPage() {
 
       {/* Date and Time Inputs */}
       <section className="p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">
           Date & Time Inputs
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+        <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
           Note: These use text inputs. For actual date pickers, integrate a library like Flatpickr by passing
           `data-fp-options`.
         </p>
@@ -372,8 +374,8 @@ export default function ThemeTestPage() {
 
       {/* Select Input */}
       <section className="p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">Select Input</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">Select Input</h2>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <FormField
             type="select"
             label="Basic Select"
@@ -418,35 +420,35 @@ export default function ThemeTestPage() {
       </section>
 
       <section className="p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">Gray Themes</h2>
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">Gray Themes</h2>
 
-        <div className="py-1 bg-slate-50 dark:bg-slate-900">
+        <div className="bg-slate-50 py-1 dark:bg-slate-900">
           <FormField type="email" label="Slate Theme" name="text_slate" theme="slate" placeholder="Slate" />
         </div>
 
-        <div className="py-1 bg-gray-50 dark:bg-gray-900">
+        <div className="bg-gray-50 py-1 dark:bg-gray-900">
           <FormField type="email" label="Gray Theme" name="text_gray" theme="gray" placeholder="Gray" />
         </div>
 
-        <div className="py-1 bg-zinc-50 dark:bg-zinc-900">
+        <div className="bg-zinc-50 py-1 dark:bg-zinc-900">
           <FormField type="email" label="Zinc Theme" name="text_zinc" theme="zinc" placeholder="Zinc" />
         </div>
 
-        <div className="py-1 bg-neutral-50 dark:bg-neutral-900">
+        <div className="bg-neutral-50 py-1 dark:bg-neutral-900">
           <FormField type="email" label="Neutral Theme" name="text_neutral" theme="neutral" placeholder="Neutral" />
         </div>
 
-        <div className="py-1 bg-stone-50 dark:bg-stone-900">
+        <div className="bg-stone-50 py-1 dark:bg-stone-900">
           <FormField type="email" label="Stone Theme" name="text_stone" theme="stone" placeholder="Stone" />
         </div>
       </section>
 
       {/* Textarea and Markdown */}
       <section className="p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">
           Textarea & Markdown
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <FormField
             type="textarea"
             label="Textarea"
@@ -482,10 +484,10 @@ export default function ThemeTestPage() {
 
       {/* Checkbox Inputs */}
       <section className="p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">
           Checkbox Inputs
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
           <FormField
             type="checkbox"
             label="Single Checkbox"
@@ -551,8 +553,8 @@ export default function ThemeTestPage() {
 
       {/* Radio Inputs */}
       <section className="p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">Radio Inputs</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">Radio Inputs</h2>
+        <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
           <FormField
             type="radio"
             label="Radio Group (Vertical)"
@@ -595,7 +597,7 @@ export default function ThemeTestPage() {
 
       {/* Other Input Types */}
       <section className="p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">Other Types</h2>
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">Other Types</h2>
         <div className="">
           <FormField
             type="display"
@@ -616,17 +618,17 @@ export default function ThemeTestPage() {
 
       {/* Test the original buttons and fields from the page */}
       <section className="p-6">
-        <h2 className="text-2xl font-semibold mb-6 border-b pb-2 border-gray-300 dark:border-gray-700">
+        <h2 className="mb-6 border-b border-gray-300 pb-2 text-2xl font-semibold dark:border-gray-700">
           Original Page Elements (for comparison)
         </h2>
-        <div className="flex gap-4 mb-4">
+        <div className="mb-4 flex gap-4">
           <button className="btn">Default Button</button>
           <button className="btn btn-primary">Primary Button</button>
           <button className="btn btn-danger">Danger Button</button>
           <button className="btn btn-green">Green Button</button>
           <button className="btn btn-ghost">Ghost Button</button>
         </div>
-        <div className="flex gap-4 mb-4">
+        <div className="mb-4 flex gap-4">
           <button className="btn" disabled>
             Disabled Button
           </button>

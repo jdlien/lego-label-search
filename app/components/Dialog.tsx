@@ -74,6 +74,14 @@ export default function Dialog({
     if (!dialog) return
 
     const handleCancel = (e: Event) => {
+      // Check if the cancel event originated from a file input
+      const target = e.target as HTMLElement
+      if (target && target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'file') {
+        e.preventDefault()
+        return
+      }
+
+      // Otherwise, this is likely an ESC key press, so close the dialog
       e.preventDefault()
       onClose()
     }
@@ -104,7 +112,7 @@ export default function Dialog({
   return (
     <dialog
       ref={dialogRef}
-      className={`w-[92vw] rounded-lg border p-0 ${sizeClasses[size]} mx-auto mt-6 max-h-[90vh] border border-gray-200 bg-white shadow-3xl transition-all duration-300 ease-out backdrop:duration-400 sm:mt-28 dark:border-gray-700 dark:border-t-gray-600 dark:bg-gray-800 ${
+      className={`w-[92vw] rounded-lg border p-0 text-gray-800 dark:text-white ${sizeClasses[size]} mx-auto mt-6 max-h-[90vh] border border-gray-200 bg-white shadow-3xl transition-all duration-300 ease-out backdrop:duration-400 sm:mt-28 dark:border-gray-700 dark:border-t-gray-600 dark:bg-gray-800 ${
         shouldShow ? 'opacity-100 backdrop:bg-black/50' : 'opacity-0 backdrop:bg-transparent'
       }`}
     >
