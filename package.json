@@ -9,6 +9,7 @@
     "dev:no-turbo": "USE_TURBOPACK=false node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
+    "start:next": "NODE_ENV=production next start",
     "lint": "next lint",
     "update-alt-parts": "node scripts/update_alt_part_ids.js"
   },

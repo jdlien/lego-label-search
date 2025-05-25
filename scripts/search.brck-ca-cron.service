@@ -1,0 +1,26 @@
+[Unit]
+Description=Search BRCK CA Cron Service
+After=network.target
+
+[Service]
+Type=simple
+User=jdlien
+WorkingDirectory=/var/www/search.brck.ca
+Environment=NODE_ENV=production
+
+# Standard streams for logging
+StandardOutput=journal
+StandardError=journal
+
+# Graceful shutdown
+KillSignal=SIGINT
+KillMode=control-group
+TimeoutStopSec=30s
+
+Restart=always
+RestartSec=10
+
+ExecStart=/usr/bin/node scripts/cron-service.js
+
+[Install]
+WantedBy=multi-user.target
