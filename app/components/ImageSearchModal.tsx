@@ -305,7 +305,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
       const formData = new FormData()
       formData.append('query_image', selectedImage)
 
-      const response = await fetch('/api/predict/parts', {
+      const response = await fetch('/api/predict/part', {
         method: 'POST',
         body: formData,
       })

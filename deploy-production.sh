@@ -42,7 +42,7 @@ fi
 
 # Start/reload the application with PM2
 echo -e "${YELLOW}Starting application with PM2...${NC}"
-pm2 reload search-brck-ca || pm2 start npm --name "search-brck-ca" -- run start:next
+pm2 reload search-brck-ca || pm2 start npm --name "search-brck-ca" -- run start
 
 # Update nginx configuration if needed
 if [ -f "nginx-production.conf" ]; then
