@@ -10,7 +10,7 @@ const HEIC_MIME_TYPES = ['image/heic', 'image/heif']
 
 /**
  * API route handler for Brickognize image prediction
- * POST /api/predict/part
+ * POST /api/predict/parts
  */
 export async function POST(request: NextRequest) {
   try {
