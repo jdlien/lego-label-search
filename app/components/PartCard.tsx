@@ -66,7 +66,7 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
   const router = useRouter()
-  const { success, error, warning } = useToastHelpers()
+  const { error, warning } = useToastHelpers()
 
   // Handle image error - try to load PNG if WebP fails
   const handleImageError = () => {
