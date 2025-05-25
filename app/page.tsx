@@ -162,18 +162,10 @@ function HomeContent() {
             <>
               {totalResultCount > MAX_DISPLAY_RESULTS && (
                 <div className="mb-4 rounded-md border border-sky-300 bg-sky-50 px-4 py-2 text-sky-800 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300">
-                  <div className="flex items-center">
-                    <svg className="mr-2 h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                  <div className="flex items-center justify-center">
                     {/* This is my lazy ass way of avoiding building a pagination system. */}
-                    <p>
-                      Showing {results.length} of {totalResultCount} total results
+                    <p className="text-center">
+                      Showing {results.length} of {totalResultCount} results
                     </p>
                   </div>
                 </div>
