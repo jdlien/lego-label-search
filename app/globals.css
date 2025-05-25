@@ -19,6 +19,11 @@
     /* Dark mode styles */
     @apply dark:bg-gray-800 dark:text-white;
   }
+
+  /* Prevent body scroll when modal dialog is open */
+  body:has(dialog[open]) {
+    overflow: hidden;
+  }
 }
 
 @layer components {
