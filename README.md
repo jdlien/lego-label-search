@@ -89,6 +89,8 @@ The caching system ensures fast API responses while keeping count data up-to-dat
 
 ## TODO
 
+- Properly handle pagination.
+- Do something to sort results by relevance.
 - Test and polish PWA mode.
 - When uploading a HEIC image, the preview is not shown. Maybe there's a way to work around this, but the cause is almost certainly that the HEIC images are not supported by the browser.
 - When a part has many alternates, they may all show at once. I might prefer to consolidate the search results to only show one record if it has many alternates.
