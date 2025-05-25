@@ -32,10 +32,9 @@ export const PWATopBar = () => {
 
   return (
     <div
-      className="pointer-events-none fixed top-0 right-0 left-0 z-[9999] bg-sky-700 dark:bg-gray-800"
+      className="fixed top-0 right-0 left-0 z-50 bg-sky-700 dark:bg-gray-800"
       style={{
         height: 'env(safe-area-inset-top, 0px)',
-        maxHeight: '50px', // Prevent excessive height
       }}
     />
   )
@@ -94,6 +93,7 @@ export const PWAViewportAdjuster = ({ children, className = '' }: PWAViewportAdj
     <div
       className={className}
       style={{
+        paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingBottom: 'calc(env(safe-area-inset-bottom) + 50px)',
         width: '100%',
       }}
