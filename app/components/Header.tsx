@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { DarkModeToggle } from './DarkModeToggle'
 import { BrckLogo } from './BrckLogo'
 import { usePWA } from './PWAHandler'
@@ -29,11 +29,48 @@ function NavLink({ href, children, onClick = () => {} }) {
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const isPWA = usePWA()
+  const [safeAreaHeight, setSafeAreaHeight] = useState<number>(0)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isPWA) {
+      // Try to get safe area from CSS env()
+      const testDiv = document.createElement('div')
+      testDiv.style.height = 'env(safe-area-inset-top, 0px)'
+      testDiv.style.position = 'fixed'
+      testDiv.style.top = '0'
+      testDiv.style.visibility = 'hidden'
+      document.body.appendChild(testDiv)
+
+      const computedHeight = window.getComputedStyle(testDiv).height
+      const heightValue = parseInt(computedHeight) || 0
+
+      document.body.removeChild(testDiv)
+
+      // Fallback detection for iOS devices
+      let fallbackHeight = 0
+      if (heightValue === 0 && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        const screenHeight = window.screen.height
+        const screenWidth = window.screen.width
+
+        if (screenHeight >= 812 || screenWidth >= 812) {
+          fallbackHeight = 44
+        }
+      }
+
+      setSafeAreaHeight(heightValue || fallbackHeight)
+    }
+  }, [isPWA])
 
   return (
     <header
       className="bg-sky-700 px-4 py-2 text-white shadow-md dark:bg-gray-800"
-      style={isPWA ? { marginTop: 'env(safe-area-inset-top, 0px)' } : undefined}
+      style={
+        isPWA && safeAreaHeight > 0
+          ? { marginTop: `${safeAreaHeight}px` }
+          : isPWA
+            ? { marginTop: 'env(safe-area-inset-top, 0px)' }
+            : undefined
+      }
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between">
         <h1 className="text-xl font-semibold sm:text-2xl">
