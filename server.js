@@ -23,6 +23,16 @@ const CRON_SCHEDULE = process.env.CATEGORY_COUNT_CRON || '0 2 * * *'
 app.prepare().then(() => {
   const server = createServer(async (req, res) => {
     const parsedUrl = parse(req.url, true)
+
+    // Explicitly handle API routes
+    if (parsedUrl.pathname && parsedUrl.pathname.startsWith('/api/')) {
+      console.log(`Handling API route: ${parsedUrl.pathname}`)
+      // Set proper headers for API routes
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+      res.setHeader('Pragma', 'no-cache')
+      res.setHeader('Expires', '0')
+    }
+
     await handle(req, res, parsedUrl)
   })
 

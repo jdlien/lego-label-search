@@ -15,6 +15,10 @@ const nextConfig = {
       },
     ],
   },
+  // Ensure API routes work properly in production
+  experimental: {
+    serverComponentsExternalPackages: ['sharp', 'heic-convert'],
+  },
   /* Uncomment when ready for production
   output: 'export',
   images: { unoptimized: true },

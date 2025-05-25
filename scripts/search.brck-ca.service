@@ -21,7 +21,7 @@ TimeoutStopSec=30s     # Increased timeout for graceful shutdown
 Restart=always
 RestartSec=10
 
-ExecStart=/usr/bin/node server.js
+ExecStart=/usr/bin/npx next start
 # ExecStop is removed as KillSignal and KillMode handle this.
 # ExecStopPost is removed; systemd will SIGKILL if TimeoutStopSec is reached.
 
