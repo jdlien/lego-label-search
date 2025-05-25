@@ -32,8 +32,11 @@ export const PWATopBar = () => {
 
   return (
     <div
-      className="pointer-events-none fixed top-0 right-0 left-0 z-[1500] bg-sky-600 backdrop-blur-md dark:bg-gray-800"
-      style={{ height: 'env(safe-area-inset-top)' }}
+      className="pointer-events-none fixed top-0 right-0 left-0 z-[9999] bg-sky-700 dark:bg-gray-800"
+      style={{
+        height: 'env(safe-area-inset-top, 0px)',
+        maxHeight: '50px', // Prevent excessive height
+      }}
     />
   )
 }
@@ -52,7 +55,7 @@ export const PWABottomNav = () => {
         height: 'calc(env(safe-area-inset-bottom) + 50px)',
         paddingLeft: 'calc(1rem + env(safe-area-inset-left))',
         paddingRight: 'calc(1rem + env(safe-area-inset-right))',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) - 50px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom) - 30px)',
       }}
     >
       <button
@@ -91,8 +94,7 @@ export const PWAViewportAdjuster = ({ children, className = '' }: PWAViewportAdj
     <div
       className={className}
       style={{
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) + 30px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom) + 50px)',
         width: '100%',
       }}
     >

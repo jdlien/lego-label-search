@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { DarkModeToggle } from './DarkModeToggle'
 import { BrckLogo } from './BrckLogo'
+import { usePWA } from './PWAHandler'
 
 // NavLink component to handle active link styling
 function NavLink({ href, children, onClick = () => {} }) {
@@ -27,9 +28,13 @@ function NavLink({ href, children, onClick = () => {} }) {
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const isPWA = usePWA()
 
   return (
-    <header className="bg-sky-700 px-4 py-2 text-white shadow-md dark:bg-gray-800">
+    <header
+      className="bg-sky-700 px-4 py-2 text-white shadow-md dark:bg-gray-800"
+      style={isPWA ? { marginTop: 'env(safe-area-inset-top, 0px)' } : undefined}
+    >
       <div className="mx-auto flex max-w-6xl items-center justify-between">
         <h1 className="text-xl font-semibold sm:text-2xl">
           <Link href="/" className="flex items-center gap-3">
@@ -75,7 +80,10 @@ export function Header() {
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} aria-hidden="true" />
 
           {/* Drawer panel */}
-          <div className="fixed top-0 right-0 h-full w-64 bg-sky-700 p-4 shadow-xl dark:bg-gray-800">
+          <div
+            className="fixed top-0 right-0 h-full w-64 bg-sky-700 p-4 shadow-xl dark:bg-gray-800"
+            style={isPWA ? { marginTop: 'env(safe-area-inset-top, 0px)' } : undefined}
+          >
             <div className="flex justify-end">
               <button
                 type="button"
