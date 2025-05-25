@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Dialog from './Dialog'
 import { useToastHelpers } from './ToastPop'
+import { usePWA } from './PWAHandler'
 
 type PartData = {
   id: string
@@ -59,6 +60,7 @@ const DownloadIcon = () => (
 
 export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch }: PartDetailModalProps) {
   const router = useRouter()
+  const isPWA = usePWA()
   const [part, setPart] = useState<PartData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -67,6 +69,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
   const [isDownloading, setIsDownloading] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
+  const [navigatingToPartId, setNavigatingToPartId] = useState<string | null>(null)
   const { error: showError, warning } = useToastHelpers()
 
   useEffect(() => {
@@ -119,6 +122,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
         setIsDownloading(false)
         setIsConverting(false)
         setLabelExists(null)
+        setNavigatingToPartId(null)
       }, 250) // Slightly longer than the 200ms animation
 
       return () => clearTimeout(timer)
@@ -142,14 +146,26 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
     }
   }
 
-  // Handler for category badge clicks
+  // Handler for category badge clicks - iOS PWA compatible
   const handleCategoryClick = (categoryId: string) => (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    // Navigate to homepage with only the category parameter
-    // This will clear any existing search query
-    router.push(`/?category=${categoryId}`)
+    // Close the modal first to ensure navigation works in iOS PWA mode
+    onClose()
+
+    // Use different navigation strategies based on PWA mode
+    if (isPWA) {
+      // In PWA mode, use a more reliable navigation method
+      setTimeout(() => {
+        window.location.href = `/?category=${categoryId}`
+      }, 150) // Slightly longer delay for PWA mode
+    } else {
+      // Standard navigation for regular browser mode
+      setTimeout(() => {
+        router.push(`/?category=${categoryId}`)
+      }, 100)
+    }
   }
 
   // Unified download trigger function
@@ -251,6 +267,40 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
       showError('There was an error converting the label.')
     } finally {
       setIsConverting(false)
+    }
+  }
+
+  // Handler for alternate part clicks - iOS PWA compatible
+  const handleAlternatePartClick = (altId: string) => {
+    // Prevent multiple clicks
+    if (navigatingToPartId === altId) return
+
+    setNavigatingToPartId(altId)
+
+    // Close the modal first to ensure navigation works in iOS PWA mode
+    onClose()
+
+    // Use different navigation strategies based on PWA mode
+    if (isPWA) {
+      // In PWA mode, use a more reliable navigation method
+      setTimeout(() => {
+        // Try the callback first
+        if (onPartSearch) {
+          onPartSearch(altId)
+        } else {
+          // Fallback to direct window navigation for iOS PWA
+          const params = new URLSearchParams()
+          params.append('q', altId)
+          window.location.href = `/?${params.toString()}`
+        }
+        setNavigatingToPartId(null)
+      }, 150) // Slightly longer delay for PWA mode
+    } else {
+      // Standard navigation for regular browser mode
+      setTimeout(() => {
+        onPartSearch?.(altId)
+        setNavigatingToPartId(null)
+      }, 100)
     }
   }
 
@@ -400,10 +450,13 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
                           {rel.ids.map((altId: string) => (
                             <button
                               key={altId}
-                              onClick={() => onPartSearch?.(altId)}
-                              className="cursor-pointer rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                              onClick={() => handleAlternatePartClick(altId)}
+                              disabled={navigatingToPartId === altId}
+                              className={`cursor-pointer rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 ${
+                                navigatingToPartId === altId ? 'cursor-not-allowed opacity-50' : ''
+                              }`}
                             >
-                              {altId}
+                              {navigatingToPartId === altId ? 'Loading...' : altId}
                             </button>
                           ))}
                         </div>
