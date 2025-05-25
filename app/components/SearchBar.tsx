@@ -49,6 +49,12 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
         const response = await fetch('/api/categories')
         const data = await response.json()
 
+        // Check if the response has categories and it's an array
+        if (!data.categories || !Array.isArray(data.categories)) {
+          console.error('Invalid categories response:', data)
+          return
+        }
+
         // Split categories into parent and child categories
         const parentCategories = data.categories
           .filter((cat: Category) => !cat.parent_id || cat.parent_id === '')
