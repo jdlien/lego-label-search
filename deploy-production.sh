@@ -24,8 +24,12 @@ echo -e "${YELLOW}Installing dependencies...${NC}"
 npm ci --production=false
 
 # Build the application (skip linting to avoid memory issues)
-echo -e "${YELLOW}Building application (skipping lint)...${NC}"
-npm run build -- --no-lint
+# echo -e "${YELLOW}Building application (skipping lint)...${NC}"
+# npm run build -- --no-lint
+
+echo -e "${YELLOW}Building application...${NC}"
+npm run build
+
 
 # Stop existing PM2 process
 echo -e "${YELLOW}Stopping existing PM2 process...${NC}"
