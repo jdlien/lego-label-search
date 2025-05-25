@@ -91,3 +91,6 @@ logs/
 data/images/*
 public/data/*
 public/*.zip
+
+# Database files
+data/lego.sqlite
