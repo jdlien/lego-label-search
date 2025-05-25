@@ -313,7 +313,6 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
               width={302}
               height={302}
               className="max-h-full max-w-full object-contain"
-              priority={true} // Modal images are typically above the fold when opened
             />
           ) : (
             <BrickPlaceholder />

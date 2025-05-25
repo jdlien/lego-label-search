@@ -8,7 +8,6 @@ type ImageWithFallbackProps = {
   height: number
   className?: string
   fallback?: React.ReactNode
-  priority?: boolean
 }
 
 // SVG icon for fallback when image fails to load
@@ -27,7 +26,6 @@ export default function ImageWithFallback({
   height,
   className = '',
   fallback,
-  priority = false,
 }: ImageWithFallbackProps) {
   const normalizedPartId = partId.replace(/^0+/, '')
   const webpPath = `/data/images/${normalizedPartId}.webp`
@@ -50,16 +48,5 @@ export default function ImageWithFallback({
     return fallback || <BrickPlaceholder size={width > 100 ? 'h-16 w-16' : 'h-10 w-10'} />
   }
 
-  return (
-    <Image
-      src={currentSrc}
-      alt={alt}
-      width={width}
-      height={height}
-      className={className}
-      onError={handleError}
-      priority={priority}
-      style={{ width: 'auto', height: 'auto' }}
-    />
-  )
+  return <Image src={currentSrc} alt={alt} width={width} height={height} className={className} onError={handleError} />
 }
