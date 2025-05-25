@@ -67,7 +67,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
   const [isDownloading, setIsDownloading] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
-  const { success, error: showError, warning } = useToastHelpers()
+  const { error: showError, warning } = useToastHelpers()
 
   useEffect(() => {
     if (!isOpen || !partId) {

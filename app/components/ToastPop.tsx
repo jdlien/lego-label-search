@@ -137,6 +137,11 @@ function Toast({ toast, onRemove, swipeDirection }: ToastProps) {
     return () => clearTimeout(timer)
   }, [])
 
+  const handleDismiss = useCallback(() => {
+    setIsExiting(true)
+    setTimeout(() => onRemove(toast.id), 300) // Allow exit animation
+  }, [toast.id, onRemove])
+
   // Auto-dismiss timer
   useEffect(() => {
     if (isExiting) return
@@ -146,12 +151,7 @@ function Toast({ toast, onRemove, swipeDirection }: ToastProps) {
     }, toast.duration || 5000)
 
     return () => clearTimeout(timer)
-  }, [toast.id, toast.duration, isExiting])
-
-  const handleDismiss = useCallback(() => {
-    setIsExiting(true)
-    setTimeout(() => onRemove(toast.id), 300) // Allow exit animation
-  }, [toast.id, onRemove])
+  }, [toast.id, toast.duration, isExiting, handleDismiss])
 
   // Touch/Mouse handlers for swipe-to-dismiss
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
