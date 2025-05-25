@@ -471,7 +471,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
                 The image search service is currently unavailable
               </p>
               <p className="mt-1 text-sm text-red-600 dark:text-red-300">
-                Please try again later or contact support if the issue persists.
+                Please try again later or contact the site owner if the issue persists.
               </p>
               <button onClick={checkApiHealth} className="btn mt-2">
                 Retry Connection
