@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Dialog from './Dialog'
 import { useToastHelpers } from './ToastPop'
 import { usePWA } from './PWAHandler'
-import ImageWithFallback from './ImageWithFallback'
 
 type PartData = {
   id: string
@@ -64,6 +64,8 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
   const [part, setPart] = useState<PartData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [imageSrc, setImageSrc] = useState<string>('')
+  const [imageError, setImageError] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
@@ -78,6 +80,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
     const fetchPart = async () => {
       setIsLoading(true)
       setError(null)
+      setImageError(false)
 
       try {
         const response = await fetch(`/api/parts/${partId}`)
@@ -88,6 +91,15 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
 
         const data = await response.json()
         setPart(data)
+
+        // Set up image fallback logic
+        if (data.image_url) {
+          setImageSrc(data.image_url)
+        } else {
+          // Generate image path similar to PartCard
+          const normalizedPartId = partId.replace(/^0+/, '')
+          setImageSrc(`/data/images/${normalizedPartId}.webp`)
+        }
       } catch (err) {
         console.error('Error fetching part details:', err)
         setError(err instanceof Error ? err.message : 'An unknown error occurred')
@@ -105,6 +117,8 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
       const timer = setTimeout(() => {
         setPart(null)
         setError(null)
+        setImageSrc('')
+        setImageError(false)
         setIsDownloading(false)
         setIsConverting(false)
         setLabelExists(null)
@@ -114,6 +128,23 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
       return () => clearTimeout(timer)
     }
   }, [isOpen, part])
+
+  // Handle image error - try to load PNG if WebP fails
+  const handleImageError = () => {
+    if (!partId) return
+
+    const normalizedPartId = partId.replace(/^0+/, '')
+    const webpPath = `/data/images/${normalizedPartId}.webp`
+    const pngPath = `/data/images/${normalizedPartId}.png`
+
+    if (imageSrc === webpPath) {
+      // Try PNG version
+      setImageSrc(pngPath)
+    } else {
+      // If all sources fail, show placeholder
+      setImageError(true)
+    }
+  }
 
   // Handler for category badge clicks - iOS PWA compatible
   const handleCategoryClick = (categoryId: string) => (e: React.MouseEvent) => {
@@ -306,13 +337,14 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
       <div className="flex flex-col gap-6 md:flex-row">
         {/* Part image */}
         <div className="flex h-56 w-full items-center justify-center rounded-md border border-gray-200 bg-white p-4 shadow-md md:h-80 md:w-96">
-          {partId ? (
-            <ImageWithFallback
-              partId={partId}
+          {!imageError && imageSrc ? (
+            <Image
+              src={imageSrc}
               alt={part.name || part.id}
               width={302}
               height={302}
               className="max-h-full max-w-full object-contain"
+              onError={handleImageError}
             />
           ) : (
             <BrickPlaceholder />
