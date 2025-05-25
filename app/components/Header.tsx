@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { DarkModeToggle } from './DarkModeToggle'
 import { BrckLogo } from './BrckLogo'
 import { usePWA } from './PWAHandler'
