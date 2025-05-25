@@ -57,7 +57,6 @@ export default function PartCard({ part, onPartClick, priority = false }: PartCa
   const imagePath = part.img_file ? `/data/images/${part.img_file}` : null
 
   // Simple state management - no complex fallback logic needed
-  const [imageSrc, setImageSrc] = useState<string>(imagePath || '')
   const [imageError, setImageError] = useState(!imagePath)
   const [isDownloading, setIsDownloading] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
@@ -223,9 +222,9 @@ export default function PartCard({ part, onPartClick, priority = false }: PartCa
             }}
             className="mr-3 flex h-32 w-40 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm border border-gray-200 bg-white p-1 dark:border-gray-600"
           >
-            {!imageError && imageSrc ? (
+            {!imageError && imagePath ? (
               <Image
-                src={imageSrc}
+                src={imagePath}
                 alt={part.name || part.id}
                 width={160}
                 height={128}
