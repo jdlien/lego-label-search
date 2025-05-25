@@ -91,7 +91,7 @@ export const PWAViewportAdjuster = ({ children, className = '' }: PWAViewportAdj
     <div
       className={className}
       style={{
-        paddingBottom: 'calc(env(safe-area-inset-bottom) + 0px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom) + 50px)',
         width: '100%',
       }}
     >

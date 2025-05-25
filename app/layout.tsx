@@ -54,15 +54,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="dark:bg-gray-900 dark:text-white">
         <PWATopBar />
         <PWAViewportAdjuster>
-          <div className="">
-            <ThemeProvider defaultTheme="gray" defaultAccent="sky" defaultUISize="lg">
-              <ToastProvider>
-                <Header />
-                <main className="">{children}</main>
-                <Footer />
-              </ToastProvider>
-            </ThemeProvider>
-          </div>
+          <ThemeProvider defaultTheme="gray" defaultAccent="sky" defaultUISize="lg">
+            <ToastProvider>
+              <Header />
+              <main className="">{children}</main>
+              <Footer />
+            </ToastProvider>
+          </ThemeProvider>
         </PWAViewportAdjuster>
         <PWABottomNav />
       </body>
