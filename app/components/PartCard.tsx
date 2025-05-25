@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import PillContainer from './PillContainer'
 import { useToastHelpers } from './ToastPop'
+import ImageWithFallback from './ImageWithFallback'
 
 // SVG icon for fallback when image fails to load
 const BrickPlaceholder = () => (
@@ -50,34 +50,11 @@ type PartCardProps = {
 }
 
 export default function PartCard({ part, onPartClick }: PartCardProps) {
-  // Strip leading zeros for image filename
-  const normalizedPartId = part.id.replace(/^0+/, '')
-
-  // Image paths - with WebP as primary and PNG as fallback
-  const webpPath = `/data/images/${normalizedPartId}.webp`
-  const pngPath = `/data/images/${normalizedPartId}.png`
-  //Experimental attempt to use Rebrickable CDN, this isn't working yet
-  // const rebrickablePath = `https://cdn.rebrickable.com/media/thumbs/parts/elements/${imageId}.jpg/250x250p`
-
-  // Start with WebP, fallback to PNG, then Rebrickable
-  const [imageSrc, setImageSrc] = useState<string>(webpPath)
-  const [imageError, setImageError] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
   const router = useRouter()
   const { error, warning } = useToastHelpers()
-
-  // Handle image error - try to load PNG if WebP fails
-  const handleImageError = () => {
-    if (imageSrc === webpPath) {
-      // Try PNG version
-      setImageSrc(pngPath)
-    } else {
-      // If all sources fail, show placeholder
-      setImageError(true)
-    }
-  }
 
   // Unified download trigger function
   const triggerDownload = async (fileUrl: string, fileName: string) => {
@@ -232,18 +209,13 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
             }}
             className="mr-3 flex h-32 w-40 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm border border-gray-200 bg-white p-1 dark:border-gray-600"
           >
-            {!imageError ? (
-              <Image
-                src={imageSrc}
-                alt={part.name || part.id}
-                width={160}
-                height={128}
-                className="max-h-full max-w-full object-contain"
-                onError={handleImageError}
-              />
-            ) : (
-              <BrickPlaceholder />
-            )}
+            <ImageWithFallback
+              partId={part.id}
+              alt={part.name || part.id}
+              width={160}
+              height={128}
+              className="max-h-full max-w-full object-contain"
+            />
           </a>
 
           {/* Part Details */}
