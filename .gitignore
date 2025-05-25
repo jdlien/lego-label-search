@@ -70,7 +70,7 @@ eggs/
 .eggs/
 lib/
 lib64/
-parts/
+# parts/ - commented out to allow Next.js API routes in app/api/parts/
 sdist/
 var/
 wheels/
