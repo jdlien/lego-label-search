@@ -47,9 +47,10 @@ type Part = {
 type PartCardProps = {
   part: Part
   onPartClick: (partId: string) => void
+  priority?: boolean
 }
 
-export default function PartCard({ part, onPartClick }: PartCardProps) {
+export default function PartCard({ part, onPartClick, priority = false }: PartCardProps) {
   const [isDownloading, setIsDownloading] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
@@ -215,6 +216,7 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
               width={160}
               height={128}
               className="max-h-full max-w-full object-contain"
+              priority={priority}
             />
           </a>
 
