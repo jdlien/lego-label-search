@@ -510,23 +510,50 @@ function buildCategoryOnlyQuery(baseQuery: string, categoryIds: string[]): Query
 }
 
 // Apply sorting to query
-function applySorting(query: string, sort?: string): string {
+function applySorting(query: string, sort?: string, originalQuery?: string): string {
   if (sort === 'alt_ids_length') {
-    return (
-      query +
-      `
-    ORDER BY
-      CASE
-        WHEN alt_part_ids IS NULL THEN 0
-        WHEN LENGTH(TRIM(alt_part_ids)) = 0 THEN 0
-        WHEN INSTR(alt_part_ids, ',') = 0 THEN 1  -- If no commas but has content, count as 1 item
-        ELSE (
-          -- Count commas and add 1 to get the number of items
-          LENGTH(alt_part_ids) - LENGTH(REPLACE(alt_part_ids, ',', '')) + 1
-        )
-      END DESC,
-      id`
-    )
+    // If we have the original query, we can prioritize exact matches
+    if (originalQuery) {
+      return (
+        query +
+        `
+      ORDER BY
+        -- Tier 1: Exact part number match (highest priority)
+        CASE WHEN id = '${originalQuery}' THEN 1 ELSE 0 END DESC,
+
+        -- Tier 2: Parts with ba_cat_id (more common/relevant parts)
+        CASE WHEN ba_cat_id IS NOT NULL AND ba_cat_id != '' THEN 1 ELSE 0 END DESC,
+
+        -- Tier 3: Original alt_ids sorting
+        CASE
+          WHEN alt_part_ids IS NULL THEN 0
+          WHEN LENGTH(TRIM(alt_part_ids)) = 0 THEN 0
+          WHEN INSTR(alt_part_ids, ',') = 0 THEN 1  -- If no commas but has content, count as 1 item
+          ELSE (
+            -- Count commas and add 1 to get the number of items
+            LENGTH(alt_part_ids) - LENGTH(REPLACE(alt_part_ids, ',', '')) + 1
+          )
+        END DESC,
+        id`
+      )
+    } else {
+      // Fallback to original sorting if no originalQuery provided
+      return (
+        query +
+        `
+      ORDER BY
+        CASE
+          WHEN alt_part_ids IS NULL THEN 0
+          WHEN LENGTH(TRIM(alt_part_ids)) = 0 THEN 0
+          WHEN INSTR(alt_part_ids, ',') = 0 THEN 1  -- If no commas but has content, count as 1 item
+          ELSE (
+            -- Count commas and add 1 to get the number of items
+            LENGTH(alt_part_ids) - LENGTH(REPLACE(alt_part_ids, ',', '')) + 1
+          )
+        END DESC,
+        id`
+      )
+    }
   } else if (sort === 'id') {
     return query + ` ORDER BY id`
   } else if (sort === 'name') {
@@ -685,7 +712,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const wrappedQuery = `SELECT DISTINCT * FROM (${query}) results_with_alt_ids`
 
     // Apply sorting and limit
-    const sortedQuery = applySorting(wrappedQuery, sort)
+    const sortedQuery = applySorting(wrappedQuery, sort, q)
     const { query: finalQuery, params: finalParams } = applyLimit(sortedQuery, params, limit)
 
     // Execute query
