@@ -291,8 +291,8 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
             <Image
               src={imageSrc}
               alt={part.name || part.id}
-              width={320}
-              height={320}
+              width={302}
+              height={302}
               className="max-h-full max-w-full object-contain"
               onError={handleImageError}
             />
