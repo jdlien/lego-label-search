@@ -46,6 +46,12 @@ export default function Dialog({
     if (!dialog) return
 
     if (open) {
+      // Prevent body scroll when dialog opens
+      const scrollY = window.scrollY
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+
       lastFocusedElement.current = document.activeElement as HTMLElement
       dialog.showModal()
       // Start the opening animation
@@ -54,6 +60,15 @@ export default function Dialog({
       const timer = setTimeout(() => {}, 300)
       return () => clearTimeout(timer)
     } else if (dialog.open) {
+      // Restore body scroll when dialog closes
+      const scrollY = document.body.style.top
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1)
+      }
+
       // Start the closing animation
       setShouldShow(false)
       // Close the dialog after animation completes
