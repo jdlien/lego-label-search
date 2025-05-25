@@ -20,6 +20,8 @@ type PartData = {
   ba_cat_id?: string
   part_material?: string
   image_url?: string
+  has_img?: number
+  img_file?: string
   alternatesByType?: Record<
     string,
     {
@@ -92,13 +94,14 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
         const data = await response.json()
         setPart(data)
 
-        // Set up image fallback logic
-        if (data.image_url) {
-          setImageSrc(data.image_url)
+        // Set up image using img_file field - much simpler!
+        if (data.img_file) {
+          setImageSrc(`/data/images/${data.img_file}`)
+          setImageError(false)
         } else {
-          // Generate image path similar to PartCard
-          const normalizedPartId = partId.replace(/^0+/, '')
-          setImageSrc(`/data/images/${normalizedPartId}.webp`)
+          // No image available
+          setImageError(true)
+          setImageSrc('')
         }
       } catch (err) {
         console.error('Error fetching part details:', err)
@@ -129,21 +132,9 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
     }
   }, [isOpen, part])
 
-  // Handle image error - try to load PNG if WebP fails
+  // Handle image error - no fallback needed since we have the exact filename
   const handleImageError = () => {
-    if (!partId) return
-
-    const normalizedPartId = partId.replace(/^0+/, '')
-    const webpPath = `/data/images/${normalizedPartId}.webp`
-    const pngPath = `/data/images/${normalizedPartId}.png`
-
-    if (imageSrc === webpPath) {
-      // Try PNG version
-      setImageSrc(pngPath)
-    } else {
-      // If all sources fail, show placeholder
-      setImageError(true)
-    }
+    setImageError(true)
   }
 
   // Handler for category badge clicks - iOS PWA compatible
@@ -336,15 +327,16 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
     content = (
       <div className="flex flex-col gap-6 md:flex-row">
         {/* Part image */}
-        <div className="flex h-56 w-full items-center justify-center rounded-md border border-gray-200 bg-white p-4 shadow-md md:h-80 md:w-96">
+        <div className="relative flex h-56 w-full items-center justify-center rounded-md border border-gray-200 bg-white p-4 shadow-md md:h-80 md:w-96">
           {!imageError && imageSrc ? (
             <Image
               src={imageSrc}
               alt={part.name || part.id}
-              width={302}
-              height={302}
-              className="max-h-full max-w-full object-contain"
+              fill
+              sizes="(max-width: 768px) 100vw, 384px"
+              className="object-contain"
               onError={handleImageError}
+              priority={true}
             />
           ) : (
             <BrickPlaceholder />

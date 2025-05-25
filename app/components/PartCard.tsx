@@ -32,6 +32,8 @@ type Part = {
   name: string
   category?: string
   image_url?: string
+  has_img?: number
+  img_file?: string
   // Category hierarchy fields
   grandparent_category?: string
   grandparent_cat_id?: string
@@ -47,36 +49,25 @@ type Part = {
 type PartCardProps = {
   part: Part
   onPartClick: (partId: string) => void
+  priority?: boolean
 }
 
-export default function PartCard({ part, onPartClick }: PartCardProps) {
-  // Strip leading zeros for image filename
-  const normalizedPartId = part.id.replace(/^0+/, '')
+export default function PartCard({ part, onPartClick, priority = false }: PartCardProps) {
+  // Use the img_file field from database - much simpler!
+  const imagePath = part.img_file ? `/data/images/${part.img_file}` : null
 
-  // Image paths - with WebP as primary and PNG as fallback
-  const webpPath = `/data/images/${normalizedPartId}.webp`
-  const pngPath = `/data/images/${normalizedPartId}.png`
-  //Experimental attempt to use Rebrickable CDN, this isn't working yet
-  // const rebrickablePath = `https://cdn.rebrickable.com/media/thumbs/parts/elements/${imageId}.jpg/250x250p`
-
-  // Start with WebP, fallback to PNG, then Rebrickable
-  const [imageSrc, setImageSrc] = useState<string>(webpPath)
-  const [imageError, setImageError] = useState(false)
+  // Simple state management - no complex fallback logic needed
+  const [imageSrc, setImageSrc] = useState<string>(imagePath || '')
+  const [imageError, setImageError] = useState(!imagePath)
   const [isDownloading, setIsDownloading] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
   const router = useRouter()
   const { error, warning } = useToastHelpers()
 
-  // Handle image error - try to load PNG if WebP fails
+  // Handle image error - no fallback needed since we have the exact filename
   const handleImageError = () => {
-    if (imageSrc === webpPath) {
-      // Try PNG version
-      setImageSrc(pngPath)
-    } else {
-      // If all sources fail, show placeholder
-      setImageError(true)
-    }
+    setImageError(true)
   }
 
   // Unified download trigger function
@@ -232,7 +223,7 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
             }}
             className="mr-3 flex h-32 w-40 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm border border-gray-200 bg-white p-1 dark:border-gray-600"
           >
-            {!imageError ? (
+            {!imageError && imageSrc ? (
               <Image
                 src={imageSrc}
                 alt={part.name || part.id}
@@ -240,6 +231,7 @@ export default function PartCard({ part, onPartClick }: PartCardProps) {
                 height={128}
                 className="max-h-full max-w-full object-contain"
                 onError={handleImageError}
+                priority={priority}
               />
             ) : (
               <BrickPlaceholder />

@@ -11,6 +11,8 @@ import PartCard from './PartCard'
 type Part = {
   id: string
   name: string
+  has_img?: number
+  img_file?: string
   [key: string]: string | number | boolean | null | undefined
 }
 
@@ -91,8 +93,8 @@ export default function SearchResults({
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-        {results.map((part) => (
-          <PartCard key={part.id} part={part} onPartClick={handlePartClick} />
+        {results.map((part, index) => (
+          <PartCard key={part.id} part={part} onPartClick={handlePartClick} priority={index < 4} />
         ))}
       </div>
 
