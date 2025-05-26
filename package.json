@@ -8,14 +8,14 @@
     "dev:turbo": "USE_TURBOPACK=true node server.js",
     "dev:no-turbo": "USE_TURBOPACK=false node server.js",
     "build": "next build",
+    "deploy": "bash deploy-production.sh",
     "start": "NODE_ENV=production node server.js",
     "start:next": "NODE_ENV=production next start",
     "lint": "next lint",
-    "update-alt-parts": "node scripts/update_alt_part_ids.js",
-    "update-category-sort": "node scripts/update_category_sort_order.js",
     "db:rebuild": "node scripts/rebuild_database.js",
     "db:migrate": "node scripts/migrations/migrate.js",
-    "db:seed": "node scripts/migrations/seed_data.js"
+    "db:seed": "node scripts/migrations/seed_data.js",
+    "db:update": "node scripts/maintenance/update_computed_fields.js"
   },
   "repository": {
     "type": "git",
