@@ -132,11 +132,19 @@ function CategoriesPageContent() {
   }, [isLoading, error, categoryId, topLevelCategories])
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+    <div>
       {/* <Header /> */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto max-w-2xl px-4 py-8">
         <div className="mb-6">
-          <h1 className="mb-4 text-3xl font-bold">LEGO Categories</h1>
+          <h1 className="mb-4 text-3xl font-bold">
+            LEGO Part Categories{' '}
+            <span className="ml-1 text-2xl text-gray-500 dark:text-gray-400">
+              from&nbsp;
+              <a href="https://brickarchitect.com" target="_blank" rel="noopener noreferrer" className="link">
+                BrickArchitect.com
+              </a>
+            </span>
+          </h1>
         </div>
 
         {isLoading && (
@@ -249,9 +257,6 @@ function CategoriesPageContent() {
             ) : (
               accordionItems.length > 0 && (
                 <div>
-                  <h2 className="mb-3 text-2xl font-semibold text-gray-700 dark:text-gray-200">
-                    Browse All Categories
-                  </h2>
                   <Accordion
                     items={accordionItems}
                     allowMultiple

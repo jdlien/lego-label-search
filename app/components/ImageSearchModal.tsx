@@ -361,8 +361,8 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
   const renderResultsView = () => {
     if (!searchResults || !searchResults.items || searchResults.items.length === 0) {
       return (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
-          <div className="flex items-center">
+        <div className="flex flex-col justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+          <div className="flex items-center justify-center">
             <svg className="mr-2 h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -372,7 +372,10 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             </svg>
             <span className="text-yellow-800 dark:text-yellow-200">No matching items found</span>
           </div>
-          <button onClick={clearSelectionAndRestartCamera} className="btn mt-3 w-full py-2 font-medium">
+          <button
+            onClick={clearSelectionAndRestartCamera}
+            className="btn mx-auto mt-3 w-full max-w-sm py-2 font-medium"
+          >
             Try Again
           </button>
         </div>
@@ -451,15 +454,19 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             </div>
           </div>
         ))}
-
-        <button onClick={clearSelectionAndRestartCamera} className="btn mt-4 w-full py-2 font-medium">
-          Search New Image
-        </button>
+        <div className="flex justify-center">
+          <button
+            onClick={clearSelectionAndRestartCamera}
+            className="btn mx-auto mt-4 w-full max-w-sm py-2 font-medium"
+          >
+            Search New Image
+          </button>
+        </div>
       </div>
     )
   }
 
-  const modalTitle = searchResults ? 'Search Results' : 'Image Search'
+  const modalTitle = searchResults ? 'Search Results' : 'Image Search for One Part'
 
   return (
     <Dialog open={isOpen} onClose={onClose} title={modalTitle} size="3xl">
@@ -473,7 +480,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
               <p className="mt-1 text-sm text-red-600 dark:text-red-300">
                 Please try again later or contact the site owner if the issue persists.
               </p>
-              <button onClick={checkApiHealth} className="btn mt-2">
+              <button onClick={checkApiHealth} className="btn mx-auto mt-2 max-w-sm">
                 Retry Connection
               </button>
             </div>
@@ -530,20 +537,20 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
         ) : searchResults ? (
           renderResultsView()
         ) : showCamera ? (
-          <div className="flex flex-col">
+          <div className="flex flex-col items-center">
             <div className="relative mb-6 w-full">
               <video ref={videoRef} autoPlay playsInline muted className="h-full w-full rounded-lg object-contain" />
             </div>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-            <div className="space-y-6">
+            <div className="flex w-full flex-col items-center justify-center space-y-6">
               <button
                 onClick={takePicture}
                 disabled={!isStreamActive || isConverting}
-                className="btn btn-primary w-full py-2"
+                className="btn btn-primary mx-auto w-full max-w-sm py-2"
               >
                 Take Picture
               </button>
-              <button onClick={handleUploadClick} disabled={isConverting} className="btn w-full py-2">
+              <button onClick={handleUploadClick} disabled={isConverting} className="btn w-full max-w-sm py-2">
                 Upload Image
               </button>
             </div>
@@ -558,10 +565,14 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
               className="mx-auto max-h-72 max-w-full rounded-lg border border-gray-200 object-contain dark:border-gray-600"
             />
             <div className="mt-6 space-y-6">
-              <button onClick={handleImageSubmit} disabled={isLoading} className="btn btn-primary w-full py-2">
+              <button
+                onClick={handleImageSubmit}
+                disabled={isLoading}
+                className="btn btn-primary mx-auto w-full max-w-sm py-2"
+              >
                 {isLoading ? 'Processing...' : 'Search with this Image'}
               </button>
-              <button onClick={clearSelectionAndRestartCamera} className="btn w-full py-2">
+              <button onClick={clearSelectionAndRestartCamera} className="btn mx-auto w-full max-w-sm py-2">
                 Choose Different Image
               </button>
             </div>

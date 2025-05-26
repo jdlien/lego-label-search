@@ -48,38 +48,52 @@ const AccordionItem: React.FC<{
 }> = ({ item, isOpen, onToggle, titleClassName, contentClassName, icon, openIcon }) => {
   const hasSubItems = item.childrenItems && item.childrenItems.length > 0
   const hasContent = !!item.content
+  const hasExpandableContent = hasSubItems || hasContent
 
   return (
     <div className="border-b border-gray-200 last:border-b-0 dark:border-gray-700">
-      <button
-        type="button"
-        onClick={onToggle}
-        className={`focus-visible:ring-opacity-75 flex w-full items-center justify-between p-3 text-left text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 dark:text-gray-300 dark:hover:bg-gray-800 ${
-          titleClassName || ''
-        }`}
-        aria-expanded={isOpen}
-      >
-        <span className="flex-1">{item.title}</span>
-        {(hasSubItems || hasContent) && (
+      {hasExpandableContent ? (
+        <button
+          type="button"
+          onClick={onToggle}
+          className={`focus-visible:ring-opacity-75 flex w-full items-center justify-between bg-gray-200/50 p-3 text-left text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 dark:bg-gray-800/50 dark:text-gray-300 dark:hover:bg-gray-800 ${
+            titleClassName || ''
+          }`}
+          aria-expanded={isOpen}
+        >
+          <span className="flex-1">{item.title}</span>
           <span className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : 'rotate-0'}`}>
             {isOpen && openIcon ? openIcon : icon ? icon : <ChevronDownIcon />}
           </span>
-        )}
-      </button>
-      {isOpen && (hasSubItems || hasContent) && (
-        <div className={`bg-white p-3 dark:bg-gray-800/50 ${contentClassName || ''}`}>
-          {item.content}
-          {hasSubItems && (
-            <Accordion
-              items={item.childrenItems!} // Asserting non-null as we checked hasSubItems
-              allowMultiple // Inherit from parent or make it configurable
-              // Pass down other relevant props if deep customization is needed
-              titleClassName={titleClassName}
-              contentClassName={contentClassName}
-              icon={icon}
-              openIcon={openIcon}
-            />
-          )}
+        </button>
+      ) : (
+        <div
+          className={`flex w-full items-center justify-between bg-gray-200/50 p-3 text-left text-gray-700 dark:bg-gray-800/50 dark:text-gray-300 ${
+            titleClassName || ''
+          }`}
+        >
+          <span className="flex-1">{item.title}</span>
+        </div>
+      )}
+      {hasExpandableContent && (
+        <div
+          className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+        >
+          <div className="overflow-hidden">
+            <div className={`bg-white/60 p-4 dark:bg-gray-950/50 ${contentClassName || ''}`}>
+              {item.content}
+              {hasSubItems && (
+                <Accordion
+                  items={item.childrenItems!}
+                  allowMultiple
+                  titleClassName={titleClassName}
+                  contentClassName={contentClassName}
+                  icon={icon}
+                  openIcon={openIcon}
+                />
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -118,7 +132,7 @@ const Accordion: React.FC<AccordionProps> = ({
   }
 
   return (
-    <div className={`rounded-md border border-gray-200 dark:border-gray-700 ${className || ''}`}>
+    <div className={`overflow-hidden rounded-md border border-gray-200 dark:border-gray-700 ${className || ''}`}>
       {items.map((item) => (
         <AccordionItem
           key={item.id}
