@@ -6,12 +6,29 @@
  * This script checks for the existence of image files (WebP and PNG) for all parts
  * in the database and updates the has_img field accordingly.
  *
+ * The script uses hierarchical matching with strict exact matches at each level:
+ *
+ * 1. EXACT MATCH: Try the original part number exactly as provided
+ * 2. BASE PART MATCH: For variant parts, try to match the base part by stripping:
+ *    - Print codes (pr0001, pr0123, etc.)
+ *    - Color codes (c01, c02, etc.)
+ *    - Pattern codes (pat0001, etc.)
+ *    - Letter suffixes (a, b, c, etc.)
+ *    - Special suffixes (dummy, LR, RL)
+ * 3. LEADING ZERO VARIATIONS: For each candidate, try with/without leading zeros
+ *
+ * Examples:
+ * - "3556pr0001" → tries "3556pr0001", then "3556", "003556", etc.
+ * - "3001c01" → tries "3001c01", then "3001", "003001", etc.
+ * - "4158a" → tries "4158a", then "4158", "004158", etc.
+ *
  * Usage:
  *   node scripts/update_image_availability.js [options]
  *
  * Options:
  *   --dry-run    Show what would be updated without making changes
  *   --verbose    Show detailed output for each part processed
+ *   --debug      Show extra debugging information (implies --verbose)
  *   --batch-size Set the number of parts to process in each batch (default: 1000)
  *   --help       Show this help message
  */
@@ -29,6 +46,8 @@ const CONFIG = {
   batchSize: 2000,
   dryRun: false,
   verbose: false,
+  debug: false,
+  testing: false,
 }
 
 // Parse command line arguments
@@ -42,6 +61,10 @@ function parseArgs() {
         break
       case '--verbose':
         CONFIG.verbose = true
+        break
+      case '--debug':
+        CONFIG.debug = true
+        CONFIG.verbose = true // Debug implies verbose
         break
       case '--help':
         showHelp()
@@ -72,12 +95,29 @@ Image Availability Update Script
 This script checks for the existence of image files (WebP and PNG) for all parts
 in the database and updates the has_img field accordingly.
 
+The script uses hierarchical matching with strict exact matches at each level:
+
+1. EXACT MATCH: Try the original part number exactly as provided
+2. BASE PART MATCH: For variant parts, try to match the base part by stripping:
+   - Print codes (pr0001, pr0123, etc.)
+   - Color codes (c01, c02, etc.)
+   - Pattern codes (pat0001, etc.)
+   - Letter suffixes (a, b, c, etc.)
+   - Special suffixes (dummy, LR, RL)
+3. LEADING ZERO VARIATIONS: For each candidate, try with/without leading zeros
+
+Examples:
+- "3556pr0001" → tries "3556pr0001", then "3556", "003556", etc.
+- "3001c01" → tries "3001c01", then "3001", "003001", etc.
+- "4158a" → tries "4158a", then "4158", "004158", etc.
+
 Usage:
   node scripts/update_image_availability.js [options]
 
 Options:
   --dry-run         Show what would be updated without making changes
   --verbose         Show detailed output for each part processed
+  --debug           Show extra debugging information (implies --verbose)
   --batch-size=N    Set the number of parts to process in each batch (default: 1000)
   --help            Show this help message
 
@@ -127,73 +167,174 @@ async function initializeImageCache() {
   return imageFilesCache
 }
 
+// Generate hierarchical part variations for matching
+function generatePartVariations(partId) {
+  const allVariations = []
+
+  // Start with the original part ID
+  allVariations.push(partId)
+
+  // Generate base part variations by progressively stripping suffixes
+  let currentPart = partId
+  const strippedVariations = []
+
+  // Strip print codes (pr followed by 4 digits)
+  if (/pr\d{4}$/.test(currentPart)) {
+    currentPart = currentPart.replace(/pr\d{4}$/, '')
+    strippedVariations.push(currentPart)
+  }
+
+  // Strip color codes (c followed by 2 digits)
+  if (/c\d{2}$/.test(currentPart)) {
+    currentPart = currentPart.replace(/c\d{2}$/, '')
+    strippedVariations.push(currentPart)
+  }
+
+  // Strip pattern codes (pat followed by 4 digits)
+  if (/pat\d{4}$/.test(currentPart)) {
+    currentPart = currentPart.replace(/pat\d{4}$/, '')
+    strippedVariations.push(currentPart)
+  }
+
+  // Strip single letter suffixes (a, b, c, etc.)
+  if (/[a-z]$/.test(currentPart)) {
+    currentPart = currentPart.replace(/[a-z]$/, '')
+    strippedVariations.push(currentPart)
+  }
+
+  // Strip dummy suffix
+  if (/dummy$/.test(currentPart)) {
+    currentPart = currentPart.replace(/dummy$/, '')
+    strippedVariations.push(currentPart)
+  }
+
+  // Strip LR/RL suffixes (left/right variants)
+  if (/(LR|RL)$/.test(currentPart)) {
+    currentPart = currentPart.replace(/(LR|RL)$/, '')
+    strippedVariations.push(currentPart)
+  }
+
+  // Add all stripped variations
+  allVariations.push(...strippedVariations)
+
+  // For each variation, add leading zero variants
+  const finalVariations = []
+  for (const variation of allVariations) {
+    if (variation && variation.length > 0) {
+      // Ensure we don't add empty strings
+      finalVariations.push(variation)
+
+      // Add version with leading zeros stripped
+      const stripped = variation.replace(/^0+/, '')
+      if (stripped && stripped !== variation) {
+        finalVariations.push(stripped)
+      }
+
+      // Add version padded to 6 digits
+      const padded = variation.padStart(6, '0')
+      if (padded !== variation) {
+        finalVariations.push(padded)
+      }
+    }
+  }
+
+  // Remove duplicates and filter out very short parts (likely invalid)
+  return [...new Set(finalVariations)].filter((v) => v && v.length >= 1)
+}
+
 // Check if part has any image and return the best filename
 async function checkPartImages(partId) {
   // Ensure cache is initialized
   await initializeImageCache()
 
-  // Try multiple filename variations for this part
-  const variations = [
-    partId, // Original part ID
-    partId.replace(/^0+/, ''), // Strip leading zeros
-    partId.padStart(6, '0'), // Pad to 6 digits with leading zeros
-  ]
+  // Generate hierarchical variations
+  const variations = generatePartVariations(partId)
 
-  // Check if any cached image files match our part variations
+  // Check if any cached image files match our part variations (EXACT MATCHES ONLY)
   let foundFiles = []
+  let matchedVariation = null
 
+  // Try variations in order of preference (exact match first, then base parts)
   for (const variation of variations) {
     const matchingFiles = imageFilesCache.filter((baseName) => {
-      // Check for exact match or files that start with the part number
-      return baseName === variation || baseName.startsWith(variation)
+      // Only allow exact matches - no partial matches
+      return baseName === variation
     })
 
     if (matchingFiles.length > 0) {
       foundFiles.push(...matchingFiles)
-      break // Found matches, no need to check other variations
+      if (!matchedVariation) {
+        matchedVariation = variation // Remember the first (highest priority) match
+      }
     }
   }
 
   // Remove duplicates and find the best image file
   const uniqueFiles = [...new Set(foundFiles)]
-  const bestImageFile = selectBestImageFile(uniqueFiles, partId)
+  const bestImageFile = selectBestImageFile(uniqueFiles, partId, matchedVariation)
 
   return {
     hasAny: uniqueFiles.length > 0,
     bestImageFile,
     foundFiles: uniqueFiles,
     variations,
+    matchedVariation,
+    isExactMatch: matchedVariation === partId,
   }
 }
 
 // Select the best image file from available options
-function selectBestImageFile(files, partId) {
+function selectBestImageFile(files, partId, matchedVariation = null) {
   if (files.length === 0) return null
 
-  // Priority order for selection:
-  // 1. Exact match with .webp extension
-  // 2. Exact match with .png extension
-  // 3. First variant with .webp extension
-  // 4. First variant with .png extension
-  // 5. Any other file
+  // If we have a specific matched variation, prioritize it
+  if (matchedVariation && files.includes(matchedVariation)) {
+    // For testing, we don't have actual files, so just return the variation
+    if (CONFIG.testing) {
+      return matchedVariation
+    }
 
-  const exactMatches = files.filter(
-    (f) => f === partId || f === partId.replace(/^0+/, '') || f === partId.padStart(6, '0')
-  )
-  const variants = files.filter((f) => !exactMatches.includes(f))
-
-  // Check for exact matches first
-  for (const file of exactMatches) {
-    // Prefer WebP over PNG for exact matches
-    if (fsSync.existsSync(path.join(CONFIG.imagesDir, `${file}.webp`))) return `${file}.webp`
-    if (fsSync.existsSync(path.join(CONFIG.imagesDir, `${file}.png`))) return `${file}.png`
+    // Check for WebP first, then PNG for the matched variation
+    if (fsSync.existsSync(path.join(CONFIG.imagesDir, `${matchedVariation}.webp`))) {
+      return `${matchedVariation}.webp`
+    }
+    if (fsSync.existsSync(path.join(CONFIG.imagesDir, `${matchedVariation}.png`))) {
+      return `${matchedVariation}.png`
+    }
   }
 
-  // Check variants
-  for (const file of variants) {
-    // Prefer WebP over PNG for variants
-    if (fsSync.existsSync(path.join(CONFIG.imagesDir, `${file}.webp`))) return `${file}.webp`
-    if (fsSync.existsSync(path.join(CONFIG.imagesDir, `${file}.png`))) return `${file}.png`
+  // Fallback to original logic if matched variation doesn't have files
+  // Create variations of the part ID for priority matching
+  const partVariations = [
+    partId, // Original part ID (highest priority)
+    partId.replace(/^0+/, ''), // Strip leading zeros
+    partId.padStart(6, '0'), // Pad to 6 digits with leading zeros
+  ]
+
+  // Remove duplicates and prioritize by preference
+  const uniqueVariations = [...new Set(partVariations)]
+
+  // Priority order for selection:
+  // 1. Original part ID (exact as provided)
+  // 2. Stripped leading zeros version
+  // 3. Padded version
+  // Within each priority level, prefer .webp over .png
+
+  for (const variation of uniqueVariations) {
+    if (files.includes(variation)) {
+      // For testing, we don't have actual files, so just return the variation
+      if (CONFIG.testing) {
+        return variation
+      }
+
+      // Check for WebP first, then PNG
+      if (fsSync.existsSync(path.join(CONFIG.imagesDir, `${variation}.webp`))) {
+        return `${variation}.webp`
+      }
+      if (fsSync.existsSync(path.join(CONFIG.imagesDir, `${variation}.png`))) {
+        return `${variation}.png`
+      }
+    }
   }
 
   return null
@@ -224,6 +365,8 @@ async function processParts(db, parts) {
     updated: 0,
     hasImage: 0,
     noImage: 0,
+    exactMatches: 0,
+    baseMatches: 0,
     errors: 0,
   }
 
@@ -247,6 +390,11 @@ async function processParts(db, parts) {
 
         if (shouldHaveImg) {
           stats.hasImage++
+          if (imageInfo.isExactMatch) {
+            stats.exactMatches++
+          } else {
+            stats.baseMatches++
+          }
         } else {
           stats.noImage++
         }
@@ -258,19 +406,33 @@ async function processParts(db, parts) {
 
           if (CONFIG.verbose) {
             const action = CONFIG.dryRun ? '[DRY RUN]' : '[UPDATING]'
+            const matchType = imageInfo.isExactMatch ? 'EXACT' : 'BASE'
             console.log(
-              `${action} Part ${part.part_num}: img_file='${currentImgFile || 'null'}' -> '${newImgFile || 'null'}'`
+              `${action} Part ${part.part_num}: img_file='${currentImgFile || 'null'}' -> '${newImgFile || 'null'}' (${matchType})`
             )
-            if (CONFIG.verbose && imageInfo.hasAny && imageInfo.foundFiles.length > 0) {
-              console.log(
-                `  Found: ${imageInfo.foundFiles.slice(0, 3).join(', ')}${imageInfo.foundFiles.length > 3 ? ` (+${imageInfo.foundFiles.length - 3} more)` : ''}`
-              )
+            if (imageInfo.hasAny && imageInfo.foundFiles.length > 0) {
+              if (!imageInfo.isExactMatch && imageInfo.matchedVariation) {
+                console.log(`  Base part match: ${imageInfo.matchedVariation}`)
+              }
+              console.log(`  Found files: ${imageInfo.foundFiles.join(', ')}`)
             }
           }
 
           await updatePartImageStatus(db, part.part_num, newImgFile)
         } else if (CONFIG.verbose) {
           console.log(`[OK] Part ${part.part_num}: img_file='${currentImgFile || 'null'}' (correct)`)
+        }
+
+        // Debug logging for potential issues
+        if (CONFIG.debug && imageInfo.hasAny) {
+          console.log(`[DEBUG] Part ${part.part_num}:`)
+          console.log(
+            `  Variations checked: ${imageInfo.variations.slice(0, 10).join(', ')}${imageInfo.variations.length > 10 ? ` (+${imageInfo.variations.length - 10} more)` : ''}`
+          )
+          console.log(`  Files found: ${imageInfo.foundFiles.join(', ')}`)
+          console.log(`  Matched variation: ${imageInfo.matchedVariation}`)
+          console.log(`  Is exact match: ${imageInfo.isExactMatch}`)
+          console.log(`  Best file selected: ${imageInfo.bestImageFile || 'none'}`)
         }
 
         // Progress indicator for large batches
@@ -351,6 +513,8 @@ async function main() {
     console.log('=======')
     console.log(`Total parts processed: ${stats.processed}`)
     console.log(`Parts with images: ${stats.hasImage}`)
+    console.log(`  - Exact matches: ${stats.exactMatches}`)
+    console.log(`  - Base part matches: ${stats.baseMatches}`)
     console.log(`Parts without images: ${stats.noImage}`)
     console.log(`Database updates needed: ${stats.updated}`)
     console.log(`Errors: ${stats.errors}`)
@@ -380,9 +544,59 @@ async function main() {
   }
 }
 
-// Run the script
-if (require.main === module) {
-  main()
+// Test function to verify matching logic
+async function testMatching() {
+  console.log('Testing image matching logic...')
+
+  // Enable testing mode
+  CONFIG.testing = true
+
+  // Mock some test data - this simulates various matching scenarios
+  imageFilesCache = ['3556', '35563', '003556', '123456', '0001', '1', '3001', '4158', '2456']
+
+  const testCases = [
+    { partId: '3556', expectedMatch: '3556', description: 'Exact match' },
+    { partId: '003556', expectedMatch: '003556', description: 'Exact match with leading zeros' },
+    { partId: '1', expectedMatch: '1', description: 'Simple exact match' },
+    { partId: '0001', expectedMatch: '0001', description: 'Exact match with leading zeros' },
+    { partId: '123456', expectedMatch: '123456', description: 'Six digit exact match' },
+    { partId: '35563', expectedMatch: '35563', description: 'Should NOT match 3556 (this was the bug)' },
+    { partId: '9999', expectedMatch: null, description: 'No match available' },
+    // Test hierarchical matching
+    { partId: '3556pr0001', expectedMatch: '3556', description: 'Printed part should match base part' },
+    { partId: '3001c01', expectedMatch: '3001', description: 'Color variant should match base part' },
+    { partId: '4158a', expectedMatch: '4158', description: 'Letter suffix should match base part' },
+    { partId: '2456pat0001', expectedMatch: '2456', description: 'Pattern part should match base part' },
+    { partId: '3001c01pr0001', expectedMatch: '3001', description: 'Complex part should match base part' },
+    { partId: '1234pr0001', expectedMatch: null, description: 'Printed part with no base match' },
+  ]
+
+  for (const testCase of testCases) {
+    const result = await checkPartImages(testCase.partId)
+    const match = result.bestImageFile
+    const status = match === testCase.expectedMatch ? '✅' : '❌'
+    const matchType = result.isExactMatch ? 'EXACT' : 'BASE'
+    console.log(
+      `${status} Part ${testCase.partId}: expected ${testCase.expectedMatch}, got ${match} (${matchType}) - ${testCase.description}`
+    )
+    if (match !== testCase.expectedMatch) {
+      console.log(
+        `  Variations: ${result.variations.slice(0, 5).join(', ')}${result.variations.length > 5 ? ` (+${result.variations.length - 5} more)` : ''}`
+      )
+      console.log(`  Found files: ${result.foundFiles.join(', ')}`)
+      console.log(`  Matched variation: ${result.matchedVariation}`)
+    }
+  }
 }
 
-module.exports = { main, checkPartImages, CONFIG }
+// Run the script
+if (require.main === module) {
+  // Check for test mode
+  if (process.argv.includes('--test')) {
+    testMatching()
+  } else {
+    main()
+  }
+}
+
+module.exports = { main, checkPartImages, generatePartVariations, testMatching, CONFIG }
