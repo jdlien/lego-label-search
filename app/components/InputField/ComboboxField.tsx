@@ -30,7 +30,7 @@ const comboboxStyles = tv({
     comboboxEmpty: 'py-6 text-center text-sm text-muted-foreground',
     comboboxGroup: 'overflow-hidden p-1',
     comboboxItem: `
-      relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 outline-none
+      relative flex cursor-default select-none items-center rounded-sm px-2 py-1.25 outline-none
       data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50
     `,
     comboboxChevron: 'h-4 w-4 shrink-0 opacity-50',
@@ -343,16 +343,16 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
               {options.map((option) => (
                 <Command.Item
                   key={option.value}
-                  value={option.label}
-                  keywords={[String(option.value), option.description || ''].filter(Boolean)}
+                  value={String(option.value)}
+                  keywords={[option.label, option.description || ''].filter(Boolean)}
                   disabled={option.disabled}
                   onSelect={() => handleComboboxSelect(option.value)}
                   className={styles.comboboxItem()}
                 >
                   <div className="flex flex-1 items-center">
                     <div className="flex-1">
-                      <div>{option.label}</div>
-                      {option.description && <div className="text-xs opacity-70">{option.description}</div>}
+                      <div className="leading-tight">{option.label}</div>
+                      {option.description && <div className="text-xs opacity-50">{option.description}</div>}
                     </div>
                   </div>
                   <IconCheck

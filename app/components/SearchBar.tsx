@@ -61,6 +61,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
           .map((cat: Category) => ({
             value: cat.id,
             label: cat.name,
+            description: cat.parts_count ? `${cat.parts_count.toLocaleString()} parts` : undefined,
           }))
 
         const childCategories = data.categories
@@ -68,6 +69,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
           .map((cat: Category) => ({
             value: cat.id,
             label: cat.name,
+            description: cat.parts_count ? `${cat.parts_count.toLocaleString()} parts` : undefined,
           }))
 
         // Sort both groups using natural sort
