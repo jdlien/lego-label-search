@@ -76,11 +76,17 @@ export default function SearchResults({
         <div className="flex items-center justify-center">
           <p className="text-gray-600 dark:text-gray-300">
             {pagination ? (
-              <>
-                Showing <strong>{(pagination.page - 1) * pagination.limit + 1}</strong> to{' '}
-                <strong>{Math.min(pagination.page * pagination.limit, totalResults)}</strong> of {totalResults} result
-                {totalResults !== 1 ? 's' : ''}
-              </>
+              totalResults <= pagination.limit ? (
+                <>
+                  Showing {totalResults} result{totalResults !== 1 ? 's' : ''}
+                </>
+              ) : (
+                <>
+                  Showing <strong>{(pagination.page - 1) * pagination.limit + 1}</strong> to{' '}
+                  <strong>{Math.min(pagination.page * pagination.limit, totalResults)}</strong> of {totalResults} result
+                  {totalResults !== 1 ? 's' : ''}
+                </>
+              )
             ) : (
               <>
                 {totalResults} result{totalResults !== 1 ? 's' : ''} found
