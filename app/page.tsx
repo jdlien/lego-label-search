@@ -181,7 +181,7 @@ function HomeContent() {
             <>
               {/* Top pagination and page size selector */}
               {pagination && (
-                <div className="mb-2 flex flex-col items-center gap-4 space-y-1 sm:flex-row sm:justify-between sm:space-y-0">
+                <div className="mb-2 flex flex-col items-center gap-4 space-y-1 sm:space-y-0">
                   {pagination.totalPages > 1 && (
                     <Pagination
                       currentPage={pagination.page}
@@ -190,7 +190,7 @@ function HomeContent() {
                       hasPrev={pagination.hasPrev}
                     />
                   )}
-                  <PageSizeSelector className="" />
+                  {/* <PageSizeSelector className="" /> */}
                 </div>
               )}
 
@@ -203,14 +203,17 @@ function HomeContent() {
               />
 
               {/* Bottom pagination */}
-              {pagination && pagination.totalPages > 1 && (
-                <div className="mt-6 flex justify-center">
-                  <Pagination
-                    currentPage={pagination.page}
-                    totalPages={pagination.totalPages}
-                    hasNext={pagination.hasNext}
-                    hasPrev={pagination.hasPrev}
-                  />
+              {pagination && (
+                <div className="mt-6 mb-2 flex flex-col items-center gap-4 space-y-1 sm:space-y-0">
+                  {pagination.totalPages > 1 && (
+                    <Pagination
+                      currentPage={pagination.page}
+                      totalPages={pagination.totalPages}
+                      hasNext={pagination.hasNext}
+                      hasPrev={pagination.hasPrev}
+                    />
+                  )}
+                  <PageSizeSelector className="" />
                 </div>
               )}
             </>

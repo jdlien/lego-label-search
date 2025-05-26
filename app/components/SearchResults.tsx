@@ -77,8 +77,8 @@ export default function SearchResults({
           <p className="text-gray-600 dark:text-gray-300">
             {pagination ? (
               <>
-                Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-                {Math.min(pagination.page * pagination.limit, totalResults)} of {totalResults} result
+                Showing <strong>{(pagination.page - 1) * pagination.limit + 1}</strong> to{' '}
+                <strong>{Math.min(pagination.page * pagination.limit, totalResults)}</strong> of {totalResults} result
                 {totalResults !== 1 ? 's' : ''}
               </>
             ) : (

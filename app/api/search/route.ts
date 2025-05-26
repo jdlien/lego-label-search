@@ -580,7 +580,7 @@ function applyPagination(
   page?: string,
   limit?: string
 ): { query: string; params: (string | number)[] } {
-  const pageSize = limit ? parseInt(limit, 10) : 50 // Default page size
+  const pageSize = limit ? parseInt(limit, 10) : 100 // Default page size
   const currentPage = page ? parseInt(page, 10) : 1
   const offset = (currentPage - 1) * pageSize
 
@@ -674,7 +674,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const q = searchParams.get('q') || ''
   const category = searchParams.get('category')
   const page = searchParams.get('page') || '1'
-  const limit = searchParams.get('limit') || '50' // Default page size
+  const limit = searchParams.get('limit') || '100' // Default page size
   const sort = searchParams.get('sort') || 'alt_ids_length'
 
   try {

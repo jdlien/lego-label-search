@@ -89,7 +89,5 @@ The caching system ensures fast API responses while keeping count data up-to-dat
 
 ## TODO
 
-- Properly handle pagination for 200+ result sets.
 - When a part has many alternates, they may all show at once. I might prefer to consolidate the search results to only show one record if it has many alternates.
-
 - There are parts that have categories from BrickArchitect (and thus labels on that site) that I don't have images for. I need to add those images, perhaps by scraping the BrickArchitect site. Examples: 80497, 24204
