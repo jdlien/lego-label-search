@@ -730,8 +730,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // Execute query
     const results = await db.all(finalQuery, ...finalParams)
 
-    // Get total count
-    const countResult = await db.get(countQuery, ...countParams)
+    // Get total count - wrap the count query with DISTINCT to match the results query
+    const wrappedCountQuery = `SELECT COUNT(*) as total FROM (SELECT DISTINCT id FROM (${query}) results_with_alt_ids)`
+    const countResult = await db.get(wrappedCountQuery, ...params)
     const total = countResult ? countResult.total : 0
 
     // Calculate pagination info
