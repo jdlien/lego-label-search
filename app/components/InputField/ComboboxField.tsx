@@ -27,10 +27,10 @@ const comboboxStyles = tv({
     // comboboxInput:
     //   'flex h-9 w-full rounded-md border-0 bg-transparent p-3 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
     comboboxList: 'max-h-[min(700px,calc(var(--radix-popover-content-available-height)-50px))] overflow-y-auto p-1',
-    comboboxEmpty: 'py-6 text-center text-sm text-muted-foreground',
-    comboboxGroup: 'overflow-hidden p-1',
+    comboboxEmpty: 'py-6 text-center text-sm',
+    comboboxGroup: 'overflow-hidden px-1 pb-3 last:pb-0',
     comboboxGroupHeading: `
-      px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide
+      px-2 py-1.25 text-sm font-semibold uppercase tracking-wide
       bg-muted/30 border-b border-border/30 sticky top-0 z-10 backdrop-blur-sm
       first:mt-0 mt-2 rounded-t-sm
     `,
@@ -41,8 +41,8 @@ const comboboxStyles = tv({
     comboboxGroupedItem: `
       relative flex cursor-default select-none items-center rounded-sm pl-4 pr-2 py-1.25 outline-none
       data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50
-      before:content-[''] before:absolute before:left-2 before:top-0 before:bottom-0 before:w-px
-      before:bg-border/40 before:my-1
+
+
     `,
     comboboxChevron: 'h-4 w-4 shrink-0 opacity-50',
     comboboxCheck: 'ml-auto h-4 w-4',
@@ -169,9 +169,9 @@ const comboboxStyles = tv({
         comboboxContent: 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700',
         comboboxPlaceholder: 'text-gray-400 dark:text-gray-500',
         comboboxGroupHeading:
-          'text-gray-500 dark:text-gray-400 bg-gray-200/50 dark:bg-gray-800/50 border-gray-200/50 dark:border-gray-700/50',
+          'text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700/90 border-gray-200/50 dark:border-gray-700/50',
         comboboxGroupedItem: `
-          before:bg-gray-300/90 dark:before:bg-gray-600/90
+          before:bg-gray-200 dark:before:bg-gray-700/90
         `,
         clearButtonIcon: 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300',
       },

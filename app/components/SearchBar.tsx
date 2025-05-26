@@ -72,16 +72,31 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
           const categoryOption: CategoryForDropdown = {
             value: cat.id,
             label: cat.name,
-            description: cat.parts_count ? `${cat.parts_count.toLocaleString()} parts` : undefined,
+            description: cat.parts_count && cat.level === 0 ? `${cat.parts_count.toLocaleString()} parts` : undefined,
           }
 
-          // Only add group for child categories (not root categories)
-          if (cat.parent_id && cat.level !== 0) {
+          // Handle grouping based on level
+          if (cat.level === 0) {
+            // Root categories - no group (ungrouped)
+          } else if (cat.level === 1) {
+            // First-level children - group under their parent
             const parent = categoryMap.get(String(cat.parent_id))
             const parentName = parent ? parent.name : 'Other'
             categoryOption.group = parentName
+          } else if (cat.level && cat.level >= 2) {
+            // Second and higher level children - group under root parent but prefix with direct parent
+            const directParent = categoryMap.get(String(cat.parent_id))
+
+            // Find the root parent (level 0) by traversing up the hierarchy
+            let rootParent = directParent
+            while (rootParent && rootParent.parent_id && rootParent.level !== 0) {
+              rootParent = categoryMap.get(String(rootParent.parent_id))
+            }
+            const rootParentName = rootParent ? rootParent.name : 'Other'
+
+            categoryOption.group = rootParentName
+            categoryOption.label = `\u00A0\u00A0 ${cat.name}`
           }
-          // Root categories will have no group property, making them ungrouped
 
           return categoryOption
         })
