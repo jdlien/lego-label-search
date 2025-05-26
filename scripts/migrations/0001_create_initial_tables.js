@@ -51,6 +51,7 @@ module.exports = {
             img_file TEXT,
             example_design_id TEXT,
             alt_part_ids TEXT,
+            label_file TEXT,
             FOREIGN KEY (part_cat_id) REFERENCES part_categories(id),
             FOREIGN KEY (ba_cat_id) REFERENCES ba_categories(id)
           )
