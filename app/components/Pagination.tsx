@@ -152,7 +152,7 @@ export default function Pagination({ currentPage, totalPages, hasNext, hasPrev, 
       <button
         onClick={() => navigateToPage(currentPage - 1)}
         disabled={!hasPrev}
-        className={`flex items-center justify-center rounded-md px-1 py-1 text-sm font-medium sm:text-base ${
+        className={`flex items-center justify-center rounded-md py-1 pr-2 pl-1 text-sm font-medium sm:text-base ${
           hasPrev
             ? 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
             : 'cursor-not-allowed border border-gray-200 bg-gray-100 text-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-500'
@@ -175,7 +175,7 @@ export default function Pagination({ currentPage, totalPages, hasNext, hasPrev, 
       <button
         onClick={() => navigateToPage(currentPage + 1)}
         disabled={!hasNext}
-        className={`flex items-center justify-center rounded-md px-1 py-1 text-sm font-medium sm:text-base ${
+        className={`flex items-center justify-center rounded-md py-1 pr-1 pl-2 text-sm font-medium sm:text-base ${
           hasNext
             ? 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
             : 'cursor-not-allowed border border-gray-200 bg-gray-100 text-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-500'
