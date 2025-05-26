@@ -55,6 +55,44 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
           return
         }
 
+        // Create a map for quick parent lookup (ensure IDs are strings)
+        const categoryMap = new Map<string, Category>(data.categories.map((cat: Category) => [String(cat.id), cat]))
+
+        // Function to build parent hierarchy path for a category (excluding the leaf)
+        const buildHierarchyPath = (category: Category): string => {
+          const path: string[] = []
+          let current = category
+          const visited = new Set<string>() // Prevent infinite loops
+          let isFirst = true // Track if this is the first (leaf) category
+
+          // Build path from leaf to root, excluding the leaf
+          while (current) {
+            // Prevent infinite loops
+            if (visited.has(String(current.id))) {
+              console.warn('Circular reference detected in category hierarchy:', current.id)
+              break
+            }
+            visited.add(String(current.id))
+
+            // Skip adding the first (leaf) category to the path
+            if (!isFirst) {
+              path.unshift(current.name)
+            }
+            isFirst = false
+
+            if (!current.parent_id || current.parent_id === '') break
+
+            const parent = categoryMap.get(String(current.parent_id))
+            if (!parent) {
+              console.warn('Parent category not found:', current.parent_id, 'for category:', current.name)
+              break
+            }
+            current = parent
+          }
+
+          return path.join(' › ')
+        }
+
         // Split categories into parent and child categories
         const parentCategories = data.categories
           .filter((cat: Category) => !cat.parent_id || cat.parent_id === '')
@@ -66,11 +104,15 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
 
         const childCategories = data.categories
           .filter((cat: Category) => cat.parent_id && cat.parent_id !== '')
-          .map((cat: Category) => ({
-            value: cat.id,
-            label: cat.name,
-            description: cat.parts_count ? `${cat.parts_count.toLocaleString()} parts` : undefined,
-          }))
+          .map((cat: Category) => {
+            const hierarchyLabel = buildHierarchyPath(cat)
+
+            return {
+              value: cat.id,
+              label: ' ' + cat.name,
+              description: hierarchyLabel + (cat.parts_count ? ` (${cat.parts_count.toLocaleString()} parts)` : ''),
+            }
+          })
 
         // Sort both groups using natural sort
         const naturalSort = (a: CategoryForDropdown, b: CategoryForDropdown) => {
