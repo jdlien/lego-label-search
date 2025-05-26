@@ -23,8 +23,8 @@ const transformCategoriesToAccordionItems = (categories: Category[]): AccordionI
   return categories.map((cat) => ({
     id: cat.id,
     title: (
-      <div className="flex w-full items-center justify-between">
-        <span>
+      <div className="flex w-full items-center justify-start space-x-4">
+        <span className="min-w-[240px]">
           {cat.name}
           <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(ID: {cat.id})</span>
         </span>
@@ -74,9 +74,9 @@ function CategoriesPageContent() {
         })
 
         fetchedCategories.forEach((cat) => {
-          if (cat.parent_id && tree[cat.parent_id]) {
+          if (cat.parent_id && cat.parent_id !== '' && tree[cat.parent_id]) {
             tree[cat.parent_id].children?.push(tree[cat.id])
-          } else if (!cat.parent_id) {
+          } else if (!cat.parent_id || cat.parent_id === '') {
             topLevel.push(tree[cat.id])
           }
         })
@@ -107,6 +107,7 @@ function CategoriesPageContent() {
         setTopLevelCategories(topLevel)
         setCategoryTree(tree)
       } catch (err) {
+        console.error('Error fetching categories:', err)
         setError(err instanceof Error ? err.message : 'An unknown error occurred')
       } finally {
         setIsLoading(false)

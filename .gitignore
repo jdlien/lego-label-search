@@ -94,3 +94,4 @@ public/*.zip
 
 # Database files
 data/lego.sqlite
+data/lego.sqlite.backup

@@ -32,9 +32,11 @@ export async function GET() {
         CASE
           WHEN parent_id = 0 OR parent_id IS NULL THEN ''
           ELSE CAST(parent_id AS TEXT)
-        END AS parent_id
+        END AS parent_id,
+        parts_count,
+        sort_order
       FROM ba_categories
-      ORDER BY name
+      ORDER BY sort_order, name
     `)
     console.log(`Fetched ${categories.length} categories`)
 
