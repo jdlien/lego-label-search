@@ -29,6 +29,13 @@ interface SearchResult {
   total: number
   returned: number
   categories: string[]
+  pagination: {
+    page: number
+    limit: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
 }
 
 interface QueryData {
@@ -566,19 +573,21 @@ function applySorting(query: string, sort?: string, originalQuery?: string): str
   }
 }
 
-// Apply limit to query
-function applyLimit(
+// Apply pagination to query
+function applyPagination(
   query: string,
   params: (string | number)[],
+  page?: string,
   limit?: string
 ): { query: string; params: (string | number)[] } {
-  if (limit) {
-    return {
-      query: query + ` LIMIT ?`,
-      params: [...params, parseInt(limit, 10)],
-    }
+  const pageSize = limit ? parseInt(limit, 10) : 50 // Default page size
+  const currentPage = page ? parseInt(page, 10) : 1
+  const offset = (currentPage - 1) * pageSize
+
+  return {
+    query: query + ` LIMIT ? OFFSET ?`,
+    params: [...params, pageSize, offset],
   }
-  return { query, params }
 }
 
 // Analyze a search term and determine what type of search to perform
@@ -664,7 +673,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url)
   const q = searchParams.get('q') || ''
   const category = searchParams.get('category')
-  const limit = searchParams.get('limit') || '10000' // Default limit to a large number
+  const page = searchParams.get('page') || '1'
+  const limit = searchParams.get('limit') || '50' // Default page size
   const sort = searchParams.get('sort') || 'alt_ids_length'
 
   try {
@@ -713,9 +723,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { query, params, countQuery, countParams } = queryData
     const wrappedQuery = `SELECT DISTINCT * FROM (${query}) results_with_alt_ids`
 
-    // Apply sorting and limit
+    // Apply sorting and pagination
     const sortedQuery = applySorting(wrappedQuery, sort, q)
-    const { query: finalQuery, params: finalParams } = applyLimit(sortedQuery, params, limit)
+    const { query: finalQuery, params: finalParams } = applyPagination(sortedQuery, params, page, limit)
 
     // Execute query
     const results = await db.all(finalQuery, ...finalParams)
@@ -724,11 +734,23 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const countResult = await db.get(countQuery, ...countParams)
     const total = countResult ? countResult.total : 0
 
+    // Calculate pagination info
+    const currentPage = parseInt(page, 10)
+    const pageSize = parseInt(limit, 10)
+    const totalPages = Math.ceil(total / pageSize)
+
     const response: SearchResult = {
       results,
       total,
       returned: results.length,
       categories: categoryIds,
+      pagination: {
+        page: currentPage,
+        limit: pageSize,
+        totalPages,
+        hasNext: currentPage < totalPages,
+        hasPrev: currentPage > 1,
+      },
     }
 
     return NextResponse.json(response)

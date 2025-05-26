@@ -22,6 +22,13 @@ type SearchResultsProps = {
   subcategoryCount?: number
   onPartClick?: (partId: string) => void
   onPartSearch?: (partId: string) => void
+  pagination?: {
+    page: number
+    limit: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
 }
 
 export default function SearchResults({
@@ -30,6 +37,7 @@ export default function SearchResults({
   subcategoryCount = 0,
   onPartClick,
   onPartSearch,
+  pagination,
 }: SearchResultsProps) {
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -67,7 +75,17 @@ export default function SearchResults({
       <div className="mt-2 mb-4">
         <div className="flex items-center justify-center">
           <p className="text-gray-600 dark:text-gray-300">
-            {totalResults} result{totalResults !== 1 ? 's' : ''} found
+            {pagination ? (
+              <>
+                Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+                {Math.min(pagination.page * pagination.limit, totalResults)} of {totalResults} result
+                {totalResults !== 1 ? 's' : ''}
+              </>
+            ) : (
+              <>
+                {totalResults} result{totalResults !== 1 ? 's' : ''} found
+              </>
+            )}
           </p>
           {subcategoryCount > 0 && (
             <p className="text-gray-600 dark:text-gray-300">

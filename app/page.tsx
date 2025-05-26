@@ -5,9 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import SearchBar from './components/SearchBar'
 import ImageSearchModal from './components/ImageSearchModal'
 import SearchResults from './components/SearchResults'
-
-// Constants
-const MAX_DISPLAY_RESULTS = 200
+import Pagination from './components/Pagination'
+import PageSizeSelector from './components/PageSizeSelector'
 
 type Part = {
   id: string
@@ -28,6 +27,20 @@ type SearchResponse = {
   }>
 }
 
+type ApiSearchResponse = {
+  results: Part[]
+  total: number
+  returned: number
+  categories: string[]
+  pagination: {
+    page: number
+    limit: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
+}
+
 function HomeContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -37,6 +50,7 @@ function HomeContent() {
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<Part[]>([])
   const [totalResultCount, setTotalResultCount] = useState(0)
+  const [pagination, setPagination] = useState<ApiSearchResponse['pagination'] | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
   const [isImageSearchModalOpen, setIsImageSearchModalOpen] = useState(false)
 
@@ -44,11 +58,14 @@ function HomeContent() {
   useEffect(() => {
     const q = searchParams.get('q')
     const category = searchParams.get('category')
+    const page = searchParams.get('page')
+    const limit = searchParams.get('limit')
 
     if (!q && !category) {
       setHasSearched(false)
       setResults([])
       setTotalResultCount(0)
+      setPagination(null)
       return
     }
 
@@ -61,19 +78,19 @@ function HomeContent() {
         const queryParams = new URLSearchParams()
         if (q) queryParams.append('q', q)
         if (category) queryParams.append('category', category)
+        if (page) queryParams.append('page', page)
+        if (limit) queryParams.append('limit', limit)
 
         const response = await fetch(`/api/search?${queryParams.toString()}`)
         if (!response.ok) {
           throw new Error(`API error: ${response.statusText}`)
         }
-        const data = await response.json()
+        const data: ApiSearchResponse = await response.json()
 
-        // Store the total count of results
-        const allResults = data.results || []
-        setTotalResultCount(allResults.length)
-
-        // Limit displayed results
-        setResults(allResults.slice(0, MAX_DISPLAY_RESULTS))
+        // Store the results and pagination info
+        setResults(data.results || [])
+        setTotalResultCount(data.total || 0)
+        setPagination(data.pagination || null)
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch results'
         setError(errorMessage)
@@ -162,22 +179,40 @@ function HomeContent() {
           {/* Results */}
           {!isLoading && !error && hasSearched && (
             <>
-              {totalResultCount > MAX_DISPLAY_RESULTS && (
-                <div className="mb-4 rounded-md border border-sky-300 bg-sky-50 px-4 py-2 text-sky-800 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300">
-                  <div className="flex items-center justify-center">
-                    {/* This is my lazy ass way of avoiding building a pagination system. */}
-                    <p className="text-center">
-                      Showing {results.length} of {totalResultCount} results
-                    </p>
-                  </div>
+              {/* Top pagination and page size selector */}
+              {pagination && (
+                <div className="mb-2 flex flex-col items-center gap-4 space-y-1 sm:flex-row sm:justify-between sm:space-y-0">
+                  {pagination.totalPages > 1 && (
+                    <Pagination
+                      currentPage={pagination.page}
+                      totalPages={pagination.totalPages}
+                      hasNext={pagination.hasNext}
+                      hasPrev={pagination.hasPrev}
+                    />
+                  )}
+                  <PageSizeSelector className="" />
                 </div>
               )}
+
               <SearchResults
                 results={results}
                 totalResults={totalResultCount}
                 subcategoryCount={results.length > 0 ? 0 : 0}
                 onPartSearch={handlePartSearch}
+                pagination={pagination}
               />
+
+              {/* Bottom pagination */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="mt-6 flex justify-center">
+                  <Pagination
+                    currentPage={pagination.page}
+                    totalPages={pagination.totalPages}
+                    hasNext={pagination.hasNext}
+                    hasPrev={pagination.hasPrev}
+                  />
+                </div>
+              )}
             </>
           )}
 
