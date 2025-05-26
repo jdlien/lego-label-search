@@ -31,6 +31,7 @@ module.exports = {
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             parent_id INTEGER,
+            parts_count INTEGER DEFAULT 0,
             FOREIGN KEY (parent_id) REFERENCES ba_categories(id)
           )
         `)

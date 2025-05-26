@@ -11,23 +11,7 @@ async function openDb() {
   })
 }
 
-async function addPartsCountColumn(db) {
-  console.log("Adding parts_count column to ba_categories table if it doesn't exist...")
-  await db
-    .run(
-      `
-    ALTER TABLE ba_categories
-    ADD COLUMN parts_count INTEGER DEFAULT 0
-  `
-    )
-    .catch((err) => {
-      // Column might already exist, which is fine
-      if (!err.message.includes('duplicate column')) {
-        throw err
-      }
-    })
-  console.log('Column added or already exists')
-}
+// parts_count column is now part of the original table schema
 
 async function getAllCategoryIds(db) {
   console.log('Getting all category IDs...')
@@ -138,7 +122,6 @@ if (require.main === module) {
       const db = await openDb()
       console.log('Database opened')
 
-      await addPartsCountColumn(db)
       await createIndexes(db)
       await updateAllCategoryCounts(db)
 
