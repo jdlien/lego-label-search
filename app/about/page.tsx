@@ -1,4 +1,7 @@
 import React from 'react'
+import path from 'path'
+import sqlite3 from 'sqlite3'
+import { open } from 'sqlite'
 
 interface Stats {
   totalParts: number
@@ -7,20 +10,49 @@ interface Stats {
   uniqueImages: number
 }
 
+// Database connection for build-time data fetching
+async function openDb() {
+  return open({
+    filename: path.join(process.cwd(), 'data', 'lego.sqlite'),
+    driver: sqlite3.Database,
+  })
+}
+
 async function getStats(): Promise<Stats> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/stats`, {
-      cache: 'no-store', // Always fetch fresh data
-    })
+    const db = await openDb()
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch stats')
+    // Get total number of parts
+    const partsResult = await db.get('SELECT COUNT(*) as count FROM parts')
+    const totalParts = partsResult?.count || 0
+
+    // Get total number of categories
+    const categoriesResult = await db.get('SELECT COUNT(*) as count FROM ba_categories')
+    const totalCategories = categoriesResult?.count || 0
+
+    // Get number of top-level categories (parent_id = 0 or NULL)
+    const topLevelCategoriesResult = await db.get(
+      'SELECT COUNT(*) as count FROM ba_categories WHERE parent_id = 0 OR parent_id IS NULL'
+    )
+    const topLevelCategories = topLevelCategoriesResult?.count || 0
+
+    // Get number of unique images (distinct image files)
+    const uniqueImagesResult = await db.get(
+      'SELECT COUNT(DISTINCT img_file) as count FROM parts WHERE has_img = 1 AND img_file IS NOT NULL'
+    )
+    const uniqueImages = uniqueImagesResult?.count || 0
+
+    await db.close()
+
+    return {
+      totalParts,
+      totalCategories,
+      topLevelCategories,
+      uniqueImages,
     }
-
-    return await response.json()
   } catch (error) {
     console.error('Error fetching stats:', error)
-    // Return fallback data if API fails
+    // Return fallback data if database access fails
     return {
       totalParts: 0,
       totalCategories: 0,
