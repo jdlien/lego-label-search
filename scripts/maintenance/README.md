@@ -8,22 +8,28 @@ The main maintenance script that handles all computed fields in the database. Th
 
 ### What it updates:
 
-1. **Category Counts** (`parts_count` field in `ba_categories`)
+1. **Category Sort Order** (`sort_order` and `level` fields in `ba_categories`)
+
+   - Runs the category sort order script to maintain hierarchical ordering
+   - Uses depth-first traversal for intuitive category display
+   - Updates level field for proper indentation
+
+2. **Category Counts** (`parts_count` field in `ba_categories`)
 
    - Recursively counts parts in each category and all its subcategories
    - Updates the `parts_count` field for efficient category browsing
 
-2. **Alternate Part IDs** (`alt_part_ids` field in `parts`)
+3. **Alternate Part IDs** (`alt_part_ids` field in `parts`)
 
    - Finds related parts through relationships (Mold, Rebrickable, Transform)
    - Stores comma-separated list of alternate part numbers
 
-3. **Example Design IDs** (`example_design_id` field in `parts`)
+4. **Example Design IDs** (`example_design_id` field in `parts`)
 
    - Selects the best design ID for each part based on color preference
    - Priority: White > Light Bluish Gray > Dark Bluish Gray > Black > Others
 
-4. **Image Availability** (`has_img` and `img_file` fields in `parts`)
+5. **Image Availability** (`has_img` and `img_file` fields in `parts`)
    - Scans the images directory for WebP and PNG files
    - Updates database to reflect actual image availability
    - Prefers WebP over PNG format
@@ -40,8 +46,11 @@ node scripts/maintenance/update_computed_fields.js --categories 1,2,3
 # Skip image availability update (faster)
 node scripts/maintenance/update_computed_fields.js --skip-image-availability
 
+# Skip category sort order update (if categories haven't changed)
+node scripts/maintenance/update_computed_fields.js --skip-category-sort-order
+
 # Only update example design IDs
-node scripts/maintenance/update_computed_fields.js --skip-category-counts --skip-alt-part-ids --skip-image-availability
+node scripts/maintenance/update_computed_fields.js --skip-category-sort-order --skip-category-counts --skip-alt-part-ids --skip-image-availability
 
 # Force update all example design IDs (useful if color preferences change)
 node scripts/maintenance/update_computed_fields.js --force-example-design-ids
@@ -60,12 +69,13 @@ The seed script (`scripts/migrations/seed_data.js`) automatically calls this mai
 
 ### Performance Notes
 
+- **Category sort order**: Fast, processes categories hierarchically
 - **Category counts**: Fast, uses recursive CTEs
 - **Alternate part IDs**: Medium speed, processes all parts
 - **Example design IDs**: Fast, single SQL update
 - **Image availability**: Slowest, requires filesystem scanning
 
-For faster updates during development, you can skip the image availability update which is the most time-consuming operation.
+For faster updates during development, you can skip the image availability update which is the most time-consuming operation. You can also skip category sort order if the category hierarchy hasn't changed.
 
 ### Replaced Scripts
 
@@ -78,6 +88,10 @@ This consolidated script replaces the functionality of:
 - `scripts/update_image_availability.js`
 
 These individual scripts are kept for reference but should not be used directly. Use this maintenance script instead.
+
+### Related Scripts
+
+- `scripts/update_category_sort_order.js` - Updates hierarchical sort order for categories (separate from computed fields)
 
 ## When to Run
 

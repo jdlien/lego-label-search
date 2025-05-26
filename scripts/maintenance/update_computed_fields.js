@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose()
 const path = require('path')
 const fs = require('fs').promises
 const fsSync = require('fs')
+const { spawn } = require('child_process')
 
 const DB_PATH = path.join(__dirname, '../../data/lego.sqlite')
 const IMAGES_DIR = path.join(__dirname, '../../public/data/images')
@@ -332,6 +333,31 @@ class ComputedFieldsUpdater {
     })
   }
 
+  // ===== CATEGORY SORT ORDER =====
+  async updateCategorySortOrder() {
+    console.log('Updating category sort order...')
+    return new Promise((resolve, reject) => {
+      const scriptPath = path.join(__dirname, '../update_category_sort_order.js')
+      const child = spawn('node', [scriptPath], {
+        stdio: 'inherit', // This will show the script's output in real-time
+        cwd: path.dirname(scriptPath),
+      })
+
+      child.on('close', (code) => {
+        if (code === 0) {
+          console.log('✓ Category sort order updated successfully')
+          resolve()
+        } else {
+          reject(new Error(`Category sort order script exited with code ${code}`))
+        }
+      })
+
+      child.on('error', (error) => {
+        reject(new Error(`Failed to run category sort order script: ${error.message}`))
+      })
+    })
+  }
+
   // ===== IMAGE AVAILABILITY =====
   async initializeImageCache() {
     if (this.imageFilesCache === null) {
@@ -507,6 +533,11 @@ class ComputedFieldsUpdater {
     try {
       console.log('Starting computed fields update...')
 
+      // Update category sort order first (affects category display)
+      if (options.categorySortOrder !== false) {
+        await this.updateCategorySortOrder()
+      }
+
       // Handle specific category updates
       if (options.modifiedCategories && options.modifiedCategories.length > 0) {
         await this.updateModifiedCategoryCounts(options.modifiedCategories)
@@ -558,6 +589,10 @@ if (require.main === module) {
     }
   }
 
+  if (args.includes('--skip-category-sort-order')) {
+    options.categorySortOrder = false
+  }
+
   if (args.includes('--skip-category-counts')) {
     options.categoryCounts = false
   }
@@ -584,6 +619,7 @@ Usage: node scripts/maintenance/update_computed_fields.js [options]
 
 Options:
   --categories <ids>           Update only specific category IDs (comma-separated)
+  --skip-category-sort-order   Skip updating category sort order
   --skip-category-counts       Skip updating category counts
   --skip-alt-part-ids         Skip updating alternate part IDs
   --skip-example-design-ids   Skip updating example design IDs
@@ -602,7 +638,7 @@ Examples:
   node scripts/maintenance/update_computed_fields.js --skip-image-availability
 
   # Only update example design IDs
-  node scripts/maintenance/update_computed_fields.js --skip-category-counts --skip-alt-part-ids --skip-image-availability
+  node scripts/maintenance/update_computed_fields.js --skip-category-sort-order --skip-category-counts --skip-alt-part-ids --skip-image-availability
 `)
     process.exit(0)
   }
@@ -646,6 +682,19 @@ module.exports.updateImageAvailability = async function () {
     console.log('✅ Image availability updated successfully!')
   } catch (error) {
     console.error('❌ Image availability update failed:', error)
+    throw error
+  } finally {
+    updater.db.close()
+  }
+}
+
+module.exports.updateCategorySortOrder = async function () {
+  const updater = new ComputedFieldsUpdater()
+  try {
+    await updater.updateCategorySortOrder()
+    console.log('✅ Category sort order updated successfully!')
+  } catch (error) {
+    console.error('❌ Category sort order update failed:', error)
     throw error
   } finally {
     updater.db.close()

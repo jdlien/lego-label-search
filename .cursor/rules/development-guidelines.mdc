@@ -1,0 +1,7 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+When working with this project follow these rules:
+- Do not start a dev server unless you first check that one is not already running. Generally a dev server is already running and it causes issues when you start another one.

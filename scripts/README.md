@@ -126,6 +126,49 @@ Processing time: 45.23 seconds
 - A summary shows the total number of errors encountered
 - The script exits with code 1 if any errors occurred
 
+## Category Management Scripts
+
+### Category Sort Order Update Script
+
+**File:** `update_category_sort_order.js`
+
+This script updates the hierarchical sort order for categories in the `ba_categories` table using a depth-first traversal approach. It implements:
+
+- **Depth-first ordering**: All descendants of a category appear before its siblings
+- **Numeric prefix sorting**: Root categories are ordered by their numeric prefix (1. Basic, 2. Wall, etc.)
+- **Alphabetical subcategory sorting**: Child categories are sorted alphabetically within each parent
+- **Level tracking**: Adds a `level` field to indicate hierarchy depth (0 = root, 1 = child, 2 = grandchild, etc.)
+
+**Features:**
+
+- Root categories ordered by numeric prefix in name (e.g., "1. Basic" comes before "2. Wall")
+- Complete subtree appears before next sibling (depth-first traversal)
+- Automatic level assignment for easy display indentation
+- Sequential sort_order values (1, 2, 3, ...) for simple ordering
+
+**Usage:**
+
+```bash
+# Update category sort orders
+node scripts/update_category_sort_order.js
+
+# Or use the npm script
+npm run update-category-sort
+```
+
+**Database Changes:**
+
+- Updates `sort_order` field with sequential numbering
+- Adds/updates `level` field indicating hierarchy depth
+- Preserves existing category relationships
+
+This script should be run when:
+
+- New categories are added to the database
+- Category hierarchy changes
+- You want to reorganize the display order of categories
+- After importing new category data
+
 ## Other Scripts
 
 ### Data Processing Scripts

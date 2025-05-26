@@ -18,6 +18,12 @@ export type NormalizedOptionType = {
   description?: string
   selected?: boolean // Retained for data structure, but 'checked' or 'value' prop will manage state
   disabled?: boolean
+  group?: string // Group identifier for organizing options
+}
+
+export type GroupedOption = {
+  name: string
+  items: NormalizedOptionType[]
 }
 
 export interface BaseInputProps {

@@ -10,12 +10,16 @@ interface Category {
   name: string
   parent_id?: string
   parts_count?: number
+  sort_order?: number
+  level?: number
 }
 
 interface CategoryForDropdown {
   value: string
   label: string
   disabled?: boolean
+  group?: string
+  description?: string
 }
 
 type SearchBarProps = {
@@ -55,86 +59,33 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
           return
         }
 
-        // Create a map for quick parent lookup (ensure IDs are strings)
-        const categoryMap = new Map<string, Category>(data.categories.map((cat: Category) => [String(cat.id), cat]))
+        // Sort categories by sort_order (which now uses depth-first traversal)
+        const sortedCategories = data.categories.sort((a: Category, b: Category) => {
+          return (a.sort_order || 0) - (b.sort_order || 0)
+        })
 
-        // Function to build parent hierarchy path for a category (excluding the leaf)
-        const buildHierarchyPath = (category: Category): string => {
-          const path: string[] = []
-          let current = category
-          const visited = new Set<string>() // Prevent infinite loops
-          let isFirst = true // Track if this is the first (leaf) category
+        // Create a map for quick parent lookup
+        const categoryMap = new Map<string, Category>(sortedCategories.map((cat: Category) => [String(cat.id), cat]))
 
-          // Build path from leaf to root, excluding the leaf
-          while (current) {
-            // Prevent infinite loops
-            if (visited.has(String(current.id))) {
-              console.warn('Circular reference detected in category hierarchy:', current.id)
-              break
-            }
-            visited.add(String(current.id))
-
-            // Skip adding the first (leaf) category to the path
-            if (!isFirst) {
-              path.unshift(current.name)
-            }
-            isFirst = false
-
-            if (!current.parent_id || current.parent_id === '') break
-
-            const parent = categoryMap.get(String(current.parent_id))
-            if (!parent) {
-              console.warn('Parent category not found:', current.parent_id, 'for category:', current.name)
-              break
-            }
-            current = parent
-          }
-
-          return path.join(' › ')
-        }
-
-        // Split categories into parent and child categories
-        const parentCategories = data.categories
-          .filter((cat: Category) => !cat.parent_id || cat.parent_id === '')
-          .map((cat: Category) => ({
+        // Convert to dropdown format with proper grouping based on hierarchy
+        const combinedCategories = sortedCategories.map((cat: Category) => {
+          const categoryOption: CategoryForDropdown = {
             value: cat.id,
             label: cat.name,
             description: cat.parts_count ? `${cat.parts_count.toLocaleString()} parts` : undefined,
-          }))
+          }
 
-        const childCategories = data.categories
-          .filter((cat: Category) => cat.parent_id && cat.parent_id !== '')
-          .map((cat: Category) => {
-            const hierarchyLabel = buildHierarchyPath(cat)
+          // Only add group for child categories (not root categories)
+          if (cat.parent_id && cat.level !== 0) {
+            const parent = categoryMap.get(String(cat.parent_id))
+            const parentName = parent ? parent.name : 'Other'
+            categoryOption.group = parentName
+          }
+          // Root categories will have no group property, making them ungrouped
 
-            return {
-              value: cat.id,
-              label: ' ' + cat.name,
-              description: hierarchyLabel + (cat.parts_count ? ` (${cat.parts_count.toLocaleString()} parts)` : ''),
-            }
-          })
+          return categoryOption
+        })
 
-        // Sort both groups using natural sort
-        const naturalSort = (a: CategoryForDropdown, b: CategoryForDropdown) => {
-          const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
-          return collator.compare(a.label, b.label)
-        }
-
-        parentCategories.sort(naturalSort)
-        childCategories.sort(naturalSort)
-
-        // Add separator between parent and child categories if we have both
-        let combinedCategories = [...parentCategories]
-
-        if (parentCategories.length > 0 && childCategories.length > 0) {
-          combinedCategories.push({
-            value: 'separator',
-            label: '── Sub Categories ──',
-            disabled: true,
-          })
-        }
-
-        combinedCategories = [...combinedCategories, ...childCategories]
         setCategoriesForDropdown(combinedCategories)
       } catch (error) {
         console.error('Error fetching categories:', error)

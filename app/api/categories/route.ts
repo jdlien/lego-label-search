@@ -34,7 +34,8 @@ export async function GET() {
           ELSE CAST(parent_id AS TEXT)
         END AS parent_id,
         parts_count,
-        sort_order
+        sort_order,
+        level
       FROM ba_categories
       ORDER BY sort_order, name
     `)

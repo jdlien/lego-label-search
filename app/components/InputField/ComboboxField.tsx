@@ -5,7 +5,7 @@ import * as Popover from '@radix-ui/react-popover'
 import { Command } from 'cmdk'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { IconXMark, IconMagnifyingGlass, IconCheck, IconAngleDown } from './InputIcons'
-import type { NormalizedOptionType } from './types'
+import type { NormalizedOptionType, GroupedOption } from './types'
 
 const comboboxStyles = tv({
   slots: {
@@ -26,12 +26,23 @@ const comboboxStyles = tv({
     comboboxCommand: 'overflow-hidden rounded-md',
     // comboboxInput:
     //   'flex h-9 w-full rounded-md border-0 bg-transparent p-3 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
-    comboboxList: 'max-h-[min(500px,calc(var(--radix-popover-content-available-height)-50px))] overflow-y-auto p-1',
+    comboboxList: 'max-h-[min(700px,calc(var(--radix-popover-content-available-height)-50px))] overflow-y-auto p-1',
     comboboxEmpty: 'py-6 text-center text-sm text-muted-foreground',
     comboboxGroup: 'overflow-hidden p-1',
+    comboboxGroupHeading: `
+      px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide
+      bg-muted/30 border-b border-border/30 sticky top-0 z-10 backdrop-blur-sm
+      first:mt-0 mt-2 rounded-t-sm
+    `,
     comboboxItem: `
       relative flex cursor-default select-none items-center rounded-sm px-2 py-1.25 outline-none
       data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50
+    `,
+    comboboxGroupedItem: `
+      relative flex cursor-default select-none items-center rounded-sm pl-4 pr-2 py-1.25 outline-none
+      data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50
+      before:content-[''] before:absolute before:left-2 before:top-0 before:bottom-0 before:w-px
+      before:bg-border/40 before:my-1
     `,
     comboboxChevron: 'h-4 w-4 shrink-0 opacity-50',
     comboboxCheck: 'ml-auto h-4 w-4',
@@ -62,66 +73,82 @@ const comboboxStyles = tv({
       blue: {
         comboboxTrigger: 'focus-visible:ring-blue-500/40',
         comboboxItem: 'data-[selected=true]:bg-blue-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-blue-600 data-[selected=true]:text-white',
       },
       sky: {
         comboboxTrigger: 'focus-visible:ring-sky-500/40',
         comboboxItem: 'data-[selected=true]:bg-sky-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-sky-600 data-[selected=true]:text-white',
       },
       red: {
         comboboxTrigger: 'focus-visible:ring-red-500/40',
         comboboxItem: 'data-[selected=true]:bg-red-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-red-600 data-[selected=true]:text-white',
       },
       green: {
         comboboxTrigger: 'focus-visible:ring-green-500/40',
         comboboxItem: 'data-[selected=true]:bg-green-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-green-600 data-[selected=true]:text-white',
       },
       indigo: {
         comboboxTrigger: 'focus-visible:ring-indigo-500/40',
         comboboxItem: 'data-[selected=true]:bg-indigo-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-indigo-600 data-[selected=true]:text-white',
       },
       violet: {
         comboboxTrigger: 'focus-visible:ring-violet-500/40',
         comboboxItem: 'data-[selected=true]:bg-violet-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-violet-600 data-[selected=true]:text-white',
       },
       purple: {
         comboboxTrigger: 'focus-visible:ring-purple-500/40',
         comboboxItem: 'data-[selected=true]:bg-purple-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-purple-600 data-[selected=true]:text-white',
       },
       fuchsia: {
         comboboxTrigger: 'focus-visible:ring-fuchsia-500/40',
         comboboxItem: 'data-[selected=true]:bg-fuchsia-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-fuchsia-600 data-[selected=true]:text-white',
       },
       pink: {
         comboboxTrigger: 'focus-visible:ring-pink-500/40',
         comboboxItem: 'data-[selected=true]:bg-pink-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-pink-600 data-[selected=true]:text-white',
       },
       rose: {
         comboboxTrigger: 'focus-visible:ring-rose-500/40',
         comboboxItem: 'data-[selected=true]:bg-rose-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-rose-600 data-[selected=true]:text-white',
       },
       amber: {
         comboboxTrigger: 'focus-visible:ring-amber-500/40',
         comboboxItem: 'data-[selected=true]:bg-amber-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-amber-600 data-[selected=true]:text-white',
       },
       yellow: {
         comboboxTrigger: 'focus-visible:ring-yellow-500/40',
         comboboxItem: 'data-[selected=true]:bg-yellow-500 data-[selected=true]:text-black',
+        comboboxGroupedItem: 'data-[selected=true]:bg-yellow-500 data-[selected=true]:text-black',
       },
       lime: {
         comboboxTrigger: 'focus-visible:ring-lime-500/40',
         comboboxItem: 'data-[selected=true]:bg-lime-500 data-[selected=true]:text-black',
+        comboboxGroupedItem: 'data-[selected=true]:bg-lime-500 data-[selected=true]:text-black',
       },
       emerald: {
         comboboxTrigger: 'focus-visible:ring-emerald-500/40',
         comboboxItem: 'data-[selected=true]:bg-emerald-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-emerald-600 data-[selected=true]:text-white',
       },
       teal: {
         comboboxTrigger: 'focus-visible:ring-teal-500/40',
         comboboxItem: 'data-[selected=true]:bg-teal-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-teal-600 data-[selected=true]:text-white',
       },
       cyan: {
         comboboxTrigger: 'focus-visible:ring-cyan-500/40',
         comboboxItem: 'data-[selected=true]:bg-cyan-600 data-[selected=true]:text-white',
+        comboboxGroupedItem: 'data-[selected=true]:bg-cyan-600 data-[selected=true]:text-white',
       },
     },
     theme: {
@@ -129,8 +156,10 @@ const comboboxStyles = tv({
         comboboxTrigger: `border-slate-400/80 bg-slate-50 dark:bg-slate-950/50 text-slate-700 dark:text-slate-200`,
         comboboxContent: 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700',
         comboboxPlaceholder: 'text-slate-400 dark:text-slate-500',
-        comboboxItem: `
-          hover:bg-slate-100/50 dark:hover:bg-slate-800/50
+        comboboxGroupHeading:
+          'text-slate-500 dark:text-slate-400 bg-slate-200/50 dark:bg-slate-800/50 border-slate-200/50 dark:border-slate-700/50',
+        comboboxGroupedItem: `
+          before:bg-slate-300/90 dark:before:bg-slate-600/90
         `,
         clearButtonIcon:
           'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300',
@@ -139,18 +168,33 @@ const comboboxStyles = tv({
         comboboxTrigger: `border-gray-400/80 bg-gray-50 dark:bg-gray-950/50 text-gray-700 dark:text-gray-200`,
         comboboxContent: 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700',
         comboboxPlaceholder: 'text-gray-400 dark:text-gray-500',
+        comboboxGroupHeading:
+          'text-gray-500 dark:text-gray-400 bg-gray-200/50 dark:bg-gray-800/50 border-gray-200/50 dark:border-gray-700/50',
+        comboboxGroupedItem: `
+          before:bg-gray-300/90 dark:before:bg-gray-600/90
+        `,
         clearButtonIcon: 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300',
       },
       zinc: {
         comboboxTrigger: `border-zinc-400/80 bg-zinc-50 dark:bg-zinc-950/50 text-zinc-700 dark:text-zinc-200`,
         comboboxContent: 'bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700',
         comboboxPlaceholder: 'text-zinc-400 dark:text-zinc-500',
+        comboboxGroupHeading:
+          'text-zinc-500 dark:text-zinc-400 bg-zinc-200/50 dark:bg-zinc-800/50 border-zinc-200/50 dark:border-zinc-700/50',
+        comboboxGroupedItem: `
+          before:bg-zinc-300/90 dark:before:bg-zinc-600/90
+        `,
         clearButtonIcon: 'text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-600 dark:group-hover:text-zinc-300',
       },
       neutral: {
         comboboxTrigger: `border-neutral-400/80 bg-neutral-50 dark:bg-neutral-950/50 text-neutral-700 dark:text-neutral-200`,
         comboboxContent: 'bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700',
         comboboxPlaceholder: 'text-neutral-400 dark:text-neutral-500',
+        comboboxGroupHeading:
+          'text-neutral-500 dark:text-neutral-400 bg-neutral-200/50 dark:bg-neutral-800/50 border-neutral-200/50 dark:border-neutral-700/50',
+        comboboxGroupedItem: `
+          before:bg-neutral-300/90 dark:before:bg-neutral-600/90
+        `,
         clearButtonIcon:
           'text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-600 dark:group-hover:text-neutral-300',
       },
@@ -158,6 +202,11 @@ const comboboxStyles = tv({
         comboboxTrigger: `border-stone-400/80 bg-stone-50 dark:bg-stone-950/50 text-stone-700 dark:text-stone-200`,
         comboboxContent: 'bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-700',
         comboboxPlaceholder: 'text-stone-400 dark:text-stone-500',
+        comboboxGroupHeading:
+          'text-stone-500 dark:text-stone-400 bg-stone-200/50 dark:bg-stone-800/50 border-stone-200/50 dark:border-stone-700/50',
+        comboboxGroupedItem: `
+          before:bg-stone-300/90 dark:before:bg-stone-600/90
+        `,
         clearButtonIcon:
           'text-stone-400 dark:text-stone-500 group-hover:text-stone-600 dark:group-hover:text-stone-300',
       },
@@ -171,6 +220,33 @@ const comboboxStyles = tv({
 })
 
 export type ComboboxStyleProps = VariantProps<typeof comboboxStyles>
+
+// Helper function to group options
+const groupOptions = (
+  options: NormalizedOptionType[]
+): { grouped: GroupedOption[]; ungrouped: NormalizedOptionType[] } => {
+  const grouped: GroupedOption[] = []
+  const ungrouped: NormalizedOptionType[] = []
+  const groupMap = new Map<string, NormalizedOptionType[]>()
+
+  options.forEach((option) => {
+    if (option.group) {
+      if (!groupMap.has(option.group)) {
+        groupMap.set(option.group, [])
+      }
+      groupMap.get(option.group)!.push(option)
+    } else {
+      ungrouped.push(option)
+    }
+  })
+
+  // Convert map to array of GroupedOption
+  groupMap.forEach((items, name) => {
+    grouped.push({ name, items })
+  })
+
+  return { grouped, ungrouped }
+}
 
 interface ComboboxFieldProps extends ComboboxStyleProps {
   id: string
@@ -221,6 +297,9 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
 
   // Generate styles using the TV function
   const styles = comboboxStyles({ size, accent, theme })
+
+  // Group options for rendering
+  const { grouped, ungrouped } = groupOptions(options)
 
   // Get display value for selected option - ensure string comparison
   const selectedOption = options.find((opt) => String(opt.value) === String(comboboxValue))
@@ -338,31 +417,63 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
           </div>
           <Command.List className={styles.comboboxList()} id={`${id}-listbox`} data-testid="combobox-list">
             <Command.Empty className={styles.comboboxEmpty()}>No options found.</Command.Empty>
-            <Command.Group className={styles.comboboxGroup()}>
-              {/* Regular options */}
-              {options.map((option) => (
-                <Command.Item
-                  key={option.value}
-                  value={String(option.value)}
-                  keywords={[option.label, option.description || ''].filter(Boolean)}
-                  disabled={option.disabled}
-                  onSelect={() => handleComboboxSelect(option.value)}
-                  className={styles.comboboxItem()}
-                >
-                  <div className="flex flex-1 items-center">
-                    <div className="flex-1">
-                      <div className="leading-tight">{option.label}</div>
-                      {option.description && <div className="text-xs opacity-50">{option.description}</div>}
+
+            {/* Render ungrouped options first */}
+            {ungrouped.length > 0 && (
+              <Command.Group className={styles.comboboxGroup()}>
+                {ungrouped.map((option) => (
+                  <Command.Item
+                    key={option.value}
+                    value={String(option.value)}
+                    keywords={[option.label, option.description || ''].filter(Boolean)}
+                    disabled={option.disabled}
+                    onSelect={() => handleComboboxSelect(option.value)}
+                    className={styles.comboboxItem()}
+                  >
+                    <div className="flex flex-1 items-center">
+                      <div className="flex-1">
+                        <div className="leading-tight">{option.label}</div>
+                        {option.description && <div className="text-xs opacity-50">{option.description}</div>}
+                      </div>
                     </div>
-                  </div>
-                  <IconCheck
-                    className={`${styles.comboboxCheck()} ${
-                      String(comboboxValue) === String(option.value) ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  />
-                </Command.Item>
-              ))}
-            </Command.Group>
+                    <IconCheck
+                      className={`${styles.comboboxCheck()} ${
+                        String(comboboxValue) === String(option.value) ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  </Command.Item>
+                ))}
+              </Command.Group>
+            )}
+
+            {/* Render grouped options */}
+            {grouped.map((group) => (
+              <Command.Group key={group.name} className={styles.comboboxGroup()}>
+                <div className={styles.comboboxGroupHeading()}>{group.name}</div>
+                {group.items.map((option) => (
+                  <Command.Item
+                    key={option.value}
+                    value={String(option.value)}
+                    keywords={[option.label, option.description || ''].filter(Boolean)}
+                    disabled={option.disabled}
+                    onSelect={() => handleComboboxSelect(option.value)}
+                    className={styles.comboboxGroupedItem()}
+                  >
+                    <div className="flex flex-1 items-center">
+                      <div className="flex-1">
+                        <div className="leading-tight">{option.label}</div>
+                        {option.description && <div className="text-xs opacity-50">{option.description}</div>}
+                      </div>
+                    </div>
+                    <IconCheck
+                      className={`${styles.comboboxCheck()} ${
+                        String(comboboxValue) === String(option.value) ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  </Command.Item>
+                ))}
+              </Command.Group>
+            ))}
           </Command.List>
         </Command>
       </Popover.Content>

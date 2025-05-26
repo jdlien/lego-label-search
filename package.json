@@ -12,6 +12,7 @@
     "start:next": "NODE_ENV=production next start",
     "lint": "next lint",
     "update-alt-parts": "node scripts/update_alt_part_ids.js",
+    "update-category-sort": "node scripts/update_category_sort_order.js",
     "db:rebuild": "node scripts/rebuild_database.js",
     "db:migrate": "node scripts/migrations/migrate.js",
     "db:seed": "node scripts/migrations/seed_data.js"

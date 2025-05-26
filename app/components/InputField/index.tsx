@@ -474,6 +474,7 @@ const normalizeOptions = (options?: OptionType[]): NormalizedOptionType[] => {
       if (optObj.selected !== undefined && typeof optObj.selected === 'boolean') normalized.selected = optObj.selected // Keep for initial state if needed
       if (optObj.disabled !== undefined && typeof optObj.disabled === 'boolean' && optObj.disabled !== false)
         normalized.disabled = optObj.disabled
+      if (optObj.group !== undefined && typeof optObj.group === 'string') normalized.group = optObj.group
 
       return normalized
     })
