@@ -9,6 +9,7 @@ set -e
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}Deploying LEGO Label Search to production...${NC}"
@@ -17,6 +18,25 @@ echo -e "${GREEN}Deploying LEGO Label Search to production...${NC}"
 if [ ! -f "package.json" ]; then
   echo -e "${RED}Error: package.json not found. Please run this script from the project root.${NC}"
   exit 1
+fi
+
+# Check sudo access upfront to avoid getting stuck later
+if ! sudo -n true 2>/dev/null; then
+  echo -e "${BLUE}This script requires sudo access for nginx configuration and optional systemd service setup.${NC}"
+  echo -e "${BLUE}Please enter your password when prompted:${NC}"
+  sudo -v
+  if [ $? -ne 0 ]; then
+    echo -e "${RED}Error: sudo access required. Exiting.${NC}"
+    exit 1
+  fi
+fi
+
+# Attempt to pull latest changes from git
+echo -e "${YELLOW}Attempting to pull latest changes from git...${NC}"
+if git pull 2>/dev/null; then
+  echo -e "${GREEN}✓ Successfully pulled latest changes${NC}"
+else
+  echo -e "${RED}⚠️  WARNING: Failed to pull from git repository${NC}"
 fi
 
 # Install dependencies
@@ -29,7 +49,6 @@ npm ci --production=false
 
 echo -e "${YELLOW}Building application...${NC}"
 npm run build
-
 
 # Stop existing PM2 process
 echo -e "${YELLOW}Stopping existing PM2 process...${NC}"
