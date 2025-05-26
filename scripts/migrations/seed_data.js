@@ -247,9 +247,8 @@ class DataSeeder {
     } catch (error) {
       console.error('❌ Seeding failed:', error)
       process.exit(1)
-    } finally {
-      this.db.close()
     }
+    // Note: Database is closed in updateComputedFields()
   }
 
   async updateComputedFields() {
@@ -270,100 +269,28 @@ class DataSeeder {
       })
     })
 
-    // parts_count column is now part of the original table structure
-
-    // Update category counts
-    console.log('Updating category counts...')
-    await this.updateAllCategoryCounts()
-  }
-
-  async updateAllCategoryCounts() {
-    return new Promise((resolve, reject) => {
-      // Get all category IDs
-      this.db.all('SELECT id FROM ba_categories', async (err, categories) => {
-        if (err) {
-          reject(err)
-          return
-        }
-
-        try {
-          for (const category of categories) {
-            await this.updateCategoryCount(category.id)
-          }
-          console.log(`✓ Updated counts for ${categories.length} categories`)
-          resolve()
-        } catch (error) {
-          reject(error)
-        }
+    await new Promise((resolve, reject) => {
+      this.db.run(`CREATE INDEX IF NOT EXISTS idx_parts_alt_part_ids ON parts(alt_part_ids)`, (err) => {
+        if (err) reject(err)
+        else resolve()
       })
     })
-  }
 
-  async updateCategoryCount(categoryId) {
-    return new Promise((resolve, reject) => {
-      // Get all subcategories including this one using recursive CTE
-      this.db.all(
-        `
-        WITH RECURSIVE subcats(id) AS (
-          SELECT id FROM ba_categories WHERE id = ?
-          UNION ALL
-          SELECT child.id FROM ba_categories child
-          JOIN subcats parent ON child.parent_id = parent.id
-        )
-        SELECT id FROM subcats
-      `,
-        categoryId,
-        (err, subcategories) => {
-          if (err) {
-            reject(err)
-            return
-          }
-
-          if (subcategories.length === 0) {
-            resolve(0)
-            return
-          }
-
-          // Count parts in all these categories
-          const placeholders = subcategories.map(() => '?').join(',')
-          const categoryIds = subcategories.map((c) => c.id)
-
-          this.db.get(
-            `
-          SELECT COUNT(*) as count FROM parts
-          WHERE ba_cat_id IN (${placeholders})
-        `,
-            ...categoryIds,
-            (err, result) => {
-              if (err) {
-                reject(err)
-                return
-              }
-
-              const count = result.count
-
-              // Update the count in the database
-              this.db.run(
-                `
-            UPDATE ba_categories
-            SET parts_count = ?
-            WHERE id = ?
-          `,
-                count,
-                categoryId,
-                (err) => {
-                  if (err) {
-                    reject(err)
-                  } else {
-                    resolve(count)
-                  }
-                }
-              )
-            }
-          )
-        }
-      )
+    await new Promise((resolve, reject) => {
+      this.db.run(`CREATE INDEX IF NOT EXISTS idx_parts_example_design_id ON parts(example_design_id)`, (err) => {
+        if (err) reject(err)
+        else resolve()
+      })
     })
+
+    // Close the database connection before running the maintenance script
+    this.db.close()
+
+    // Use the comprehensive maintenance script for all computed fields
+    console.log('Running comprehensive computed fields update...')
+    const ComputedFieldsUpdater = require('../maintenance/update_computed_fields')
+    const updater = new ComputedFieldsUpdater()
+    await updater.run()
   }
 }
 

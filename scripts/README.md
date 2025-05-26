@@ -2,11 +2,32 @@
 
 This directory contains utility scripts for maintaining and managing the LEGO Label Search application.
 
-## Image Availability Update Script
+## Maintenance Scripts
+
+**Primary Script:** `maintenance/update_computed_fields.js`
+
+This is the main maintenance script that handles all computed fields in the database. It consolidates functionality that was previously scattered across multiple individual scripts.
+
+### What it updates:
+
+1. **Category Counts** - Recursively counts parts in each category and subcategories
+2. **Alternate Part IDs** - Finds related parts through relationships
+3. **Example Design IDs** - Selects best design ID based on color preference
+4. **Image Availability** - Scans filesystem and updates image flags
+
+See `maintenance/README.md` for detailed documentation.
+
+## Legacy Individual Scripts
+
+The following scripts are kept for reference but should not be used directly. Use the consolidated maintenance script instead:
+
+### Image Availability Update Script (LEGACY)
 
 **File:** `update_image_availability.js`
 
 This script checks for the existence of image files (WebP and PNG) for all parts in the database and updates both the `has_img` and `img_file` fields accordingly. The `img_file` field stores the exact filename of the image (including extension), while `has_img` is a boolean flag. This helps optimize the application by preventing unnecessary 404 requests for missing images and eliminates complex filename matching logic in the frontend.
+
+**Note:** This functionality is now included in `maintenance/update_computed_fields.js`.
 
 ### Usage
 

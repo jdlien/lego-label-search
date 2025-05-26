@@ -12,8 +12,8 @@ const app = next({
 const handle = app.getRequestHandler()
 
 // These now only run in production
-const { updateAllCategoryCounts, openDb } = require('./scripts/update_category_counts')
-// const { updateAllAltPartIds } = require('./scripts/update_alt_part_ids')
+const { updateCategoryCounts } = require('./scripts/maintenance/update_computed_fields')
+// const { updateAltPartIds } = require('./scripts/maintenance/update_computed_fields')
 
 // Define how often to update the category counts (by default, once per day at 2 AM)
 const CRON_SCHEDULE = process.env.CATEGORY_COUNT_CRON || '0 2 * * *'
@@ -42,8 +42,7 @@ app.prepare().then(() => {
     cron.schedule(CRON_SCHEDULE, async () => {
       console.log('Running scheduled category counts update...')
       try {
-        const db = await openDb()
-        await updateAllCategoryCounts(db)
+        await updateCategoryCounts()
         console.log('Scheduled category counts update completed successfully')
       } catch (error) {
         console.error('Error in scheduled category counts update:', error)
@@ -69,8 +68,7 @@ app.prepare().then(() => {
   // Also update counts and alt part IDs on startup only in production
   if (process.env.NODE_ENV === 'production' && process.env.UPDATE_COUNTS_ON_STARTUP !== 'false') {
     console.log('Running initial category counts update...')
-    openDb()
-      .then((db) => updateAllCategoryCounts(db))
+    updateCategoryCounts()
       .then(() => console.log('Initial category counts update completed successfully'))
       .catch((error) => console.error('Error in initial category counts update:', error))
   }

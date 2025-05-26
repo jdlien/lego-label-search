@@ -2,7 +2,7 @@
 const cron = require('node-cron')
 
 // Import the update functions
-const { updateAllCategoryCounts, openDb } = require('./update_category_counts')
+const { updateCategoryCounts } = require('./maintenance/update_computed_fields')
 
 // Define cron schedules from environment variables
 const CRON_SCHEDULE = process.env.CATEGORY_COUNT_CRON || '0 2 * * *'
@@ -14,8 +14,7 @@ console.log(`Scheduling category counts update with cron schedule: ${CRON_SCHEDU
 cron.schedule(CRON_SCHEDULE, async () => {
   console.log('Running scheduled category counts update...')
   try {
-    const db = await openDb()
-    await updateAllCategoryCounts(db)
+    await updateCategoryCounts()
     console.log('Scheduled category counts update completed successfully')
   } catch (error) {
     console.error('Error in scheduled category counts update:', error)
@@ -25,8 +24,7 @@ cron.schedule(CRON_SCHEDULE, async () => {
 // Update counts on startup
 if (process.env.UPDATE_COUNTS_ON_STARTUP !== 'false') {
   console.log('Running initial category counts update...')
-  openDb()
-    .then((db) => updateAllCategoryCounts(db))
+  updateCategoryCounts()
     .then(() => console.log('Initial category counts update completed successfully'))
     .catch((error) => console.error('Error in initial category counts update:', error))
 }
