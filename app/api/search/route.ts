@@ -720,7 +720,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     // Wrap the query in a subquery to apply sorting consistently and eliminate duplicates
-    const { query, params, countQuery, countParams } = queryData
+    const { query, params } = queryData
     const wrappedQuery = `SELECT DISTINCT * FROM (${query}) results_with_alt_ids`
 
     // Apply sorting and pagination
