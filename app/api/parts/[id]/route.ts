@@ -41,7 +41,6 @@ interface Part {
   grandparent_category: string
   alt_part_ids: string
   example_design_id: string
-  has_img: number
   img_file: string
   image_url?: string
   description?: string
@@ -70,7 +69,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
              c.name as category_name, b.name as ba_category_name,
              parent.id as parent_cat_id, parent.name as parent_category,
              grandparent.id as grandparent_cat_id, grandparent.name as grandparent_category,
-             p.alt_part_ids, p.example_design_id, p.has_img, p.img_file
+             p.alt_part_ids, p.example_design_id, p.img_file
       FROM parts p
       LEFT JOIN part_categories c ON p.part_cat_id = c.id
       LEFT JOIN ba_categories b ON p.ba_cat_id = b.id

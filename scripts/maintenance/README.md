@@ -29,9 +29,9 @@ The main maintenance script that handles all computed fields in the database. Th
    - Selects the best design ID for each part based on color preference
    - Priority: White > Light Bluish Gray > Dark Bluish Gray > Black > Others
 
-5. **Image Availability** (`has_img` and `img_file` fields in `parts`)
+5. **Image Reference** (`img_file` fields in `parts`)
    - Scans the images directory for WebP and PNG files
-   - Updates database to reflect actual image availability
+   - Updates database to reflect actual image path
    - Prefers WebP over PNG format
 
 ### Usage:

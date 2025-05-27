@@ -63,8 +63,9 @@ node scripts/update_image_availability.js --dry-run --verbose --batch-size=100
    - Handles various filename patterns (with/without leading zeros, variant suffixes like 'a', 'b', 'c')
    - Prefers WebP over PNG when both are available
 3. **Updates the database** with:
+
    - `img_file`: The exact filename of the best available image (e.g., "3001.webp", "003381a.png")
-   - `has_img`: Boolean flag (1 if image exists, 0 if not)
+
 4. **Provides detailed statistics** about the update process
 
 ### Scheduling with Cron

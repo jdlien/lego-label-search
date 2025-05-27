@@ -32,7 +32,6 @@ type Part = {
   name: string
   category?: string
   image_url?: string
-  has_img?: number
   img_file?: string
   // Category hierarchy fields
   grandparent_category?: string

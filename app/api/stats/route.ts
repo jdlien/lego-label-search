@@ -6,10 +6,6 @@ import { open, Database } from 'sqlite'
 // Database connection pool
 let dbPromise: Promise<Database> | null = null
 
-// Reset database connection (for testing)
-export function resetDbConnection() {
-  dbPromise = null
-}
 
 // Create a database connection
 async function openDb() {
@@ -43,7 +39,7 @@ export async function GET() {
 
     // Get number of unique images (distinct image files)
     const uniqueImagesResult = await db.get(
-      'SELECT COUNT(DISTINCT img_file) as count FROM parts WHERE has_img = 1 AND img_file IS NOT NULL'
+      'SELECT COUNT(DISTINCT img_file) as count FROM parts WHERE img_file IS NOT NULL'
     )
     const uniqueImages = uniqueImagesResult?.count || 0
 

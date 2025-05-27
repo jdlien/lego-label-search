@@ -6,10 +6,6 @@ import { open, Database } from 'sqlite'
 // Database connection pool
 let dbPromise: Promise<Database> | null = null
 
-// Reset database connection (for testing)
-export function resetDbConnection() {
-  dbPromise = null
-}
 
 // Create a database connection
 async function openDb() {

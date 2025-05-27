@@ -7,9 +7,6 @@ module.exports = {
         db.run('CREATE INDEX IF NOT EXISTS idx_parts_name ON parts(name)')
         db.run('CREATE INDEX IF NOT EXISTS idx_parts_part_cat_id ON parts(part_cat_id)')
         db.run('CREATE INDEX IF NOT EXISTS idx_parts_ba_cat_id ON parts(ba_cat_id)')
-        db.run('CREATE INDEX IF NOT EXISTS idx_parts_sort_order ON parts(sort_order)')
-        db.run('CREATE INDEX IF NOT EXISTS idx_parts_image_available ON parts(image_available)')
-        db.run('CREATE INDEX IF NOT EXISTS idx_parts_has_img ON parts(has_img)')
 
         // Elements table indexes
         db.run('CREATE INDEX IF NOT EXISTS idx_elements_part_num ON elements(part_num)')
@@ -42,9 +39,6 @@ module.exports = {
         db.run('DROP INDEX IF EXISTS idx_parts_name')
         db.run('DROP INDEX IF EXISTS idx_parts_part_cat_id')
         db.run('DROP INDEX IF EXISTS idx_parts_ba_cat_id')
-        db.run('DROP INDEX IF EXISTS idx_parts_sort_order')
-        db.run('DROP INDEX IF EXISTS idx_parts_image_available')
-        db.run('DROP INDEX IF EXISTS idx_parts_has_img')
         db.run('DROP INDEX IF EXISTS idx_elements_part_num')
         db.run('DROP INDEX IF EXISTS idx_elements_color_id')
         db.run('DROP INDEX IF EXISTS idx_elements_design_id')

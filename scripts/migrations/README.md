@@ -68,9 +68,6 @@ The database contains the following tables:
 - `part_material` (TEXT) - Material type
 - `ba_name` (TEXT) - BrickLink name
 - `ba_cat_id` (INTEGER) - BrickLink category ID
-- `sort_order` (INTEGER) - Sort order for display
-- `image_available` (INTEGER) - Legacy field, use has_img instead
-- `has_img` (INTEGER) - 1 if image exists, 0 if not
 - `img_file` (TEXT) - Filename of the image (e.g., "3001.webp")
 - `example_design_id` (TEXT) - Example design ID
 - `alt_part_ids` (TEXT) - Alternative part IDs (JSON)

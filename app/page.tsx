@@ -11,7 +11,6 @@ import PageSizeSelector from './components/PageSizeSelector'
 type Part = {
   id: string
   name: string
-  has_img?: number
   img_file?: string
   [key: string]: string | number | boolean | null | undefined
 }
@@ -119,7 +118,7 @@ function HomeContent() {
     }
 
     fetchResults()
-  }, [searchParams])
+  }, [searchParams, directPartId, router])
 
   // Handler functions
   const handleImageSearchModalOpen = () => {

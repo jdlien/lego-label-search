@@ -4,7 +4,6 @@ const sqlite3 = require('sqlite3').verbose()
 const fs = require('fs')
 const path = require('path')
 const csv = require('csv-parser')
-const { execSync } = require('child_process')
 
 const DB_PATH = path.join(__dirname, '../../data/lego.sqlite')
 const DATA_DIR = path.join(__dirname, '../../data')
@@ -143,82 +142,30 @@ class DataSeeder {
     })
   }
 
-  async ensureBaPartsData() {
-    const baPartsPath = path.join(DATA_DIR, 'ba_parts.csv')
-    
-    // Check if ba_parts.csv exists
-    if (!fs.existsSync(baPartsPath)) {
-      console.log('ba_parts.csv not found, running fetch_ba_data.js to generate it...')
-      try {
-        const fetchScriptPath = path.join(__dirname, '../data_processing/fetch_ba_data.js')
-        execSync(`node "${fetchScriptPath}"`, { 
-          stdio: 'inherit', 
-          cwd: path.dirname(fetchScriptPath) 
-        })
-        console.log('✓ Generated ba_parts.csv successfully')
-      } catch (error) {
-        console.error('❌ Failed to generate ba_parts.csv:', error.message)
-        throw error
-      }
-    } else {
-      console.log('✓ ba_parts.csv already exists')
-    }
-  }
-
   async seedBaParts() {
-    console.log('Processing BrickArchitect parts data...')
-    
-    // Ensure ba_parts.csv exists
-    await this.ensureBaPartsData()
-    
+    console.log('Updating parts with BrickArchitect data...')
     return new Promise((resolve, reject) => {
-      const partsToProcess = []
+      const updates = []
 
       fs.createReadStream(path.join(DATA_DIR, 'ba_parts.csv'))
         .pipe(csv())
         .on('data', (row) => {
-          partsToProcess.push({
-            part_num: row.part_num,
-            ba_name: row.ba_name,
-            ba_cat_id: row.ba_cat_id ? parseInt(row.ba_cat_id) : null
-          })
+          updates.push([row.part_num, row.ba_name, row.ba_cat_id ? parseInt(row.ba_cat_id) : null])
         })
         .on('end', () => {
-          let insertedCount = 0
-          let updatedCount = 0
-
-          // Check which parts exist and which need to be inserted
-          const checkStmt = this.db.prepare(`SELECT part_num FROM parts WHERE part_num = ?`)
-          const insertStmt = this.db.prepare(`
-            INSERT INTO parts (part_num, name, ba_name, ba_cat_id) 
-            VALUES (?, ?, ?, ?)
-          `)
-          const updateStmt = this.db.prepare(`
-            UPDATE parts SET ba_name = ?, ba_cat_id = ? WHERE part_num = ?
+          const stmt = this.db.prepare(`
+            INSERT OR REPLACE INTO parts (part_num, name, ba_name, ba_cat_id)
+            VALUES (?, COALESCE((SELECT name FROM parts WHERE part_num = ?), ?), ?, ?)
           `)
 
-          partsToProcess.forEach((part) => {
-            const existingPart = checkStmt.get(part.part_num)
-            
-            if (existingPart) {
-              // Part exists, update BA data
-              updateStmt.run([part.ba_name, part.ba_cat_id, part.part_num])
-              updatedCount++
-            } else {
-              // Part doesn't exist, insert new record
-              insertStmt.run([part.part_num, part.ba_name, part.ba_name, part.ba_cat_id])
-              insertedCount++
-            }
+          updates.forEach((update) => {
+            const [part_num, ba_name, ba_cat_id] = update
+            stmt.run([part_num, part_num, ba_name, ba_name, ba_cat_id])
           })
-
-          checkStmt.finalize()
-          insertStmt.finalize()
-          updateStmt.finalize((err) => {
+          stmt.finalize((err) => {
             if (err) reject(err)
             else {
-              console.log(`✓ Processed ${partsToProcess.length} BrickArchitect parts:`)
-              console.log(`  - Inserted ${insertedCount} new parts`)
-              console.log(`  - Updated ${updatedCount} existing parts`)
+              console.log(`✓ Updated ${updates.length} parts with BrickArchitect data`)
               resolve()
             }
           })
@@ -297,20 +244,19 @@ class DataSeeder {
       await this.seedElements()
       await this.seedPartRelationships()
 
-      console.log('Creating indexes and updating computed fields...')
-      await this.updateComputedFields()
+      console.log('Creating indexes...')
+      await this.createIndexes()
 
       console.log('✅ All data seeded successfully!')
     } catch (error) {
       console.error('❌ Seeding failed:', error)
       process.exit(1)
+    } finally {
+      this.db.close()
     }
-    // Note: Database is closed in updateComputedFields()
   }
 
-  async updateComputedFields() {
-    console.log('Creating performance indexes...')
-
+  async createIndexes() {
     // Create indexes for better performance
     await new Promise((resolve, reject) => {
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_parts_ba_cat_id ON parts(ba_cat_id)`, (err) => {
@@ -339,15 +285,6 @@ class DataSeeder {
         else resolve()
       })
     })
-
-    // Close the database connection before running the maintenance script
-    this.db.close()
-
-    // Use the comprehensive maintenance script for all computed fields
-    console.log('Running comprehensive computed fields update...')
-    const ComputedFieldsUpdater = require('../maintenance/update_computed_fields')
-    const updater = new ComputedFieldsUpdater()
-    await updater.run()
   }
 }
 

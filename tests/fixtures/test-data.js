@@ -68,75 +68,75 @@ const testData = {
   parts: {
     // Basic bricks
     bricks: [
-      { part_num: '3001', name: 'Brick 2 x 4', part_cat_id: 1, ba_cat_id: 10, image_available: 1, sort_order: 1 },
-      { part_num: '3002', name: 'Brick 2 x 3', part_cat_id: 1, ba_cat_id: 10, image_available: 1, sort_order: 2 },
-      { part_num: '3003', name: 'Brick 2 x 2', part_cat_id: 1, ba_cat_id: 10, image_available: 1, sort_order: 3 },
-      { part_num: '3004', name: 'Brick 1 x 2', part_cat_id: 1, ba_cat_id: 10, image_available: 1, sort_order: 4 },
-      { part_num: '3005', name: 'Brick 1 x 1', part_cat_id: 1, ba_cat_id: 10, image_available: 1, sort_order: 5 },
-      { part_num: '3622', name: 'Brick 1 x 3', part_cat_id: 1, ba_cat_id: 10, image_available: 1, sort_order: 6 },
-      { part_num: '3010', name: 'Brick 1 x 4', part_cat_id: 1, ba_cat_id: 10, image_available: 0, sort_order: 7 },
+      { part_num: '3001', name: 'Brick 2 x 4', part_cat_id: 1, ba_cat_id: 10, sort_order: 1 },
+      { part_num: '3002', name: 'Brick 2 x 3', part_cat_id: 1, ba_cat_id: 10, sort_order: 2 },
+      { part_num: '3003', name: 'Brick 2 x 2', part_cat_id: 1, ba_cat_id: 10, sort_order: 3 },
+      { part_num: '3004', name: 'Brick 1 x 2', part_cat_id: 1, ba_cat_id: 10, sort_order: 4 },
+      { part_num: '3005', name: 'Brick 1 x 1', part_cat_id: 1, ba_cat_id: 10, sort_order: 5 },
+      { part_num: '3622', name: 'Brick 1 x 3', part_cat_id: 1, ba_cat_id: 10, sort_order: 6 },
+      { part_num: '3010', name: 'Brick 1 x 4', part_cat_id: 1, ba_cat_id: 10, sort_order: 7 },
     ],
 
     // Modified bricks
     modifiedBricks: [
-      { part_num: '87087', name: 'Brick 1 x 1 with Stud on Side', part_cat_id: 1, ba_cat_id: 12, image_available: 1, sort_order: 20 },
-      { part_num: '11211', name: 'Brick 1 x 2 with Studs on Side', part_cat_id: 1, ba_cat_id: 12, image_available: 1, sort_order: 21 },
-      { part_num: '30414', name: 'Brick 1 x 4 with Studs on Side', part_cat_id: 1, ba_cat_id: 12, image_available: 0, sort_order: 22 },
+      { part_num: '87087', name: 'Brick 1 x 1 with Stud on Side', part_cat_id: 1, ba_cat_id: 12, sort_order: 20 },
+      { part_num: '11211', name: 'Brick 1 x 2 with Studs on Side', part_cat_id: 1, ba_cat_id: 12, sort_order: 21 },
+      { part_num: '30414', name: 'Brick 1 x 4 with Studs on Side', part_cat_id: 1, ba_cat_id: 12, sort_order: 22 },
     ],
 
     // Basic plates
     plates: [
-      { part_num: '3020', name: 'Plate 2 x 4', part_cat_id: 2, ba_cat_id: 20, image_available: 1, sort_order: 30 },
-      { part_num: '3021', name: 'Plate 2 x 3', part_cat_id: 2, ba_cat_id: 20, image_available: 1, sort_order: 31 },
-      { part_num: '3022', name: 'Plate 2 x 2', part_cat_id: 2, ba_cat_id: 20, image_available: 1, sort_order: 32 },
-      { part_num: '3023', name: 'Plate 1 x 2', part_cat_id: 2, ba_cat_id: 20, image_available: 1, sort_order: 33 },
-      { part_num: '3024', name: 'Plate 1 x 1', part_cat_id: 2, ba_cat_id: 20, image_available: 1, sort_order: 34 },
-      { part_num: '3710', name: 'Plate 1 x 4', part_cat_id: 2, ba_cat_id: 20, image_available: 1, sort_order: 35 },
-      { part_num: '3666', name: 'Plate 1 x 6', part_cat_id: 2, ba_cat_id: 20, image_available: 0, sort_order: 36 },
-      { part_num: '3034', name: 'Plate 2 x 8', part_cat_id: 2, ba_cat_id: 20, image_available: 1, sort_order: 37 },
-      { part_num: '3035', name: 'Plate 4 x 8', part_cat_id: 2, ba_cat_id: 20, image_available: 0, sort_order: 38 },
-      { part_num: '3032', name: 'Plate 4 x 6', part_cat_id: 2, ba_cat_id: 20, image_available: 0, sort_order: 39 },
+      { part_num: '3020', name: 'Plate 2 x 4', part_cat_id: 2, ba_cat_id: 20, sort_order: 30 },
+      { part_num: '3021', name: 'Plate 2 x 3', part_cat_id: 2, ba_cat_id: 20, sort_order: 31 },
+      { part_num: '3022', name: 'Plate 2 x 2', part_cat_id: 2, ba_cat_id: 20, sort_order: 32 },
+      { part_num: '3023', name: 'Plate 1 x 2', part_cat_id: 2, ba_cat_id: 20, sort_order: 33 },
+      { part_num: '3024', name: 'Plate 1 x 1', part_cat_id: 2, ba_cat_id: 20, sort_order: 34 },
+      { part_num: '3710', name: 'Plate 1 x 4', part_cat_id: 2, ba_cat_id: 20, sort_order: 35 },
+      { part_num: '3666', name: 'Plate 1 x 6', part_cat_id: 2, ba_cat_id: 20, sort_order: 36 },
+      { part_num: '3034', name: 'Plate 2 x 8', part_cat_id: 2, ba_cat_id: 20, sort_order: 37 },
+      { part_num: '3035', name: 'Plate 4 x 8', part_cat_id: 2, ba_cat_id: 20, sort_order: 38 },
+      { part_num: '3032', name: 'Plate 4 x 6', part_cat_id: 2, ba_cat_id: 20, sort_order: 39 },
     ],
 
     // Slopes
     slopes: [
-      { part_num: '3040', name: 'Slope 45 2 x 1', part_cat_id: 3, ba_cat_id: 30, image_available: 1, sort_order: 50 },
-      { part_num: '3037', name: 'Slope 45 2 x 4', part_cat_id: 3, ba_cat_id: 30, image_available: 1, sort_order: 51 },
-      { part_num: '3038', name: 'Slope 45 2 x 3', part_cat_id: 3, ba_cat_id: 30, image_available: 1, sort_order: 52 },
-      { part_num: '3039', name: 'Slope 45 2 x 2', part_cat_id: 3, ba_cat_id: 30, image_available: 0, sort_order: 53 },
+      { part_num: '3040', name: 'Slope 45 2 x 1', part_cat_id: 3, ba_cat_id: 30, sort_order: 50 },
+      { part_num: '3037', name: 'Slope 45 2 x 4', part_cat_id: 3, ba_cat_id: 30, sort_order: 51 },
+      { part_num: '3038', name: 'Slope 45 2 x 3', part_cat_id: 3, ba_cat_id: 30, sort_order: 52 },
+      { part_num: '3039', name: 'Slope 45 2 x 2', part_cat_id: 3, ba_cat_id: 30, sort_order: 53 },
     ],
 
     // Technic
     technic: [
-      { part_num: '3700', name: 'Technic Brick 1 x 2 with Hole', part_cat_id: 4, ba_cat_id: 40, image_available: 1, sort_order: 60 },
-      { part_num: '3701', name: 'Technic Brick 1 x 4 with Holes', part_cat_id: 4, ba_cat_id: 40, image_available: 1, sort_order: 61 },
-      { part_num: '32316', name: 'Technic Beam 5', part_cat_id: 4, ba_cat_id: 40, image_available: 1, sort_order: 62 },
-      { part_num: '2780', name: 'Technic Pin with Friction', part_cat_id: 4, ba_cat_id: 41, image_available: 1, sort_order: 70 },
-      { part_num: '3673', name: 'Technic Pin', part_cat_id: 4, ba_cat_id: 41, image_available: 1, sort_order: 71 },
-      { part_num: '32062', name: 'Technic Axle 2', part_cat_id: 4, ba_cat_id: 41, image_available: 0, sort_order: 72 },
+      { part_num: '3700', name: 'Technic Brick 1 x 2 with Hole', part_cat_id: 4, ba_cat_id: 40, sort_order: 60 },
+      { part_num: '3701', name: 'Technic Brick 1 x 4 with Holes', part_cat_id: 4, ba_cat_id: 40, sort_order: 61 },
+      { part_num: '32316', name: 'Technic Beam 5', part_cat_id: 4, ba_cat_id: 40, sort_order: 62 },
+      { part_num: '2780', name: 'Technic Pin with Friction', part_cat_id: 4, ba_cat_id: 41, sort_order: 70 },
+      { part_num: '3673', name: 'Technic Pin', part_cat_id: 4, ba_cat_id: 41, sort_order: 71 },
+      { part_num: '32062', name: 'Technic Axle 2', part_cat_id: 4, ba_cat_id: 41, sort_order: 72 },
     ],
 
     // Parts with alternates
     alternates: [
-      { part_num: '3004b', name: 'Brick 1 x 2 with Embossed Line', part_cat_id: 1, ba_cat_id: 11, image_available: 0, sort_order: 100 },
-      { part_num: '3024b', name: 'Plate 1 x 1 Round', part_cat_id: 2, ba_cat_id: 21, image_available: 0, sort_order: 101 },
-      { part_num: '6141', name: 'Plate 1 x 1 Round', part_cat_id: 2, ba_cat_id: 21, image_available: 1, sort_order: 102 },
+      { part_num: '3004b', name: 'Brick 1 x 2 with Embossed Line', part_cat_id: 1, ba_cat_id: 11, sort_order: 100 },
+      { part_num: '3024b', name: 'Plate 1 x 1 Round', part_cat_id: 2, ba_cat_id: 21, sort_order: 101 },
+      { part_num: '6141', name: 'Plate 1 x 1 Round', part_cat_id: 2, ba_cat_id: 21, sort_order: 102 },
     ],
 
     // Parts with special characters (for testing edge cases)
     specialCharacters: [
-      { part_num: 'SPEC001', name: 'Part with "Quotes"', part_cat_id: 1, ba_cat_id: 10, image_available: 0, sort_order: 200 },
-      { part_num: 'SPEC002', name: "Part with 'Apostrophe'", part_cat_id: 1, ba_cat_id: 10, image_available: 0, sort_order: 201 },
-      { part_num: 'SPEC003', name: 'Part with & Ampersand', part_cat_id: 1, ba_cat_id: 10, image_available: 0, sort_order: 202 },
-      { part_num: 'SPEC004', name: 'Part with < > Brackets', part_cat_id: 1, ba_cat_id: 10, image_available: 0, sort_order: 203 },
+      { part_num: 'SPEC001', name: 'Part with "Quotes"', part_cat_id: 1, ba_cat_id: 10, sort_order: 200 },
+      { part_num: 'SPEC002', name: "Part with 'Apostrophe'", part_cat_id: 1, ba_cat_id: 10, sort_order: 201 },
+      { part_num: 'SPEC003', name: 'Part with & Ampersand', part_cat_id: 1, ba_cat_id: 10, sort_order: 202 },
+      { part_num: 'SPEC004', name: 'Part with < > Brackets', part_cat_id: 1, ba_cat_id: 10, sort_order: 203 },
     ],
 
     // Parts for search testing
     searchTest: [
-      { part_num: '99999', name: 'Test Part No Image', part_cat_id: 1, ba_cat_id: 10, image_available: 0, sort_order: 300 },
-      { part_num: '88888', name: 'Another Test No Image', part_cat_id: 2, ba_cat_id: 20, image_available: 0, sort_order: 301 },
-      { part_num: '2420', name: 'Plate 2 x 2 Corner', part_cat_id: 2, ba_cat_id: 21, image_available: 1, sort_order: 302 },
-      { part_num: '2357', name: 'Brick 2 x 2 Corner', part_cat_id: 1, ba_cat_id: 11, image_available: 1, sort_order: 303 },
+      { part_num: '99999', name: 'Test Part No Image', part_cat_id: 1, ba_cat_id: 10, sort_order: 300 },
+      { part_num: '88888', name: 'Another Test No Image', part_cat_id: 2, ba_cat_id: 20, sort_order: 301 },
+      { part_num: '2420', name: 'Plate 2 x 2 Corner', part_cat_id: 2, ba_cat_id: 21, sort_order: 302 },
+      { part_num: '2357', name: 'Brick 2 x 2 Corner', part_cat_id: 1, ba_cat_id: 11, sort_order: 303 },
     ],
   },
 
@@ -202,9 +202,9 @@ const testData = {
         ).join(',\n')
       };`,
 
-      parts: `INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, image_available, alt_part_ids, ba_name, sort_order) VALUES ${
+      parts: `INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, alt_part_ids, ba_name, sort_order) VALUES ${
         this.getAllParts().map(p => 
-          `('${p.part_num}', '${p.name.replace(/'/g, "''")}', ${p.part_cat_id}, ${p.ba_cat_id}, ${p.image_available}, ${p.alt_part_ids ? `'${p.alt_part_ids}'` : 'NULL'}, '${p.ba_name || p.name.replace(/'/g, "''")}', ${p.sort_order})`
+          `('${p.part_num}', '${p.name.replace(/'/g, "''")}', ${p.part_cat_id}, ${p.ba_cat_id}, ${p.alt_part_ids ? `'${p.alt_part_ids}'` : 'NULL'}, '${p.ba_name || p.name.replace(/'/g, "''")}', ${p.sort_order})`
         ).join(',\n')
       };`,
 

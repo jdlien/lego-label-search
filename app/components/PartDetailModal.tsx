@@ -20,7 +20,6 @@ type PartData = {
   ba_cat_id?: string
   part_material?: string
   image_url?: string
-  has_img?: number
   img_file?: string
   alternatesByType?: Record<
     string,

@@ -26,6 +26,16 @@ async function rebuildDatabase() {
     const dataSeeder = new DataSeeder()
     await dataSeeder.seed()
 
+    // Run computed fields update
+    console.log('\n🛠️  Updating computed fields...')
+    const { spawnSync } = require('child_process')
+    const computedFieldsScript = path.join(__dirname, 'maintenance', 'update_computed_fields.js')
+    const result = spawnSync('node', [computedFieldsScript], { stdio: 'inherit' })
+    if (result.status !== 0) {
+      console.error('❌ Computed fields update failed.')
+      process.exit(1)
+    }
+
     console.log('\n✅ Database rebuild completed successfully!')
     console.log(`📍 Database location: ${DB_PATH}`)
 

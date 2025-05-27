@@ -4,7 +4,7 @@
  * Image Availability Update Script
  *
  * This script checks for the existence of image files (WebP and PNG) for all parts
- * in the database and updates the has_img field accordingly.
+ * in the database and updates the img_file field accordingly.
  *
  * The script uses hierarchical matching with strict exact matches at each level:
  *
@@ -93,7 +93,7 @@ function showHelp() {
 Image Availability Update Script
 
 This script checks for the existence of image files (WebP and PNG) for all parts
-in the database and updates the has_img field accordingly.
+in the database and updates the img_file field accordingly.
 
 The script uses hierarchical matching with strict exact matches at each level:
 
@@ -342,19 +342,18 @@ function selectBestImageFile(files, partId, matchedVariation = null) {
 
 // Get all parts from database
 async function getAllParts(db) {
-  const query = 'SELECT part_num, has_img, img_file FROM parts ORDER BY part_num'
+  const query = 'SELECT part_num, img_file FROM parts ORDER BY part_num'
   return db.all(query)
 }
 
-// Update img_file and has_img fields for a part
+// Update img_file field for a part
 async function updatePartImageStatus(db, partId, imgFile) {
   if (CONFIG.dryRun) {
     return
   }
 
-  const hasImg = imgFile ? 1 : 0
-  const query = 'UPDATE parts SET has_img = ?, img_file = ? WHERE part_num = ?'
-  await db.run(query, [hasImg, imgFile, partId])
+  const query = 'UPDATE parts SET img_file = ? WHERE part_num = ?'
+  await db.run(query, [imgFile, partId])
 }
 
 // Process parts in batches

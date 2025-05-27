@@ -11,7 +11,6 @@ import PartCard from './PartCard'
 type Part = {
   id: string
   name: string
-  has_img?: number
   img_file?: string
   [key: string]: string | number | boolean | null | undefined
 }
