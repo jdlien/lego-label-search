@@ -557,13 +557,16 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
           </div>
         ) : previewUrl ? (
           <div className="text-center">
-            <Image
-              src={previewUrl}
-              alt="Selected preview"
-              width={300}
-              height={300}
-              className="mx-auto max-h-72 max-w-full rounded-lg border border-gray-200 object-contain dark:border-gray-600"
-            />
+            <div className="relative mx-auto flex w-full max-w-[360px] sm:max-w-[480px]">
+              <Image
+                src={previewUrl}
+                alt="Selected preview"
+                width={0}
+                height={0}
+                className="h-auto w-full rounded-md border object-contain shadow-md"
+              />
+            </div>
+
             <div className="mt-6 space-y-6">
               <button
                 onClick={handleImageSubmit}
