@@ -6,11 +6,17 @@ import { open, Database } from 'sqlite'
 // Database connection pool
 let dbPromise: Promise<Database> | null = null
 
+// Reset database connection (for testing)
+export function resetDbConnection() {
+  dbPromise = null
+}
+
 // Create a database connection
 async function openDb() {
   if (!dbPromise) {
+    const dbPath = process.env.DB_PATH || path.join(process.cwd(), 'data', 'lego.sqlite')
     dbPromise = open({
-      filename: path.join(process.cwd(), 'data', 'lego.sqlite'),
+      filename: dbPath,
       driver: sqlite3.Database,
     })
   }

@@ -237,11 +237,67 @@ async function seedPaginationTestData(db, partCount = 100) {
   }
 }
 
+/**
+ * Seeds data for testing stats endpoint
+ */
+async function seedStatsTestData(db) {
+  // Insert colors
+  await db.exec(`
+    INSERT INTO colors (id, name, rgb, is_trans) VALUES
+    (0, 'Black', '1B2A34', 0),
+    (15, 'White', 'FFFFFF', 0);
+  `)
+
+  // Insert part categories
+  await db.exec(`
+    INSERT INTO part_categories (id, name) VALUES (1, 'Test');
+  `)
+
+  // Insert ba_categories with hierarchy for stats testing
+  await db.exec(`
+    INSERT INTO ba_categories (id, name, parent_id, sort_order, level) VALUES
+    -- Root categories (3 total)
+    (1, 'Category A', NULL, 1, 0),
+    (2, 'Category B', NULL, 2, 0),
+    (3, 'Category C', NULL, 3, 0),
+    
+    -- Level 1 subcategories
+    (10, 'A.1', 1, 1, 1),
+    (11, 'A.2', 1, 2, 1),
+    (20, 'B.1', 2, 1, 1),
+    (21, 'B.2', 2, 2, 1),
+    
+    -- Level 2 subcategories
+    (100, 'A.1.1', 10, 1, 2),
+    (101, 'A.1.2', 10, 2, 2),
+    (110, 'A.2.1', 11, 1, 2),
+    (200, 'B.1.1', 20, 1, 2),
+    
+    -- Level 3 subcategories
+    (1000, 'A.1.1.1', 100, 1, 3),
+    (1001, 'A.1.1.2', 100, 2, 3);
+  `)
+
+  // Insert parts with specific image distribution for stats testing
+  await db.exec(`
+    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, has_img, img_file, image_available, sort_order) VALUES
+    -- Parts with unique images (3 total)
+    ('P001', 'Part with Image 1', 1, 1, 1, 'p001.webp', 1, 1),
+    ('P002', 'Part with Image 2', 1, 2, 1, 'p002.webp', 1, 2),
+    ('P003', 'Part with Image 3', 1, 3, 1, 'p003.webp', 1, 3),
+    
+    -- Parts without images
+    ('P004', 'Part without Image 1', 1, 10, 0, NULL, 0, 4),
+    ('P005', 'Part without Image 2', 1, 11, 0, NULL, 0, 5);
+  `)
+}
+
 module.exports = {
   seedFullTestData,
   seedSearchTestData,
   seedCategoryTestData,
   seedRelationshipTestData,
   seedPaginationTestData,
+  seedStatsTestData,
   testData,
 }

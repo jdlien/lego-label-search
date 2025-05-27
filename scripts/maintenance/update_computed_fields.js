@@ -5,6 +5,7 @@ const path = require('path')
 const fs = require('fs').promises
 const fsSync = require('fs')
 const { spawn } = require('child_process')
+const updateImageAvailabilityScript = require('../update_image_availability.js')
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../data/lego.sqlite')
 const IMAGES_DIR = path.join(__dirname, '../../public/data/images')
@@ -12,7 +13,6 @@ const IMAGES_DIR = path.join(__dirname, '../../public/data/images')
 class ComputedFieldsUpdater {
   constructor() {
     this.db = new sqlite3.Database(DB_PATH)
-    this.imageFilesCache = null
   }
 
   // ===== CATEGORY COUNTS =====
@@ -359,174 +359,7 @@ class ComputedFieldsUpdater {
   }
 
   // ===== IMAGE AVAILABILITY =====
-  async initializeImageCache() {
-    if (this.imageFilesCache === null) {
-      try {
-        console.log('📁 Loading image files list...')
-        const allFiles = await fs.readdir(IMAGES_DIR)
-        // Filter to only image files and remove extensions for easier matching
-        this.imageFilesCache = allFiles
-          .filter((file) => /\.(webp|png)$/i.test(file))
-          .map((file) => file.replace(/\.(webp|png)$/i, ''))
-        console.log(`Found ${this.imageFilesCache.length} image files`)
-      } catch (error) {
-        console.error(`Error reading images directory: ${error.message}`)
-        this.imageFilesCache = []
-      }
-    }
-    return this.imageFilesCache
-  }
-
-  async checkPartImages(partId) {
-    // Ensure cache is initialized
-    await this.initializeImageCache()
-
-    // Try multiple filename variations for this part
-    const variations = [
-      partId, // Original part ID
-      partId.replace(/^0+/, ''), // Strip leading zeros
-      partId.padStart(6, '0'), // Pad to 6 digits with leading zeros
-    ]
-
-    // Check if any cached image files match our part variations
-    let foundFiles = []
-
-    for (const variation of variations) {
-      const matchingFiles = this.imageFilesCache.filter((baseName) => {
-        // Check for exact match or files that start with the part number
-        return baseName === variation || baseName.startsWith(variation)
-      })
-
-      if (matchingFiles.length > 0) {
-        foundFiles.push(...matchingFiles)
-        break // Found matches, no need to check other variations
-      }
-    }
-
-    // Remove duplicates and find the best image file
-    const uniqueFiles = [...new Set(foundFiles)]
-    const bestImageFile = this.selectBestImageFile(uniqueFiles, partId)
-
-    return {
-      hasAny: uniqueFiles.length > 0,
-      bestImageFile,
-      foundFiles: uniqueFiles,
-      variations,
-    }
-  }
-
-  selectBestImageFile(files, partId) {
-    if (files.length === 0) return null
-
-    // Priority order for selection:
-    // 1. Exact match with .webp extension
-    // 2. Exact match with .png extension
-    // 3. First variant with .webp extension
-    // 4. First variant with .png extension
-    // 5. Any other file
-
-    const exactMatches = files.filter(
-      (f) => f === partId || f === partId.replace(/^0+/, '') || f === partId.padStart(6, '0')
-    )
-    const variants = files.filter((f) => !exactMatches.includes(f))
-
-    // Check for exact matches first
-    for (const file of exactMatches) {
-      // Prefer WebP over PNG for exact matches
-      if (fsSync.existsSync(path.join(IMAGES_DIR, `${file}.webp`))) return `${file}.webp`
-      if (fsSync.existsSync(path.join(IMAGES_DIR, `${file}.png`))) return `${file}.png`
-    }
-
-    // Check variants
-    for (const file of variants) {
-      // Prefer WebP over PNG for variants
-      if (fsSync.existsSync(path.join(IMAGES_DIR, `${file}.webp`))) return `${file}.webp`
-      if (fsSync.existsSync(path.join(IMAGES_DIR, `${file}.png`))) return `${file}.png`
-    }
-
-    return null
-  }
-
-  async updatePartImageStatus(partId, imgFile) {
-    return new Promise((resolve, reject) => {
-      const hasImg = imgFile ? 1 : 0
-      this.db.run('UPDATE parts SET has_img = ?, img_file = ? WHERE part_num = ?', [hasImg, imgFile, partId], (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
-    })
-  }
-
-  async updateAllImageAvailability() {
-    console.log('Updating image availability for all parts...')
-    return new Promise((resolve, reject) => {
-      this.db.all('SELECT part_num, has_img, img_file FROM parts ORDER BY part_num', async (err, parts) => {
-        if (err) {
-          reject(err)
-          return
-        }
-
-        try {
-          const stats = {
-            total: parts.length,
-            processed: 0,
-            updated: 0,
-            hasImage: 0,
-            noImage: 0,
-            errors: 0,
-          }
-
-          console.log(`Processing ${stats.total} parts...`)
-
-          for (const part of parts) {
-            try {
-              const imageInfo = await this.checkPartImages(part.part_num)
-              const currentImgFile = part.img_file
-              const newImgFile = imageInfo.bestImageFile
-              const shouldHaveImg = imageInfo.hasAny
-
-              stats.processed++
-
-              if (shouldHaveImg) {
-                stats.hasImage++
-              } else {
-                stats.noImage++
-              }
-
-              // Update if the database value doesn't match reality
-              const needsUpdate = currentImgFile !== newImgFile
-              if (needsUpdate) {
-                stats.updated++
-                await this.updatePartImageStatus(part.part_num, newImgFile)
-              }
-
-              // Progress indicator for large batches
-              if (stats.processed % 1000 === 0) {
-                const progress = ((stats.processed / stats.total) * 100).toFixed(1)
-                console.log(`  Progress: ${stats.processed}/${stats.total} (${progress}%)`)
-              }
-            } catch (error) {
-              stats.errors++
-              console.error(`Error processing part ${part.part_num}:`, error.message)
-            }
-          }
-
-          console.log(
-            `✓ Image availability updated: ${stats.updated} changes, ${stats.hasImage} with images, ${stats.noImage} without`
-          )
-          if (stats.errors > 0) {
-            console.log(`⚠️  ${stats.errors} errors occurred during processing`)
-          }
-          resolve()
-        } catch (error) {
-          reject(error)
-        }
-      })
-    })
-  }
+  // Image availability logic is now delegated to scripts/update_image_availability.js
 
   // ===== MAIN EXECUTION =====
   async run(options = {}) {
@@ -559,9 +392,10 @@ class ComputedFieldsUpdater {
         }
       }
 
-      // Update image availability
+      // Update image availability using the more sophisticated script
       if (options.imageAvailability !== false) {
-        await this.updateAllImageAvailability()
+        console.log('Delegating image availability update to update_image_availability.js...')
+        await updateImageAvailabilityScript.main()
       }
 
       console.log('✅ Computed fields updated successfully!')
@@ -676,15 +510,12 @@ module.exports.updateAltPartIds = async function () {
 }
 
 module.exports.updateImageAvailability = async function () {
-  const updater = new ComputedFieldsUpdater()
   try {
-    await updater.updateAllImageAvailability()
+    await require('../update_image_availability.js').main()
     console.log('✅ Image availability updated successfully!')
   } catch (error) {
     console.error('❌ Image availability update failed:', error)
     throw error
-  } finally {
-    updater.db.close()
   }
 }
 

@@ -65,20 +65,75 @@ afterAll(async () => {
   await new Promise(resolve => setTimeout(resolve, 100))
 })
 
-// Suppress console errors during tests unless explicitly needed
+// Suppress console output during tests unless explicitly needed
 const originalError = console.error
+const originalLog = console.log
+const originalWarn = console.warn
+
+// Check if running in verbose mode
+const isVerbose = process.argv.includes('--verbose') || process.env.JEST_VERBOSE === 'true'
+
 beforeAll(() => {
+  // Suppress console.error unless it's expected test errors or in verbose mode
   console.error = (...args) => {
-    // Only log errors that aren't expected test errors
-    if (!args[0]?.includes?.('Expected error') && 
-        !args[0]?.includes?.('Test error')) {
+    const errorMessage = args[0]?.toString() || ''
+    
+    // Always show in verbose mode
+    if (isVerbose) {
       originalError.call(console, ...args)
+      return
+    }
+    
+    // Suppress expected test errors based on specific patterns
+    const suppressedPatterns = [
+      'Expected error',
+      'Test error',
+      'Database error',
+      'SQLITE_CANTOPEN',
+      'SQLITE_NOTADB', 
+      'Network error',
+      'Request timeout',
+      'Invalid JSON',
+      'String error',
+      'Database connection failed',
+      'An update to HomeContent inside a test was not wrapped in act',
+      'warnIfUpdatesNotWrappedWithActDEV',
+      'When testing, code that causes React state updates should be wrapped into act',
+      'Categories error:',
+      'Stats error:',
+      'Search error:',
+      'Error retrieving part:',
+      'Error proxying health check:'
+    ]
+    
+    const shouldSuppress = suppressedPatterns.some(pattern => 
+      errorMessage.includes(pattern)
+    )
+    
+    if (!shouldSuppress) {
+      originalError.call(console, ...args)
+    }
+  }
+
+  // Suppress console.log unless in verbose mode
+  console.log = (...args) => {
+    if (isVerbose) {
+      originalLog.call(console, ...args)
+    }
+  }
+
+  // Suppress console.warn unless in verbose mode  
+  console.warn = (...args) => {
+    if (isVerbose) {
+      originalWarn.call(console, ...args)
     }
   }
 })
 
 afterAll(() => {
   console.error = originalError
+  console.log = originalLog
+  console.warn = originalWarn
 })
 
 // Add custom Jest matchers

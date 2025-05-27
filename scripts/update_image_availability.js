@@ -370,16 +370,19 @@ async function processParts(db, parts) {
     errors: 0,
   }
 
-  console.log(`Processing ${stats.total} parts in batches of ${CONFIG.batchSize}...`)
+  // ANSI color codes
+  const COLOR_GREEN = '\x1b[32m'
+  const COLOR_RESET = '\x1b[0m'
+  const COLOR_CYAN = '\x1b[36m'
+
+  const totalBatches = Math.ceil(parts.length / CONFIG.batchSize)
 
   for (let i = 0; i < parts.length; i += CONFIG.batchSize) {
     const batch = parts.slice(i, i + CONFIG.batchSize)
     const batchNum = Math.floor(i / CONFIG.batchSize) + 1
-    const totalBatches = Math.ceil(parts.length / CONFIG.batchSize)
 
-    console.log(`Processing batch ${batchNum}/${totalBatches} (${batch.length} parts)...`)
-
-    for (const part of batch) {
+    for (let j = 0; j < batch.length; j++) {
+      const part = batch[j]
       try {
         const imageInfo = await checkPartImages(part.part_num)
         const currentImgFile = part.img_file
@@ -435,16 +438,22 @@ async function processParts(db, parts) {
           console.log(`  Best file selected: ${imageInfo.bestImageFile || 'none'}`)
         }
 
-        // Progress indicator for large batches
-        if (stats.processed % 100 === 0) {
-          const progress = ((stats.processed / stats.total) * 100).toFixed(1)
-          console.log(`  Progress: ${stats.processed}/${stats.total} (${progress}%)`)
+        // Single-line progress indicator (if not verbose)
+        if (!CONFIG.verbose) {
+          process.stdout.write(
+            `\r${COLOR_GREEN}Processing: ${stats.processed}/${stats.total} parts (Batch ${batchNum}/${totalBatches})${COLOR_RESET}`
+          )
         }
       } catch (error) {
         stats.errors++
         console.error(`Error processing part ${part.part_num}:`, error.message)
       }
     }
+  }
+
+  // At the end, clear the progress line and print the final summary
+  if (!CONFIG.verbose) {
+    process.stdout.write('\r\x1b[2K') // Clear the line
   }
 
   return stats
