@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose()
 const fs = require('fs')
 const path = require('path')
 const csv = require('csv-parser')
+const { execSync } = require('child_process')
 
 const DB_PATH = path.join(__dirname, '../../data/lego.sqlite')
 const DATA_DIR = path.join(__dirname, '../../data')
@@ -142,26 +143,82 @@ class DataSeeder {
     })
   }
 
+  async ensureBaPartsData() {
+    const baPartsPath = path.join(DATA_DIR, 'ba_parts.csv')
+    
+    // Check if ba_parts.csv exists
+    if (!fs.existsSync(baPartsPath)) {
+      console.log('ba_parts.csv not found, running fetch_ba_data.js to generate it...')
+      try {
+        const fetchScriptPath = path.join(__dirname, '../data_processing/fetch_ba_data.js')
+        execSync(`node "${fetchScriptPath}"`, { 
+          stdio: 'inherit', 
+          cwd: path.dirname(fetchScriptPath) 
+        })
+        console.log('✓ Generated ba_parts.csv successfully')
+      } catch (error) {
+        console.error('❌ Failed to generate ba_parts.csv:', error.message)
+        throw error
+      }
+    } else {
+      console.log('✓ ba_parts.csv already exists')
+    }
+  }
+
   async seedBaParts() {
-    console.log('Updating parts with Rebrickable data...')
+    console.log('Processing BrickArchitect parts data...')
+    
+    // Ensure ba_parts.csv exists
+    await this.ensureBaPartsData()
+    
     return new Promise((resolve, reject) => {
-      const updates = []
+      const partsToProcess = []
 
       fs.createReadStream(path.join(DATA_DIR, 'ba_parts.csv'))
         .pipe(csv())
         .on('data', (row) => {
-          updates.push([row.ba_name, row.ba_cat_id ? parseInt(row.ba_cat_id) : null, row.part_num])
+          partsToProcess.push({
+            part_num: row.part_num,
+            ba_name: row.ba_name,
+            ba_cat_id: row.ba_cat_id ? parseInt(row.ba_cat_id) : null
+          })
         })
         .on('end', () => {
-          const stmt = this.db.prepare(`
+          let insertedCount = 0
+          let updatedCount = 0
+
+          // Check which parts exist and which need to be inserted
+          const checkStmt = this.db.prepare(`SELECT part_num FROM parts WHERE part_num = ?`)
+          const insertStmt = this.db.prepare(`
+            INSERT INTO parts (part_num, name, ba_name, ba_cat_id) 
+            VALUES (?, ?, ?, ?)
+          `)
+          const updateStmt = this.db.prepare(`
             UPDATE parts SET ba_name = ?, ba_cat_id = ? WHERE part_num = ?
           `)
 
-          updates.forEach((update) => stmt.run(update))
-          stmt.finalize((err) => {
+          partsToProcess.forEach((part) => {
+            const existingPart = checkStmt.get(part.part_num)
+            
+            if (existingPart) {
+              // Part exists, update BA data
+              updateStmt.run([part.ba_name, part.ba_cat_id, part.part_num])
+              updatedCount++
+            } else {
+              // Part doesn't exist, insert new record
+              insertStmt.run([part.part_num, part.ba_name, part.ba_name, part.ba_cat_id])
+              insertedCount++
+            }
+          })
+
+          checkStmt.finalize()
+          insertStmt.finalize()
+          updateStmt.finalize((err) => {
             if (err) reject(err)
             else {
-              console.log(`✓ Updated ${updates.length} parts with Rebrickable data`)
+              console.log(`✓ Processed ${partsToProcess.length} BrickArchitect parts:`)
+              console.log(`  - Inserted ${insertedCount} new parts`)
+              console.log(`  - Updated ${updatedCount} existing parts`)
               resolve()
             }
           })
