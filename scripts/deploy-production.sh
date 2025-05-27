@@ -41,7 +41,7 @@ fi
 
 # Install dependencies
 echo -e "${YELLOW}Installing dependencies...${NC}"
-npm ci --production=false
+npm install --omit=dev
 
 # Build the application (skip linting to avoid memory issues)
 # echo -e "${YELLOW}Building application (skipping lint)...${NC}"
