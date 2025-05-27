@@ -44,9 +44,9 @@ echo -e "${YELLOW}Installing dependencies...${NC}"
 # Since we build on the server, we need dev dependencies
 npm install # --omit=dev
 
-# Build the application (skip linting to avoid memory issues)
-# echo -e "${YELLOW}Building application (skipping lint)...${NC}"
-# npm run build -- --no-lint
+# Clear build cache to ensure fresh CSS generation
+echo -e "${YELLOW}Clearing build cache...${NC}"
+rm -rf .next
 
 echo -e "${YELLOW}Building application...${NC}"
 npm run build
