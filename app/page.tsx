@@ -141,7 +141,7 @@ function HomeContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="">
       <div className="container mx-auto max-w-screen-2xl px-4 pt-4 pb-3">
         <div className="flex flex-col items-stretch">
           {/* SearchBar component */}

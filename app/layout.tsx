@@ -51,13 +51,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="dark:bg-gray-900 dark:text-white">
+      <body className="flex min-h-screen flex-col bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-white">
         <PWATopBar />
         <PWAViewportAdjuster>
           <ThemeProvider defaultTheme="gray" defaultAccent="sky" defaultUISize="lg">
             <ToastProvider>
               <Header />
-              <main className="">{children}</main>
+              <main className="flex-1">{children}</main>
               <Footer />
             </ToastProvider>
           </ThemeProvider>

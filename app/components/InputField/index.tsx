@@ -33,7 +33,7 @@ const inputFieldStyles = tv({
     // Applied to the outermost div, formerly form-item (this is now the InputFieldContainer)
     inputFieldOuterContainer: 'py-0.5 sm:grid sm:grid-cols-3 sm:items-start sm:gap-x-4 sm:gap-y-1.5',
     inputContainer: 'sm:mt-0', // Wrapper for the input group or standalone checkbox/radio
-    inputGroup: 'relative flex shadow-sm', // Wraps prefix, input, suffix. Base rounding via compound variants.
+    inputGroup: 'relative flex', // Wraps prefix, input, suffix. Base rounding via compound variants.
     clearButton:
       'absolute p-1.5 top-1/2 -translate-y-1/2 justify-center group outline-none focus-visible:inset-ring-sky-500/40 focus-visible:inset-ring-2 rounded-full',
     clearButtonIcon: 'size-4', // Base size, theme variants will handle colors

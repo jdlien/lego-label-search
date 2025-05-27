@@ -12,16 +12,6 @@
 }
 
 @layer base {
-  html {
-    @apply h-full;
-  }
-
-  body {
-    @apply text-gray-800;
-    /* Dark mode styles */
-    @apply dark:bg-gray-800 dark:text-white;
-  }
-
   /* Prevent body scroll when modal dialog is open */
   body:has(dialog[open]) {
     overflow: hidden;
@@ -421,8 +411,5 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
