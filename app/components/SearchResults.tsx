@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import PartDetailModal from './PartDetailModal'
 import PartCard from './PartCard'
@@ -22,6 +22,7 @@ type SearchResultsProps = {
   subcategoryCount?: number
   onPartClick?: (partId: string) => void
   onPartSearch?: (partId: string) => void
+  autoOpenPartId?: string | null
   pagination?: {
     page: number
     limit: number
@@ -37,6 +38,7 @@ export default function SearchResults({
   subcategoryCount = 0,
   onPartClick,
   onPartSearch,
+  autoOpenPartId,
   pagination,
 }: SearchResultsProps) {
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null)
@@ -44,6 +46,17 @@ export default function SearchResults({
 
   const router = useRouter()
   const searchParams = useSearchParams()
+
+  // Auto-open modal if autoOpenPartId is provided and matches a result
+  useEffect(() => {
+    if (autoOpenPartId && results.length > 0) {
+      const matchingPart = results.find(part => part.id === autoOpenPartId)
+      if (matchingPart) {
+        setSelectedPartId(autoOpenPartId)
+        setIsModalOpen(true)
+      }
+    }
+  }, [autoOpenPartId, results])
 
   const handlePartClick = (partId: string) => {
     // If parent provided a click handler, use that

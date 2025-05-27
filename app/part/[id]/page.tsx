@@ -12,7 +12,8 @@ export default function PartPage() {
     if (!id) return
 
     // In the app router, we use push with a URL string instead of replace with pathname/query
-    router.push(`/?part=${id}`)
+    // Encode the ID to handle special characters
+    router.push(`/?part=${encodeURIComponent(id)}`)
   }, [id, router])
 
   // Return an empty component since this will redirect quickly

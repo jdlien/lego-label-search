@@ -94,3 +94,21 @@ public/*.zip
 # Database files
 data/lego.sqlite
 data/lego.sqlite.backup
+
+# Added by Claude Task Master
+logs
+dev-debug.log
+# Dependency directories
+node_modules/
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+# Task files
+tasks.json
+tasks/ 

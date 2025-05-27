@@ -4,7 +4,7 @@ const sqlite3 = require('sqlite3').verbose()
 const fs = require('fs')
 const path = require('path')
 
-const DB_PATH = path.join(__dirname, '../../data/lego.sqlite')
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../data/lego.sqlite')
 const MIGRATIONS_DIR = __dirname
 
 class MigrationRunner {

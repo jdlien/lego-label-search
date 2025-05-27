@@ -6,7 +6,7 @@ const fs = require('fs').promises
 const fsSync = require('fs')
 const { spawn } = require('child_process')
 
-const DB_PATH = path.join(__dirname, '../../data/lego.sqlite')
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../data/lego.sqlite')
 const IMAGES_DIR = path.join(__dirname, '../../public/data/images')
 
 class ComputedFieldsUpdater {

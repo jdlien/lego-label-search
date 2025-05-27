@@ -53,6 +53,7 @@ function HomeContent() {
   const [pagination, setPagination] = useState<ApiSearchResponse['pagination'] | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
   const [isImageSearchModalOpen, setIsImageSearchModalOpen] = useState(false)
+  const [directPartId, setDirectPartId] = useState<string | null>(null)
 
   // Load search results when query parameters change
   useEffect(() => {
@@ -60,12 +61,25 @@ function HomeContent() {
     const category = searchParams.get('category')
     const page = searchParams.get('page')
     const limit = searchParams.get('limit')
+    const part = searchParams.get('part')
+
+    // If we have a part parameter, search for that specific part
+    if (part && !q) {
+      setDirectPartId(part)
+      // Convert to a search query
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('part')
+      params.set('q', part)
+      router.replace(`/?${params.toString()}`)
+      return
+    }
 
     if (!q && !category) {
       setHasSearched(false)
       setResults([])
       setTotalResultCount(0)
       setPagination(null)
+      setDirectPartId(null)
       return
     }
 
@@ -91,6 +105,11 @@ function HomeContent() {
         setResults(data.results || [])
         setTotalResultCount(data.total || 0)
         setPagination(data.pagination || null)
+        
+        // Clear directPartId after results are loaded
+        if (directPartId) {
+          setTimeout(() => setDirectPartId(null), 100)
+        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch results'
         setError(errorMessage)
@@ -200,6 +219,7 @@ function HomeContent() {
                 subcategoryCount={results.length > 0 ? 0 : 0}
                 onPartSearch={handlePartSearch}
                 pagination={pagination}
+                autoOpenPartId={directPartId}
               />
 
               {/* Bottom pagination */}

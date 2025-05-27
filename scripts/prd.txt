@@ -1,0 +1,25 @@
+<context>
+# Overview
+This is a tool for searching a database of LEGO parts that are categorized using the system from BrickArchitect.com.
+It allows for download of labels for LEGO parts in two versions of LBX labels for Brother label printers: 12mm and 24mm.
+Users can also search for parts with their camera or image files via the Brickognize API.
+This is helpful for people with large collections of LEGO parts to help organize and label their collections.
+
+# Core Features
+-	Search by part number: Each LEGO brick shape has a Design ID (also called a Part ID) (e.g. a 2x4 brick has a design id of 3001).
+  -	A Design ID can have many Element IDs, which are specific combinations of that part’s design, color, and sometimes print or material.
+- Search by description with a flexible multi-word search
+- Support multiple formats of dimensions (e.g., 2x4, 2 x 4, 2×4)
+- Image search using camera or image files via the brickognize.com API.
+- Print original 12mm labels from BrickArchitect.com (where available)
+- Convert 12mm labels to 24mm labels
+- Future feature: Support generating labels from scratch using lbx-utils when brickarchitect labels aren't available
+
+</context>
+<PRD>
+# Technical Architecture
+- This app uses a SQLite database in data/lego.sqlite
+- The framework is modern Next.js
+- It uses custom UI components
+
+</PRD>
