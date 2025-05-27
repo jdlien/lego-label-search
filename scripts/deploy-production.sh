@@ -41,7 +41,8 @@ fi
 
 # Install dependencies
 echo -e "${YELLOW}Installing dependencies...${NC}"
-npm install --omit=dev
+# Since we build on the server, we need dev dependencies
+npm install # --omit=dev
 
 # Build the application (skip linting to avoid memory issues)
 # echo -e "${YELLOW}Building application (skipping lint)...${NC}"
