@@ -12,6 +12,7 @@ interface Category {
   parts_count?: number
   sort_order?: number
   level?: number
+  description?: string
 }
 
 interface CategoryForDropdown {
@@ -59,46 +60,65 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
           return
         }
 
-        // Sort categories by sort_order (which now uses depth-first traversal)
-        const sortedCategories = data.categories.sort((a: Category, b: Category) => {
+        // Create a map for quick parent lookup
+        const categoryMap = new Map<string, Category>(data.categories.map((cat: Category) => [String(cat.id), cat]))
+
+        // First, separate root categories from subcategories
+        const rootCategories = data.categories.filter((cat: Category) => cat.level === 0)
+        const subcategories = data.categories.filter((cat: Category) => cat.level !== 0)
+
+        // Sort root categories by their sort_order (1-12)
+        rootCategories.sort((a: Category, b: Category) => {
           return (a.sort_order || 0) - (b.sort_order || 0)
         })
 
-        // Create a map for quick parent lookup
-        const categoryMap = new Map<string, Category>(sortedCategories.map((cat: Category) => [String(cat.id), cat]))
+        // Build the dropdown options
+        const combinedCategories: CategoryForDropdown[] = []
 
-        // Convert to dropdown format with proper grouping based on hierarchy
-        const combinedCategories = sortedCategories.map((cat: Category) => {
-          const categoryOption: CategoryForDropdown = {
-            value: cat.id,
-            label: cat.name,
-            description: cat.parts_count && cat.level === 0 ? `${cat.parts_count.toLocaleString()} parts` : undefined,
-          }
+        const description = (cat: Category) => {
+          const partsCount = cat.parts_count ? `${cat.parts_count.toLocaleString()} parts` : ''
+          const truncatedDescription = cat.description
+            ? cat.description.substring(0, 40).split(' ').slice(0, -1).join(' ') + '…'
+            : ''
+          const descriptionText = truncatedDescription ? ` / ${truncatedDescription}` : ''
 
-          // Handle grouping based on level
-          if (cat.level === 0) {
-            // Root categories - no group (ungrouped)
-          } else if (cat.level === 1) {
-            // First-level children - group under their parent
-            const parent = categoryMap.get(String(cat.parent_id))
-            const parentName = parent ? parent.name : 'Other'
-            categoryOption.group = parentName
-          } else if (cat.level && cat.level >= 2) {
-            // Second and higher level children - group under root parent but prefix with direct parent
-            const directParent = categoryMap.get(String(cat.parent_id))
+          return partsCount || descriptionText ? `${partsCount}${descriptionText}` : undefined
+        }
 
-            // Find the root parent (level 0) by traversing up the hierarchy
-            let rootParent = directParent
-            while (rootParent && rootParent.parent_id && rootParent.level !== 0) {
-              rootParent = categoryMap.get(String(rootParent.parent_id))
+        // Add root categories first (ungrouped)
+        rootCategories.forEach((rootCat: Category) => {
+          combinedCategories.push({
+            value: rootCat.id,
+            label: rootCat.name,
+            description: description(rootCat),
+          })
+
+          // Find all descendants of this root category and add them in sort_order
+          const descendants = subcategories
+            .filter((cat: Category) => {
+              // Find the ultimate root parent
+              let parent = categoryMap.get(String(cat.parent_id))
+              while (parent && parent.level !== 0) {
+                parent = categoryMap.get(String(parent.parent_id))
+              }
+              return parent?.id === rootCat.id
+            })
+            .sort((a: Category, b: Category) => (a.sort_order || 0) - (b.sort_order || 0))
+
+          descendants.forEach((cat: Category) => {
+            const categoryOption: CategoryForDropdown = {
+              value: cat.id,
+              label: cat.name,
+              group: rootCat.name,
             }
-            const rootParentName = rootParent ? rootParent.name : 'Other'
 
-            categoryOption.group = rootParentName
-            categoryOption.label = `\u00A0\u00A0 ${cat.name}`
-          }
+            // Add indentation for level 2+ categories
+            if (cat.level && cat.level >= 2) {
+              categoryOption.label = `\u00A0\u00A0 ${cat.name}`
+            }
 
-          return categoryOption
+            combinedCategories.push(categoryOption)
+          })
         })
 
         setCategoriesForDropdown(combinedCategories)

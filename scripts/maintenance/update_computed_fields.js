@@ -16,119 +16,59 @@ class ComputedFieldsUpdater {
   }
 
   // ===== CATEGORY COUNTS =====
-  async updateCategoryCount(categoryId) {
-    return new Promise((resolve, reject) => {
-      // Get all subcategories including this one using recursive CTE
-      this.db.all(
-        `
-        WITH RECURSIVE subcats(id) AS (
-          SELECT id FROM ba_categories WHERE id = ?
-          UNION ALL
-          SELECT child.id FROM ba_categories child
-          JOIN subcats parent ON child.parent_id = parent.id
-        )
-        SELECT id FROM subcats
-      `,
-        categoryId,
-        (err, subcategories) => {
-          if (err) {
-            reject(err)
-            return
-          }
-
-          if (subcategories.length === 0) {
-            resolve(0)
-            return
-          }
-
-          // Count parts in all these categories
-          const placeholders = subcategories.map(() => '?').join(',')
-          const categoryIds = subcategories.map((c) => c.id)
-
-          this.db.get(
-            `
-          SELECT COUNT(*) as count FROM parts
-          WHERE ba_cat_id IN (${placeholders})
-        `,
-            ...categoryIds,
-            (err, result) => {
-              if (err) {
-                reject(err)
-                return
-              }
-
-              const count = result.count
-
-              // Update the count in the database
-              this.db.run(
-                `
-            UPDATE ba_categories
-            SET parts_count = ?
-            WHERE id = ?
-          `,
-                count,
-                categoryId,
-                (err) => {
-                  if (err) {
-                    reject(err)
-                  } else {
-                    resolve(count)
-                  }
-                }
-              )
-            }
-          )
-        }
-      )
-    })
-  }
-
   async updateAllCategoryCounts() {
-    console.log('Updating category counts...')
+    console.log('Delegating category count update to update_ba_category_counts.js...')
     return new Promise((resolve, reject) => {
-      // Get all category IDs
-      this.db.all('SELECT id FROM ba_categories', async (err, categories) => {
-        if (err) {
-          reject(err)
-          return
-        }
+      const scriptPath = path.join(__dirname, 'update_ba_category_counts.js')
+      const child = spawn('node', [scriptPath], {
+        stdio: 'inherit', // This will show the script's output in real-time
+        cwd: path.dirname(scriptPath),
+      })
 
-        try {
-          let updated = 0
-          for (const category of categories) {
-            const count = await this.updateCategoryCount(category.id)
-            console.log(`Category ${category.id}: ${count} parts`)
-            updated++
-          }
-          console.log(`✓ Updated counts for ${updated} categories`)
+      child.on('close', (code) => {
+        if (code === 0) {
+          console.log('✓ Category counts updated successfully')
           resolve()
-        } catch (error) {
-          reject(error)
+        } else {
+          reject(new Error(`Category count update script exited with code ${code}`))
         }
+      })
+
+      child.on('error', (error) => {
+        reject(new Error(`Failed to run category count update script: ${error.message}`))
       })
     })
   }
 
   async updateModifiedCategoryCounts(modifiedCategoryIds = []) {
-    console.log('Updating counts for modified categories...')
+    console.log('Delegating modified category count update to update_ba_category_counts.js...')
 
     if (modifiedCategoryIds.length === 0) {
       console.log('No categories to update')
       return
     }
 
-    try {
-      let updated = 0
-      for (const categoryId of modifiedCategoryIds) {
-        const count = await this.updateCategoryCount(categoryId)
-        console.log(`Category ${categoryId}: ${count} parts`)
-        updated++
-      }
-      console.log(`✓ Updated counts for ${updated} modified categories`)
-    } catch (error) {
-      console.error('Error updating modified category counts:', error)
-      throw error
-    }
+    return new Promise((resolve, reject) => {
+      const scriptPath = path.join(__dirname, 'update_ba_category_counts.js')
+      const args = ['--categories', modifiedCategoryIds.join(',')]
+      const child = spawn('node', [scriptPath, ...args], {
+        stdio: 'inherit',
+        cwd: path.dirname(scriptPath),
+      })
+
+      child.on('close', (code) => {
+        if (code === 0) {
+          console.log('✓ Modified category counts updated successfully')
+          resolve()
+        } else {
+          reject(new Error(`Category count update script exited with code ${code}`))
+        }
+      })
+
+      child.on('error', (error) => {
+        reject(new Error(`Failed to run category count update script: ${error.message}`))
+      })
+    })
   }
 
   // ===== ALTERNATE PART IDS =====
@@ -484,15 +424,15 @@ module.exports = ComputedFieldsUpdater
 
 // Export convenience functions for backward compatibility and cron jobs
 module.exports.updateCategoryCounts = async function () {
-  const updater = new ComputedFieldsUpdater()
   try {
+    const BaCategoryCountUpdater = require('./update_ba_category_counts')
+    const updater = new BaCategoryCountUpdater()
     await updater.updateAllCategoryCounts()
+    updater.close()
     console.log('✅ Category counts updated successfully!')
   } catch (error) {
     console.error('❌ Category counts update failed:', error)
     throw error
-  } finally {
-    updater.db.close()
   }
 }
 

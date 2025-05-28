@@ -37,7 +37,8 @@ export async function GET() {
         END AS parent_id,
         parts_count,
         sort_order,
-        level
+        level,
+        description
       FROM ba_categories
       ORDER BY sort_order, name
     `)

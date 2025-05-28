@@ -6,15 +6,21 @@ const MigrationRunner = require('./migrations/migrate')
 const DataSeeder = require('./migrations/seed_data')
 
 const DB_PATH = path.join(__dirname, '../data/lego.sqlite')
+const BACKUP_PATH = path.join(__dirname, '../data/lego.backup.sqlite')
 
 async function rebuildDatabase() {
   try {
     console.log('🔄 Starting database rebuild...\n')
 
-    // Remove existing database if it exists
+    // Remove or overwrite existing backup if it exists
+    if (fs.existsSync(BACKUP_PATH)) {
+      fs.unlinkSync(BACKUP_PATH)
+    }
+
+    // Move existing database to backup if it exists
     if (fs.existsSync(DB_PATH)) {
-      console.log('🗑️  Removing existing database...')
-      fs.unlinkSync(DB_PATH)
+      console.log('🗂️  Backing up existing database to lego.backup.sqlite...')
+      fs.renameSync(DB_PATH, BACKUP_PATH)
     }
 
     // Run migrations

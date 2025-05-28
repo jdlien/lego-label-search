@@ -12,6 +12,7 @@ interface Category {
   parent_id: string | null
   sort_order?: number
   parts_count: number
+  description?: string
   children?: Category[] // Added for tree structure
 }
 
@@ -39,6 +40,9 @@ const transformCategoriesToAccordionItems = (categories: Category[]): AccordionI
         )}
       </div>
     ),
+    content: cat.description ? (
+      <div className="mb-3 text-sm text-gray-600 dark:text-gray-400">{cat.description}</div>
+    ) : undefined,
     childrenItems:
       cat.children && cat.children.length > 0 ? transformCategoriesToAccordionItems(cat.children) : undefined,
   }))

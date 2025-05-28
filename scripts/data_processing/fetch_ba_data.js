@@ -15,22 +15,58 @@ async function initFetch() {
 // Create data directory if it doesn't exist
 const DATA_DIR = path.join(__dirname, '../../data')
 
-// Define URLs to process
-const urls = [
-  'https://brickarchitect.com/parts/category-1?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-2?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-3?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-7?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-8?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-106?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-10?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-11?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-9?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-12?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-13?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-14?&partstyle=1&retired=1',
-  'https://brickarchitect.com/parts/category-89?&partstyle=1&retired=1',
-]
+// Base URL for the main parts page
+const MAIN_PARTS_URL = 'https://brickarchitect.com/parts/'
+
+// Function to fetch root categories from the main parts page
+async function fetchRootCategories() {
+  const fetchFn = await initFetch()
+  console.log('Fetching root categories from main parts page...')
+  
+  try {
+    const html = await fetchWithRetry(MAIN_PARTS_URL)
+    const $ = cheerio.load(html)
+    
+    const rootCategories = []
+    const categoryItems = $('.categorylistitem')
+    
+    categoryItems.each((index, item) => {
+      const $item = $(item)
+      const nameDiv = $item.find('.categorylistitem_name')
+      const summaryDiv = $item.find('.categorylistitem_summary')
+      const link = nameDiv.find('a')
+      
+      if (link.length > 0) {
+        const href = link.attr('href')
+        const name = link.text().trim()
+        const description = summaryDiv.text().trim()
+        
+        // Extract category ID from the URL
+        const idMatch = href.match(/category-(\d+)/)
+        if (idMatch) {
+          const categoryId = parseInt(idMatch[1])
+          // Add query parameters for parts style and retired
+          const fullUrl = `${href}?&partstyle=1&retired=1`
+          
+          rootCategories.push({
+            id: categoryId,
+            name: name,
+            url: fullUrl,
+            description: description,
+            sort_order: index + 1, // 1-based index for sort order
+            level: 0 // Root level categories
+          })
+        }
+      }
+    })
+    
+    console.log(`Found ${rootCategories.length} root categories`)
+    return rootCategories
+  } catch (error) {
+    console.error('Error fetching root categories:', error.message)
+    throw error
+  }
+}
 
 // Helper function to delay between requests (rate limiting)
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -39,7 +75,13 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 function arrayToCSV(data, headers) {
   const csvHeaders = headers.map((h) => `"${h}"`).join(',')
   const csvRows = data.map((row) =>
-    headers.map((header) => `"${String(row[header] || '').replace(/"/g, '""')}"`).join(',')
+    headers.map((header) => {
+      const value = row[header]
+      // Handle numeric zero specially to avoid converting to empty string
+      if (value === 0) return '"0"'
+      // For other values, convert to string (empty string for null/undefined)
+      return `"${String(value || '').replace(/"/g, '""')}"`
+    }).join(',')
   )
   return [csvHeaders, ...csvRows].join('\n')
 }
@@ -76,7 +118,7 @@ async function fetchWithRetry(url, maxRetries = 3) {
   }
 }
 
-async function processUrl(url) {
+async function processUrl(url, rootCategoryInfo = null) {
   console.log(`Processing ${url}`)
 
   // Extract main category ID from URL
@@ -111,195 +153,144 @@ async function processUrl(url) {
 
     const mainCategoryName = strongElement.text().trim()
 
-    // Add main category to categories list
+    // Add main category to categories list with additional fields from rootCategoryInfo
     categories.push({
       id: mainCategoryId,
       name: mainCategoryName,
       parent_id: '',
+      level: 0,
+      sort_order: rootCategoryInfo?.sort_order || null,
+      description: rootCategoryInfo?.description || ''
     })
 
-    // Find all subcategories (h2 elements with class partcategoryname)
-    const subcategoryH2s = $('h2.partcategoryname')
-
-    subcategoryH2s.each((_, h2Element) => {
-      const $h2 = $(h2Element)
-
-      // Extract subcategory ID from the id attribute
-      const h2Id = $h2.attr('id')
-      if (!h2Id) {
-        console.log('Missing id attribute in subcategory h2')
+    // Find all part_category divs
+    const partCategoryDivs = $('.part_category')
+    
+    partCategoryDivs.each((_, categoryDiv) => {
+      const $categoryDiv = $(categoryDiv)
+      
+      // Find the category header - could be h2 or h3 with class partcategoryname
+      const categoryHeader = $categoryDiv.find('.partcategoryname').first()
+      
+      if (categoryHeader.length === 0) {
+        console.log('No category header found in part_category div')
         return
       }
-
-      const idMatch = h2Id.match(/category-(\d+)/)
+      
+      // Extract category ID from the id attribute
+      const headerId = categoryHeader.attr('id')
+      if (!headerId) {
+        console.log('Missing id attribute in category header')
+        return
+      }
+      
+      const idMatch = headerId.match(/category-(\d+)/)
       if (!idMatch) {
-        console.log(`Could not extract subcategory ID from h2 id: ${h2Id}`)
+        console.log(`Could not extract category ID from header id: ${headerId}`)
         return
       }
-
-      const subcategoryId = parseInt(idMatch[1])
-
-      // Extract subcategory name (text inside the a tag)
-      const aElement = $h2.find('a')
+      
+      const categoryId = parseInt(idMatch[1])
+      
+      // Extract category name from the a tag
+      const aElement = categoryHeader.find('a')
       if (aElement.length === 0) {
-        console.log('Missing a element in subcategory h2')
+        console.log('Missing a element in category header')
         return
       }
-
-      const subcategoryName = aElement.text().trim()
-
-      // Add subcategory to categories list
+      
+      const categoryName = aElement.text().trim()
+      
+      // Determine the parent ID and level based on the header type and content
+      let parentId = mainCategoryId
+      let level = 1
+      
+      // Check if this is an h2 or h3
+      if (categoryHeader.is('h2')) {
+        // h2 elements are direct subcategories of the main category
+        parentId = mainCategoryId
+        level = 1
+      } else if (categoryHeader.is('h3')) {
+        // h3 elements might be sub-subcategories
+        // Check if this h3 has a parent category by looking for › in the full text
+        const fullText = categoryHeader.text()
+        const arrowCount = (fullText.match(/›/g) || []).length
+        
+        if (arrowCount > 0) {
+          // This is a sub-subcategory, need to parse parent from the text
+          // Extract the parent category name from before the ›
+          const textBeforeArrow = fullText.split('›')[0].trim()
+          
+          // Find the parent category by searching backwards through our categories
+          const parentCategory = categories.slice().reverse().find(cat => 
+            cat.name === textBeforeArrow && cat.level === 1
+          )
+          
+          if (parentCategory) {
+            parentId = parentCategory.id
+            level = 2
+          } else {
+            // If we can't find parent, default to main category
+            parentId = mainCategoryId
+            level = 1
+          }
+        } else {
+          // h3 without arrow is a direct subcategory
+          parentId = mainCategoryId
+          level = 1
+        }
+      }
+      
+      // Add category to categories list
       categories.push({
-        id: subcategoryId,
-        name: subcategoryName,
-        parent_id: mainCategoryId,
+        id: categoryId,
+        name: categoryName,
+        parent_id: parentId,
+        level: level,
+        sort_order: null, // Only root categories have sort_order
+        description: ''
       })
-
-      // Find the part_category div containing this h2
-      const partCategoryDiv = $h2.closest('.part_category')
-      if (partCategoryDiv.length === 0) {
-        console.log(`Could not find parent part_category div for subcategory ${subcategoryName}`)
-        return
-      }
-
-      // Find all the parts in this category (inside tbody div)
-      const tbody = partCategoryDiv.find('.tbody')
+      
+      // Find all parts in this category (inside tbody div)
+      const tbody = $categoryDiv.find('.tbody').first()
       if (tbody.length === 0) {
-        console.log(`No parts found for subcategory ${subcategoryName}`)
+        console.log(`No parts found for category ${categoryName}`)
         return
       }
-
+      
       // Find all parts (a elements which contain tr divs)
-      const trContainers = tbody.find('a')
-
+      const trContainers = tbody.find('> a')
+      
       trContainers.each((_, container) => {
         const $container = $(container)
         const tr = $container.find('.tr')
         if (tr.length === 0) {
           return
         }
-
+        
         // Find part name and part number from the td span elements
         const partNameTd = tr.find('span.td.part_name')
         if (partNameTd.length === 0) {
           return
         }
-
+        
         // Find the partname and partnum spans
         const partNameElem = partNameTd.find('span.partname')
         const partNumElem = partNameTd.find('span.partnum')
-
+        
         if (partNameElem.length === 0 || partNumElem.length === 0) {
           return
         }
-
+        
         const partName = partNameElem.text().trim()
         const partNum = partNumElem.text().trim()
-
-        // Add to temporary parts data with category level 2
+        
+        // Add part with the correct category ID
         partsData.push({
           part_num: partNum,
           ba_name: partName,
-          ba_cat_id: subcategoryId,
-          category_level: 2, // Level 2 = subcategory
-        })
-      })
-
-      // Also check for subcategories (h3 elements with class partcategoryname)
-      const subcategoryH3s = partCategoryDiv.find('h3.partcategoryname')
-
-      subcategoryH3s.each((_, h3Element) => {
-        const $h3 = $(h3Element)
-
-        // Extract subsubcategory ID from the id attribute
-        const h3Id = $h3.attr('id')
-        if (!h3Id) {
-          console.log('Missing id attribute in subsubcategory h3')
-          return
-        }
-
-        const idMatch = h3Id.match(/category-(\d+)/)
-        if (!idMatch) {
-          console.log(`Could not extract subsubcategory ID from h3 id: ${h3Id}`)
-          return
-        }
-
-        const subsubcategoryId = parseInt(idMatch[1])
-
-        // For the subsubcategory name, we only want the text inside the a tag
-        const aElement = $h3.find('a')
-        if (aElement.length === 0) {
-          console.log('Missing a element in subsubcategory h3')
-          return
-        }
-
-        // Get just the text from the a element
-        const subsubcategoryName = aElement.text().trim()
-
-        // Add subsubcategory to categories list
-        categories.push({
-          id: subsubcategoryId,
-          name: subsubcategoryName,
-          parent_id: subcategoryId,
-        })
-
-        // Find the tbody element that belongs to this specific h3
-        // Look for the tbody that follows this h3 and comes before the next h3 or h2
-        let nextElement = $h3.next()
-        let foundTbody = null
-
-        while (nextElement.length > 0 && !nextElement.is('h2, h3')) {
-          if (nextElement.is('div') && nextElement.hasClass('tbody')) {
-            foundTbody = nextElement
-            break
-          }
-          nextElement = nextElement.next()
-        }
-
-        if (!foundTbody) {
-          // Try another approach - find the tbody within the same div as h3
-          foundTbody = partCategoryDiv.find('.tbody').first()
-        }
-
-        if (!foundTbody || foundTbody.length === 0) {
-          console.log(`No parts found for subsubcategory ${subsubcategoryName}`)
-          return
-        }
-
-        // Find all parts (a elements which contain tr divs)
-        const trContainers = foundTbody.find('a')
-
-        trContainers.each((_, container) => {
-          const $container = $(container)
-          const tr = $container.find('.tr')
-          if (tr.length === 0) {
-            return
-          }
-
-          // Find part name and part number from the td span elements
-          const partNameTd = tr.find('span.td.part_name')
-          if (partNameTd.length === 0) {
-            return
-          }
-
-          // Find the partname and partnum spans
-          const partNameElem = partNameTd.find('span.partname')
-          const partNumElem = partNameTd.find('span.partnum')
-
-          if (partNameElem.length === 0 || partNumElem.length === 0) {
-            return
-          }
-
-          const partName = partNameElem.text().trim()
-          const partNum = partNumElem.text().trim()
-
-          // Add to temporary parts data with category level 3
-          partsData.push({
-            part_num: partNum,
-            ba_name: partName,
-            ba_cat_id: subsubcategoryId,
-            category_level: 3, // Level 3 = subsubcategory
-          })
+          ba_cat_id: categoryId,
+          category_level: level + 1, // Parts are one level below their category
         })
       })
     })
@@ -322,9 +313,12 @@ async function main() {
     const allCategories = []
     const allPartsData = []
 
-    // Process all URLs
-    for (const url of urls) {
-      const result = await processUrl(url)
+    // First, fetch the root categories from the main page
+    const rootCategories = await fetchRootCategories()
+
+    // Process all URLs from the dynamically fetched root categories
+    for (const rootCategory of rootCategories) {
+      const result = await processUrl(rootCategory.url, rootCategory)
       allCategories.push(...result.categories)
       allPartsData.push(...result.parts)
     }
@@ -371,8 +365,29 @@ async function main() {
     // Filter out parts with invalid category IDs - these might be malformed from the HTML parsing
     const cleanedParts = finalParts.filter((part) => validCategoryIds.has(part.ba_cat_id))
 
-    // Write categories to CSV with proper quoting
-    await writeCSV('ba_categories.csv', uniqueCategories, ['id', 'name', 'parent_id'])
+    // Ensure all fields have proper values and convert to proper types for CSV
+    uniqueCategories.forEach(cat => {
+      // For root categories, ensure level is 0 (numeric)
+      if (!cat.parent_id) {
+        cat.level = 0
+      }
+      // Ensure level is a number
+      if (cat.level === undefined || cat.level === '') {
+        cat.level = cat.parent_id ? 1 : 0  // Default based on whether it has a parent
+      }
+      // For sort_order, only root categories should have values
+      if (cat.parent_id) {
+        cat.sort_order = ''  // Empty string for non-root categories
+      } else if (cat.sort_order === undefined || cat.sort_order === null) {
+        cat.sort_order = ''  // Empty string if not set
+      }
+      // Ensure other fields
+      if (cat.description === undefined) cat.description = ''
+      if (cat.parent_id === undefined) cat.parent_id = ''
+    })
+
+    // Write categories to CSV with proper quoting and new fields
+    await writeCSV('ba_categories.csv', uniqueCategories, ['id', 'name', 'parent_id', 'level', 'sort_order', 'description'])
 
     // Write parts to CSV with proper quoting
     await writeCSV('ba_parts.csv', cleanedParts, ['part_num', 'ba_name', 'ba_cat_id'])

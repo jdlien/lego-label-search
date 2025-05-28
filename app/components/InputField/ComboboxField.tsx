@@ -30,9 +30,8 @@ const comboboxStyles = tv({
     comboboxEmpty: 'py-6 text-center text-sm',
     comboboxGroup: 'overflow-hidden px-1 pb-3 last:pb-0',
     comboboxGroupHeading: `
-      px-2 py-1.25 text-sm font-semibold uppercase tracking-wide
-      bg-muted/30 border-b border-border/30 sticky top-0 z-10 backdrop-blur-sm
-      first:mt-0 mt-2 rounded-t-sm
+      px-2 py-1.25 text-sm font-semibold uppercase tracking-wide border-b
+      first:mt-0 mt-2 rounded-t-sm text-center
     `,
     comboboxItem: `
       relative flex cursor-default select-none items-center rounded-sm px-2 py-1.25 outline-none
@@ -157,7 +156,7 @@ const comboboxStyles = tv({
         comboboxContent: 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700',
         comboboxPlaceholder: 'text-slate-400 dark:text-slate-500',
         comboboxGroupHeading:
-          'text-slate-500 dark:text-slate-400 bg-slate-200/50 dark:bg-slate-800/50 border-slate-200/50 dark:border-slate-700/50',
+          'text-slate-500 dark:text-slate-400 bg-slate-200/50 dark:bg-slate-800/50 border-slate-300 dark:border-slate-600',
         comboboxGroupedItem: `
           before:bg-slate-300/90 dark:before:bg-slate-600/90
         `,
@@ -169,7 +168,7 @@ const comboboxStyles = tv({
         comboboxContent: 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700',
         comboboxPlaceholder: 'text-gray-400 dark:text-gray-500',
         comboboxGroupHeading:
-          'text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700/90 border-gray-200/50 dark:border-gray-700/50',
+          'text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700/90 border-gray-300 dark:border-gray-600',
         comboboxGroupedItem: `
           before:bg-gray-200 dark:before:bg-gray-700/90
         `,
@@ -180,7 +179,7 @@ const comboboxStyles = tv({
         comboboxContent: 'bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700',
         comboboxPlaceholder: 'text-zinc-400 dark:text-zinc-500',
         comboboxGroupHeading:
-          'text-zinc-500 dark:text-zinc-400 bg-zinc-200/50 dark:bg-zinc-800/50 border-zinc-200/50 dark:border-zinc-700/50',
+          'text-zinc-500 dark:text-zinc-400 bg-zinc-200/50 dark:bg-zinc-800/50 border-zinc-300 dark:border-zinc-600',
         comboboxGroupedItem: `
           before:bg-zinc-300/90 dark:before:bg-zinc-600/90
         `,
@@ -191,7 +190,7 @@ const comboboxStyles = tv({
         comboboxContent: 'bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700',
         comboboxPlaceholder: 'text-neutral-400 dark:text-neutral-500',
         comboboxGroupHeading:
-          'text-neutral-500 dark:text-neutral-400 bg-neutral-200/50 dark:bg-neutral-800/50 border-neutral-200/50 dark:border-neutral-700/50',
+          'text-neutral-500 dark:text-neutral-400 bg-neutral-200/50 dark:bg-neutral-800/50 border-neutral-300 dark:border-neutral-600',
         comboboxGroupedItem: `
           before:bg-neutral-300/90 dark:before:bg-neutral-600/90
         `,
@@ -203,7 +202,7 @@ const comboboxStyles = tv({
         comboboxContent: 'bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-700',
         comboboxPlaceholder: 'text-stone-400 dark:text-stone-500',
         comboboxGroupHeading:
-          'text-stone-500 dark:text-stone-400 bg-stone-200/50 dark:bg-stone-800/50 border-stone-200/50 dark:border-stone-700/50',
+          'text-stone-500 dark:text-stone-400 bg-stone-200/50 dark:bg-stone-800/50 border-stone-300 dark:border-stone-600',
         comboboxGroupedItem: `
           before:bg-stone-300/90 dark:before:bg-stone-600/90
         `,

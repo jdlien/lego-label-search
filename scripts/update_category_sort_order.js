@@ -29,8 +29,13 @@ function buildHierarchyAndSort(categories) {
     }
   })
 
-  // Sort root categories by their numeric prefix
+  // Sort root categories by their existing sort_order from CSV (1-12)
   rootCategories.sort((a, b) => {
+    // If both have valid sort_order from CSV (1-12), use that
+    if (a.sort_order >= 1 && a.sort_order <= 12 && b.sort_order >= 1 && b.sort_order <= 12) {
+      return a.sort_order - b.sort_order
+    }
+    // Otherwise fall back to numeric prefix extraction
     const numA = extractNumericPrefix(a.name)
     const numB = extractNumericPrefix(b.name)
     if (numA !== numB) return numA - numB
@@ -39,15 +44,21 @@ function buildHierarchyAndSort(categories) {
 
   // Depth-first traversal to assign sort orders
   const sortedCategories = []
-  let currentSortOrder = 1
+  let currentSortOrder = 13 // Start after the root categories (1-12)
 
   function traverseDepthFirst(categoryId, level = 0) {
     const category = categoryMap.get(categoryId)
     if (!category) return
 
-    // Assign sort order and level to this category
-    category.sort_order = currentSortOrder++
+    // Set level
     category.level = level
+    
+    // For subcategories, assign sequential sort order
+    if (level > 0) {
+      category.sort_order = currentSortOrder++
+    }
+    // Root categories keep their original sort_order (1-12)
+    
     sortedCategories.push(category)
 
     console.log(`${'  '.repeat(level)}${category.sort_order}: ${category.name} (ID: ${category.id}, Level: ${level})`)
@@ -95,8 +106,8 @@ async function updateCategorySortOrder() {
           console.log('Added level column to ba_categories table')
         }
 
-        // Get all categories
-        db.all('SELECT id, name, parent_id FROM ba_categories ORDER BY id', (err, categories) => {
+        // Get all categories including existing sort_order
+        db.all('SELECT id, name, parent_id, sort_order FROM ba_categories ORDER BY id', (err, categories) => {
           if (err) {
             console.error('Error fetching categories:', err.message)
             reject(err)

@@ -81,25 +81,33 @@ class DataSeeder {
   }
 
   async seedBaCategories() {
-    console.log('Seeding Rebrickable categories...')
+    console.log('Seeding BrickArchitect categories...')
     return new Promise((resolve, reject) => {
       const categories = []
 
       fs.createReadStream(path.join(DATA_DIR, 'ba_categories.csv'))
         .pipe(csv())
         .on('data', (row) => {
-          categories.push([parseInt(row.id), row.name, row.parent_id ? parseInt(row.parent_id) : null])
+          categories.push([
+            parseInt(row.id),
+            row.name,
+            row.parent_id ? parseInt(row.parent_id) : null,
+            row.level ? parseInt(row.level) : 0,
+            row.sort_order ? parseInt(row.sort_order) : null,
+            row.description || null
+          ])
         })
         .on('end', () => {
           const stmt = this.db.prepare(`
-            INSERT OR REPLACE INTO ba_categories (id, name, parent_id) VALUES (?, ?, ?)
+            INSERT OR REPLACE INTO ba_categories (id, name, parent_id, level, sort_order, description) 
+            VALUES (?, ?, ?, ?, ?, ?)
           `)
 
           categories.forEach((cat) => stmt.run(cat))
           stmt.finalize((err) => {
             if (err) reject(err)
             else {
-              console.log(`✓ Imported ${categories.length} Rebrickable categories`)
+              console.log(`✓ Imported ${categories.length} BrickArchitect categories`)
               resolve()
             }
           })
