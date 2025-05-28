@@ -77,12 +77,14 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
 
         const description = (cat: Category) => {
           const partsCount = cat.parts_count ? `${cat.parts_count.toLocaleString()} parts` : ''
-          const truncatedDescription = cat.description
-            ? cat.description.substring(0, 40).split(' ').slice(0, -1).join(' ') + '…'
-            : ''
-          const descriptionText = truncatedDescription ? ` / ${truncatedDescription}` : ''
+          // I removed the description beacuse it was affecting combobox search
+          // const truncatedDescription = cat.description
+          //   ? cat.description.substring(0, 40).split(' ').slice(0, -1).join(' ') + '…'
+          //   : ''
+          // const descriptionText = truncatedDescription ? ` / ${truncatedDescription}` : ''
 
-          return partsCount || descriptionText ? `${partsCount}${descriptionText}` : undefined
+          // return partsCount || descriptionText ? `${partsCount}${descriptionText}` : undefined
+          return partsCount ? `${partsCount}` : undefined
         }
 
         // Add root categories first (ungrouped)
@@ -113,7 +115,8 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
                 key: rootCat.name,
                 display: (
                   <>
-                    <span className="text-gray-800 dark:text-gray-200">{rootCat.sort_order}.</span> {rootCat.name}
+                    <span className="text-gray-800 dark:text-gray-200">{rootCat.sort_order / 10000}.</span>{' '}
+                    {rootCat.name}
                   </>
                 ),
               },

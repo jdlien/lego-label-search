@@ -8,10 +8,9 @@ module.exports = {
         db.run('CREATE INDEX IF NOT EXISTS idx_parts_part_cat_id ON parts(part_cat_id)')
         db.run('CREATE INDEX IF NOT EXISTS idx_parts_ba_cat_id ON parts(ba_cat_id)')
 
-        // Elements table indexes
+        // Elements table indexes - minimal set for design ID updates
         db.run('CREATE INDEX IF NOT EXISTS idx_elements_part_num ON elements(part_num)')
-        db.run('CREATE INDEX IF NOT EXISTS idx_elements_color_id ON elements(color_id)')
-        db.run('CREATE INDEX IF NOT EXISTS idx_elements_design_id ON elements(design_id)')
+        db.run('CREATE INDEX IF NOT EXISTS idx_elements_part_color ON elements(part_num, color_id, design_id)')
 
         // Part relationships indexes
         db.run('CREATE INDEX IF NOT EXISTS idx_part_relationships_child ON part_relationships(child_part_num)')
@@ -40,8 +39,7 @@ module.exports = {
         db.run('DROP INDEX IF EXISTS idx_parts_part_cat_id')
         db.run('DROP INDEX IF EXISTS idx_parts_ba_cat_id')
         db.run('DROP INDEX IF EXISTS idx_elements_part_num')
-        db.run('DROP INDEX IF EXISTS idx_elements_color_id')
-        db.run('DROP INDEX IF EXISTS idx_elements_design_id')
+        db.run('DROP INDEX IF EXISTS idx_elements_part_color')
         db.run('DROP INDEX IF EXISTS idx_part_relationships_child')
         db.run('DROP INDEX IF EXISTS idx_part_relationships_parent')
         db.run('DROP INDEX IF EXISTS idx_part_relationships_type')

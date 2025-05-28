@@ -7,6 +7,14 @@ const path = require('path')
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../data/lego.sqlite')
 const MIGRATIONS_DIR = __dirname
 
+// ANSI color codes
+const colors = {
+  reset: '\x1b[0m',
+  green: '\x1b[32m'
+}
+
+const c = (color, text) => `${colors[color]}${text}${colors.reset}`
+
 class MigrationRunner {
   constructor() {
     this.db = new sqlite3.Database(DB_PATH)
@@ -53,7 +61,7 @@ class MigrationRunner {
         this.db.run('INSERT INTO migrations (filename) VALUES (?)', [filename], (err) => {
           if (err) reject(err)
           else {
-            console.log(`✓ Migration ${filename} completed`)
+            console.log(`${c('green', '✓')} Migration ${filename} completed`)
             resolve()
           }
         })

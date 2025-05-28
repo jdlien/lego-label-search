@@ -29,7 +29,7 @@ const transformCategoriesToAccordionItems = (
     title: (
       <div className="flex w-full items-center justify-start space-x-4">
         <span className="min-w-[240px]">
-          {isRootLevel && cat.sort_order !== undefined && <strong className="mr-1">{cat.sort_order}.</strong>}
+          {isRootLevel && cat.sort_order !== undefined && <strong className="mr-1">{cat.sort_order / 10000}.</strong>}
           {cat.name}
           <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(ID: {cat.id})</span>
         </span>

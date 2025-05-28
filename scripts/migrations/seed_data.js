@@ -8,13 +8,40 @@ const csv = require('csv-parser')
 const DB_PATH = path.join(__dirname, '../../data/lego.sqlite')
 const DATA_DIR = path.join(__dirname, '../../data')
 
+// ANSI color codes
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  dim: '\x1b[2m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+  white: '\x1b[37m',
+}
+
+const c = (color, text) => `${colors[color]}${text}${colors.reset}`
+
+// Progress bar function (for future use)
+const progressBar = (current, total, label) => {
+  const percentage = Math.round((current / total) * 100)
+  const barLength = 20
+  const filledLength = Math.round((barLength * current) / total)
+  const bar = '█'.repeat(filledLength) + '░'.repeat(barLength - filledLength)
+  return `${c('dim', label)} ${c('cyan', bar)} ${c('bright', percentage + '%')} ${c('dim', `(${current.toLocaleString()}/${total.toLocaleString()})`)}`
+}
+
 class DataSeeder {
   constructor() {
     this.db = new sqlite3.Database(DB_PATH)
   }
 
   async seedColors() {
-    console.log('Seeding colors...')
+    console.log(c('yellow', '🎨 Seeding colors...'))
+    const startTime = Date.now()
+
     return new Promise((resolve, reject) => {
       const colors = []
 
@@ -43,7 +70,10 @@ class DataSeeder {
           stmt.finalize((err) => {
             if (err) reject(err)
             else {
-              console.log(`✓ Imported ${colors.length} colors`)
+              const duration = ((Date.now() - startTime) / 1000).toFixed(1)
+              console.log(
+                `   ${c('green', '✓')} Imported ${c('bright', colors.length.toLocaleString())} colors in ${c('cyan', duration + 's')}`
+              )
               resolve()
             }
           })
@@ -53,7 +83,9 @@ class DataSeeder {
   }
 
   async seedPartCategories() {
-    console.log('Seeding part categories...')
+    console.log(c('blue', '📂 Seeding part categories...'))
+    const startTime = Date.now()
+
     return new Promise((resolve, reject) => {
       const categories = []
 
@@ -71,7 +103,10 @@ class DataSeeder {
           stmt.finalize((err) => {
             if (err) reject(err)
             else {
-              console.log(`✓ Imported ${categories.length} part categories`)
+              const duration = ((Date.now() - startTime) / 1000).toFixed(1)
+              console.log(
+                `   ${c('green', '✓')} Imported ${c('bright', categories.length.toLocaleString())} part categories in ${c('cyan', duration + 's')}`
+              )
               resolve()
             }
           })
@@ -81,7 +116,9 @@ class DataSeeder {
   }
 
   async seedBaCategories() {
-    console.log('Seeding BrickArchitect categories...')
+    console.log(c('magenta', '🏗️  Seeding BrickArchitect categories...'))
+    const startTime = Date.now()
+
     return new Promise((resolve, reject) => {
       const categories = []
 
@@ -94,12 +131,12 @@ class DataSeeder {
             row.parent_id ? parseInt(row.parent_id) : null,
             row.level ? parseInt(row.level) : 0,
             row.sort_order ? parseInt(row.sort_order) : null,
-            row.description || null
+            row.description || null,
           ])
         })
         .on('end', () => {
           const stmt = this.db.prepare(`
-            INSERT OR REPLACE INTO ba_categories (id, name, parent_id, level, sort_order, description) 
+            INSERT OR REPLACE INTO ba_categories (id, name, parent_id, level, sort_order, description)
             VALUES (?, ?, ?, ?, ?, ?)
           `)
 
@@ -107,7 +144,10 @@ class DataSeeder {
           stmt.finalize((err) => {
             if (err) reject(err)
             else {
-              console.log(`✓ Imported ${categories.length} BrickArchitect categories`)
+              const duration = ((Date.now() - startTime) / 1000).toFixed(1)
+              console.log(
+                `   ${c('green', '✓')} Imported ${c('bright', categories.length.toLocaleString())} BrickArchitect categories in ${c('cyan', duration + 's')}`
+              )
               resolve()
             }
           })
@@ -117,41 +157,106 @@ class DataSeeder {
   }
 
   async seedParts() {
-    console.log('Seeding parts...')
+    console.log(c('red', '🧱 Seeding parts...'))
+    const startTime = Date.now()
+
     return new Promise((resolve, reject) => {
-      const parts = []
+      let count = 0
+      const batchSize = 10000 // Larger batch size for better performance
+      let batch = []
 
-      fs.createReadStream(path.join(DATA_DIR, 'parts.csv'))
-        .pipe(csv())
-        .on('data', (row) => {
-          parts.push([
-            row.part_num,
-            row.name,
-            row.part_cat_id ? parseInt(row.part_cat_id) : null,
-            row.part_material || null,
-          ])
-        })
-        .on('end', () => {
-          const stmt = this.db.prepare(`
-            INSERT OR REPLACE INTO parts (part_num, name, part_cat_id, part_material)
-            VALUES (?, ?, ?, ?)
-          `)
+      // First, clear the parts table since we're doing a fresh load
+      this.db.run('DELETE FROM parts', (err) => {
+        if (err) {
+          reject(err)
+          return
+        }
 
-          parts.forEach((part) => stmt.run(part))
-          stmt.finalize((err) => {
-            if (err) reject(err)
-            else {
-              console.log(`✓ Imported ${parts.length} parts`)
-              resolve()
+        // Set pragmas for maximum insert performance
+        this.db.serialize(() => {
+          this.db.run('PRAGMA synchronous = OFF')
+          this.db.run('PRAGMA journal_mode = MEMORY')
+          this.db.run('PRAGMA cache_size = 10000')
+          this.db.run('PRAGMA locking_mode = EXCLUSIVE')
+          this.db.run('PRAGMA temp_store = MEMORY')
+
+          // Start a transaction for much faster bulk inserts
+          this.db.run('BEGIN TRANSACTION', (err) => {
+            if (err) {
+              reject(err)
+              return
             }
+
+            const stmt = this.db.prepare(`
+              INSERT INTO parts (part_num, name, part_cat_id, part_material)
+              VALUES (?, ?, ?, ?)
+            `)
+
+            const processBatch = () => {
+              batch.forEach((part) => stmt.run(part))
+              count += batch.length
+              batch = []
+            }
+
+            fs.createReadStream(path.join(DATA_DIR, 'parts.csv'))
+              .pipe(csv())
+              .on('data', (row) => {
+                batch.push([
+                  row.part_num,
+                  row.name,
+                  row.part_cat_id ? parseInt(row.part_cat_id) : null,
+                  row.part_material || null,
+                ])
+
+                // Process batch when it reaches the size limit
+                if (batch.length >= batchSize) {
+                  processBatch()
+                }
+              })
+              .on('end', () => {
+                // Process any remaining parts
+                if (batch.length > 0) {
+                  processBatch()
+                }
+
+                stmt.finalize((err) => {
+                  if (err) {
+                    this.db.run('ROLLBACK', () => reject(err))
+                  } else {
+                    // Commit the transaction
+                    this.db.run('COMMIT', (err) => {
+                      if (err) reject(err)
+                      else {
+                        // Reset pragmas back to safe defaults
+                        this.db.serialize(() => {
+                          this.db.run('PRAGMA synchronous = NORMAL')
+                          this.db.run('PRAGMA journal_mode = DELETE')
+                          this.db.run('PRAGMA locking_mode = NORMAL')
+
+                          const duration = ((Date.now() - startTime) / 1000).toFixed(1)
+                          console.log(
+                            `   ${c('green', '✓')} Imported ${c('bright', count.toLocaleString())} parts in ${c('cyan', duration + 's')}`
+                          )
+                          resolve()
+                        })
+                      }
+                    })
+                  }
+                })
+              })
+              .on('error', (err) => {
+                this.db.run('ROLLBACK', () => reject(err))
+              })
           })
         })
-        .on('error', reject)
+      })
     })
   }
 
   async seedBaParts() {
-    console.log('Updating parts with BrickArchitect data...')
+    console.log(c('cyan', '🔄 Updating parts with BrickArchitect data...'))
+    const startTime = Date.now()
+
     return new Promise((resolve, reject) => {
       const updates = []
 
@@ -173,7 +278,10 @@ class DataSeeder {
           stmt.finalize((err) => {
             if (err) reject(err)
             else {
-              console.log(`✓ Updated ${updates.length} parts with BrickArchitect data`)
+              const duration = ((Date.now() - startTime) / 1000).toFixed(1)
+              console.log(
+                `   ${c('green', '✓')} Updated ${c('bright', updates.length.toLocaleString())} parts with BrickArchitect data in ${c('cyan', duration + 's')}`
+              )
               resolve()
             }
           })
@@ -183,66 +291,194 @@ class DataSeeder {
   }
 
   async seedElements() {
-    console.log('Seeding elements...')
+    console.log(c('green', '⚛️  Seeding elements...'))
+    const startTime = Date.now()
+
     return new Promise((resolve, reject) => {
-      const elements = []
+      let count = 0
+      const batchSize = 10000 // Larger batch size for better performance
+      let batch = []
 
-      fs.createReadStream(path.join(DATA_DIR, 'elements.csv'))
-        .pipe(csv())
-        .on('data', (row) => {
-          elements.push([row.element_id, row.part_num, parseInt(row.color_id), row.design_id || null])
-        })
-        .on('end', () => {
-          const stmt = this.db.prepare(`
-            INSERT OR REPLACE INTO elements (element_id, part_num, color_id, design_id)
-            VALUES (?, ?, ?, ?)
-          `)
+      // First, clear the elements table since we're doing a fresh load
+      this.db.run('DELETE FROM elements', (err) => {
+        if (err) {
+          reject(err)
+          return
+        }
 
-          elements.forEach((element) => stmt.run(element))
-          stmt.finalize((err) => {
-            if (err) reject(err)
-            else {
-              console.log(`✓ Imported ${elements.length} elements`)
-              resolve()
+        // Set pragmas for maximum insert performance
+        this.db.serialize(() => {
+          this.db.run('PRAGMA synchronous = OFF')
+          this.db.run('PRAGMA journal_mode = MEMORY')
+          this.db.run('PRAGMA cache_size = 10000')
+          this.db.run('PRAGMA locking_mode = EXCLUSIVE')
+          this.db.run('PRAGMA temp_store = MEMORY')
+
+          // Start a transaction for much faster bulk inserts
+          this.db.run('BEGIN TRANSACTION', (err) => {
+            if (err) {
+              reject(err)
+              return
             }
+
+            const stmt = this.db.prepare(`
+              INSERT INTO elements (element_id, part_num, color_id, design_id)
+              VALUES (?, ?, ?, ?)
+            `)
+
+            const processBatch = () => {
+              batch.forEach((element) => stmt.run(element))
+              count += batch.length
+              batch = []
+            }
+
+            fs.createReadStream(path.join(DATA_DIR, 'elements.csv'))
+              .pipe(csv())
+              .on('data', (row) => {
+                batch.push([row.element_id, row.part_num, parseInt(row.color_id), row.design_id || null])
+
+                // Process batch when it reaches the size limit
+                if (batch.length >= batchSize) {
+                  processBatch()
+                }
+              })
+              .on('end', () => {
+                // Process any remaining elements
+                if (batch.length > 0) {
+                  processBatch()
+                }
+
+                stmt.finalize((err) => {
+                  if (err) {
+                    this.db.run('ROLLBACK', () => reject(err))
+                  } else {
+                    // Commit the transaction
+                    this.db.run('COMMIT', (err) => {
+                      if (err) reject(err)
+                      else {
+                        // Reset pragmas back to safe defaults
+                        this.db.serialize(() => {
+                          this.db.run('PRAGMA synchronous = NORMAL')
+                          this.db.run('PRAGMA journal_mode = DELETE')
+                          this.db.run('PRAGMA locking_mode = NORMAL')
+
+                          const duration = ((Date.now() - startTime) / 1000).toFixed(1)
+                          console.log(
+                            `   ${c('green', '✓')} Imported ${c('bright', count.toLocaleString())} elements in ${c('cyan', duration + 's')}`
+                          )
+                          resolve()
+                        })
+                      }
+                    })
+                  }
+                })
+              })
+              .on('error', (err) => {
+                this.db.run('ROLLBACK', () => reject(err))
+              })
           })
         })
-        .on('error', reject)
+      })
     })
   }
 
   async seedPartRelationships() {
-    console.log('Seeding part relationships...')
+    console.log(c('white', '🔗 Seeding part relationships...'))
+    const startTime = Date.now()
+
     return new Promise((resolve, reject) => {
-      const relationships = []
+      let count = 0
+      const batchSize = 10000
+      let batch = []
 
-      fs.createReadStream(path.join(DATA_DIR, 'part_relationships.csv'))
-        .pipe(csv())
-        .on('data', (row) => {
-          relationships.push([row.rel_type, row.child_part_num, row.parent_part_num])
-        })
-        .on('end', () => {
-          const stmt = this.db.prepare(`
-            INSERT OR REPLACE INTO part_relationships (rel_type, child_part_num, parent_part_num)
-            VALUES (?, ?, ?)
-          `)
+      // First, clear the part_relationships table since we're doing a fresh load
+      this.db.run('DELETE FROM part_relationships', (err) => {
+        if (err) {
+          reject(err)
+          return
+        }
 
-          relationships.forEach((rel) => stmt.run(rel))
-          stmt.finalize((err) => {
-            if (err) reject(err)
-            else {
-              console.log(`✓ Imported ${relationships.length} part relationships`)
-              resolve()
+        // Set pragmas for maximum insert performance
+        this.db.serialize(() => {
+          this.db.run('PRAGMA synchronous = OFF')
+          this.db.run('PRAGMA journal_mode = MEMORY')
+          this.db.run('PRAGMA cache_size = 10000')
+          this.db.run('PRAGMA locking_mode = EXCLUSIVE')
+          this.db.run('PRAGMA temp_store = MEMORY')
+
+          // Start a transaction for much faster bulk inserts
+          this.db.run('BEGIN TRANSACTION', (err) => {
+            if (err) {
+              reject(err)
+              return
             }
+
+            const stmt = this.db.prepare(`
+              INSERT INTO part_relationships (rel_type, child_part_num, parent_part_num)
+              VALUES (?, ?, ?)
+            `)
+
+            const processBatch = () => {
+              batch.forEach((rel) => stmt.run(rel))
+              count += batch.length
+              batch = []
+            }
+
+            fs.createReadStream(path.join(DATA_DIR, 'part_relationships.csv'))
+              .pipe(csv())
+              .on('data', (row) => {
+                batch.push([row.rel_type, row.child_part_num, row.parent_part_num])
+
+                // Process batch when it reaches the size limit
+                if (batch.length >= batchSize) {
+                  processBatch()
+                }
+              })
+              .on('end', () => {
+                // Process any remaining relationships
+                if (batch.length > 0) {
+                  processBatch()
+                }
+
+                stmt.finalize((err) => {
+                  if (err) {
+                    this.db.run('ROLLBACK', () => reject(err))
+                  } else {
+                    // Commit the transaction
+                    this.db.run('COMMIT', (err) => {
+                      if (err) reject(err)
+                      else {
+                        // Reset pragmas back to safe defaults
+                        this.db.serialize(() => {
+                          this.db.run('PRAGMA synchronous = NORMAL')
+                          this.db.run('PRAGMA journal_mode = DELETE')
+                          this.db.run('PRAGMA locking_mode = NORMAL')
+
+                          const duration = ((Date.now() - startTime) / 1000).toFixed(1)
+                          console.log(
+                            `   ${c('green', '✓')} Imported ${c('bright', count.toLocaleString())} part relationships in ${c('cyan', duration + 's')}`
+                          )
+                          resolve()
+                        })
+                      }
+                    })
+                  }
+                })
+              })
+              .on('error', (err) => {
+                this.db.run('ROLLBACK', () => reject(err))
+              })
           })
         })
-        .on('error', reject)
+      })
     })
   }
 
   async seed() {
     try {
-      console.log('Starting data seeding...')
+      console.log(c('cyan', '📊 Data Seeding'))
+      console.log()
+      const totalStartTime = Date.now()
 
       await this.seedColors()
       await this.seedPartCategories()
@@ -252,12 +488,19 @@ class DataSeeder {
       await this.seedElements()
       await this.seedPartRelationships()
 
-      console.log('Creating indexes...')
+      console.log(c('dim', '🔧 Creating indexes...'))
       await this.createIndexes()
 
-      console.log('✅ All data seeded successfully!')
+      const totalDuration = ((Date.now() - totalStartTime) / 1000).toFixed(1)
+      console.log()
+      console.log(c('green', '✓ Seeding Complete!'))
+      console.log(c('dim', `⏱️  Total time: ${totalDuration}s`))
+      console.log()
     } catch (error) {
-      console.error('❌ Seeding failed:', error)
+      console.log()
+      console.log(c('red', '❌ Seeding Failed!'))
+      console.log(c('bright', '==============='))
+      console.error(c('red', error.message))
       process.exit(1)
     } finally {
       this.db.close()

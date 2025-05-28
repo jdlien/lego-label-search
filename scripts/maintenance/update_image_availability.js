@@ -39,6 +39,18 @@ const path = require('path')
 const sqlite3 = require('sqlite3')
 const { open } = require('sqlite')
 
+// ANSI color codes
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  cyan: '\x1b[36m',
+  red: '\x1b[31m',
+}
+
+const c = (color, text) => `${colors[color]}${text}${colors.reset}`
+
 // Configuration
 const CONFIG = {
   dbPath: path.join(process.cwd(), 'data', 'lego.sqlite'),
@@ -158,9 +170,9 @@ async function initializeImageCache() {
       imageFilesCache = allFiles
         .filter((file) => /\.(webp|png)$/i.test(file))
         .map((file) => file.replace(/\.(webp|png)$/i, ''))
-      console.log(`Found ${imageFilesCache.length} image files`)
+      console.log(`   ${c('green', '✓')} Found ${imageFilesCache.length} image files`)
     } catch (error) {
-      console.error(`Error reading images directory: ${error.message}`)
+      console.error(`   ${c('red', '❌')} Error reading images directory: ${error.message}`)
       imageFilesCache = []
     }
   }
@@ -369,10 +381,7 @@ async function processParts(db, parts) {
     errors: 0,
   }
 
-  // ANSI color codes
-  const COLOR_GREEN = '\x1b[32m'
-  const COLOR_RESET = '\x1b[0m'
-  const COLOR_CYAN = '\x1b[36m'
+  // Progress display formatting
 
   const totalBatches = Math.ceil(parts.length / CONFIG.batchSize)
 
@@ -440,7 +449,7 @@ async function processParts(db, parts) {
         // Single-line progress indicator (if not verbose)
         if (!CONFIG.verbose) {
           process.stdout.write(
-            `\r${COLOR_GREEN}Processing: ${stats.processed}/${stats.total} parts (Batch ${batchNum}/${totalBatches})${COLOR_RESET}`
+            `\r${c('green', `Processing: ${stats.processed}/${stats.total} parts (Batch ${batchNum}/${totalBatches})`)}`
           )
         }
       } catch (error) {
@@ -462,11 +471,10 @@ async function processParts(db, parts) {
 async function main() {
   parseArgs()
 
-  console.log('Image Availability Update Script')
-  console.log('================================')
+  console.log(c('cyan', '🖼️  Image Availability Update'))
 
   if (CONFIG.dryRun) {
-    console.log('🔍 DRY RUN MODE - No changes will be made to the database')
+    console.log(c('yellow', '🔍 DRY RUN MODE - No changes will be made to the database'))
   }
 
   console.log(`Database: ${CONFIG.dbPath}`)
@@ -479,7 +487,7 @@ async function main() {
     try {
       await fs.access(CONFIG.dbPath)
     } catch {
-      console.error(`❌ Database not found: ${CONFIG.dbPath}`)
+      console.error(c('red', `❌ Database not found: ${CONFIG.dbPath}`))
       process.exit(1)
     }
 
@@ -487,16 +495,14 @@ async function main() {
     try {
       await fs.access(CONFIG.imagesDir)
     } catch {
-      console.error(`❌ Images directory not found: ${CONFIG.imagesDir}`)
+      console.error(c('red', `❌ Images directory not found: ${CONFIG.imagesDir}`))
       process.exit(1)
     }
 
     // Open database connection
-    console.log('📂 Opening database connection...')
     const db = await openDb()
 
     // Get all parts
-    console.log('📋 Fetching parts from database...')
     const parts = await getAllParts(db)
     console.log(`Found ${parts.length} parts in database`)
 
@@ -517,8 +523,8 @@ async function main() {
 
     // Print summary
     console.log('')
-    console.log('Summary')
-    console.log('=======')
+    console.log(c('cyan', 'Summary'))
+    console.log(c('bright', '======='))
     console.log(`Total parts processed: ${stats.processed}`)
     console.log(`Parts with images: ${stats.hasImage}`)
     console.log(`  - Exact matches: ${stats.exactMatches}`)
@@ -530,21 +536,21 @@ async function main() {
 
     if (CONFIG.dryRun && stats.updated > 0) {
       console.log('')
-      console.log('💡 Run without --dry-run to apply these changes to the database')
+      console.log(c('cyan', '💡 Run without --dry-run to apply these changes to the database'))
     }
 
     if (stats.updated > 0 && !CONFIG.dryRun) {
       console.log('')
-      console.log('✅ Database has been updated successfully!')
+      console.log(c('green', '✅ Database has been updated successfully!'))
     }
 
     if (stats.errors > 0) {
       console.log('')
-      console.log(`⚠️  ${stats.errors} errors occurred during processing`)
+      console.log(c('yellow', `⚠️  ${stats.errors} errors occurred during processing`))
       process.exit(1)
     }
   } catch (error) {
-    console.error('❌ Fatal error:', error.message)
+    console.error(c('red', '❌ Fatal error:'), error.message)
     if (CONFIG.verbose) {
       console.error(error.stack)
     }

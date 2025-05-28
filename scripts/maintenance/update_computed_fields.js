@@ -10,6 +10,17 @@ const updateImageAvailabilityScript = require('../update_image_availability.js')
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../data/lego.sqlite')
 const IMAGES_DIR = path.join(__dirname, '../../public/data/images')
 
+// ANSI color codes for better output formatting
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  dim: '\x1b[2m',
+  green: '\x1b[32m',
+  cyan: '\x1b[36m',
+}
+
+const c = (color, text) => `${colors[color]}${text}${colors.reset}`
+
 class ComputedFieldsUpdater {
   constructor() {
     this.db = new sqlite3.Database(DB_PATH)
@@ -17,17 +28,55 @@ class ComputedFieldsUpdater {
 
   // ===== CATEGORY COUNTS =====
   async updateAllCategoryCounts() {
-    console.log('Delegating category count update to update_ba_category_counts.js...')
+    console.log('Updating category counts...')
     return new Promise((resolve, reject) => {
       const scriptPath = path.join(__dirname, 'update_ba_category_counts.js')
       const child = spawn('node', [scriptPath], {
-        stdio: 'inherit', // This will show the script's output in real-time
+        stdio: ['pipe', 'pipe', 'pipe'], // Capture output so we can format it
         cwd: path.dirname(scriptPath),
       })
 
+      let currentCategory = ''
+      let totalCategories = 0
+      let processedCategories = 0
+
+      // Parse output to show cleaner progress
+      child.stdout.on('data', (data) => {
+        const output = data.toString()
+        const lines = output.split('\n')
+
+        lines.forEach((line) => {
+          if (line.includes('Category ') && line.includes(' parts')) {
+            processedCategories++
+            const match = line.match(/Category \d+ "([^"]+)".*?(\d+) parts/)
+            if (match) {
+              currentCategory = match[1]
+              const partCount = match[2]
+              process.stdout.write(
+                `\r\x1b[K   ${c('dim', `Processing category ${processedCategories}/193:`)} ${c('cyan', currentCategory)} ${c('bright', partCount)} parts `
+              )
+            }
+          } else if (line.includes('categories processed')) {
+            // Extract total from progress messages like "Progress: 50/193 categories processed..."
+            const progressMatch = line.match(/Progress: \d+\/(\d+)/)
+            if (progressMatch) {
+              totalCategories = parseInt(progressMatch[1])
+            }
+          }
+        })
+      })
+
+      child.stderr.on('data', (data) => {
+        // Still show errors
+        console.error(data.toString())
+      })
+
       child.on('close', (code) => {
+        // Move to next line when done
+        process.stdout.write('\n')
+
         if (code === 0) {
-          console.log('✓ Category counts updated successfully')
+          console.log(`${c('green', '✓')} Category counts updated successfully`)
           resolve()
         } else {
           reject(new Error(`Category count update script exited with code ${code}`))
@@ -41,7 +90,7 @@ class ComputedFieldsUpdater {
   }
 
   async updateModifiedCategoryCounts(modifiedCategoryIds = []) {
-    console.log('Delegating modified category count update to update_ba_category_counts.js...')
+    console.log('Updating modified category counts...')
 
     if (modifiedCategoryIds.length === 0) {
       console.log('No categories to update')
@@ -52,13 +101,43 @@ class ComputedFieldsUpdater {
       const scriptPath = path.join(__dirname, 'update_ba_category_counts.js')
       const args = ['--categories', modifiedCategoryIds.join(',')]
       const child = spawn('node', [scriptPath, ...args], {
-        stdio: 'inherit',
+        stdio: ['pipe', 'pipe', 'pipe'], // Capture output so we can format it
         cwd: path.dirname(scriptPath),
       })
 
+      let processedCategories = 0
+
+      // Parse output to show cleaner progress
+      child.stdout.on('data', (data) => {
+        const output = data.toString()
+        const lines = output.split('\n')
+
+        lines.forEach((line) => {
+          if (line.includes('Category ') && line.includes(' parts')) {
+            processedCategories++
+            const match = line.match(/Category \d+ "([^"]+)".*?(\d+) parts/)
+            if (match) {
+              const currentCategory = match[1]
+              const partCount = match[2]
+              process.stdout.write(
+                `\r\x1b[K   ${c('dim', `Processing category ${processedCategories}/${modifiedCategoryIds.length}:`)} ${c('cyan', currentCategory)} ${c('bright', partCount)} parts `
+              )
+            }
+          }
+        })
+      })
+
+      child.stderr.on('data', (data) => {
+        // Still show errors
+        console.error(data.toString())
+      })
+
       child.on('close', (code) => {
+        // Move to next line when done
+        process.stdout.write('\n')
+
         if (code === 0) {
-          console.log('✓ Modified category counts updated successfully')
+          console.log(`${c('green', '✓')} Modified category counts updated successfully`)
           resolve()
         } else {
           reject(new Error(`Category count update script exited with code ${code}`))
@@ -150,13 +229,21 @@ class ComputedFieldsUpdater {
             }
             totalUpdated++
 
-            // Log progress every 1000 parts
-            if (totalUpdated % 1000 === 0) {
-              console.log(`Processed ${totalUpdated}/${parts.length} parts...`)
+            // Update progress on same line every 1000 parts
+            if (totalUpdated % 1000 === 0 || totalUpdated === parts.length) {
+              const percentage = Math.round((totalUpdated / parts.length) * 100)
+              process.stdout.write(
+                `\r\x1b[K   ${c('dim', 'Processing alternate part IDs:')} ${c('cyan', totalUpdated.toLocaleString())}${c('dim', '/')}${c('bright', parts.length.toLocaleString())} ${c('dim', `(${percentage}%)`)} `
+              )
             }
           }
 
-          console.log(`✓ Updated alternate part IDs for ${totalUpdated} parts (${partsWithAlts} parts have alternates)`)
+          // Move to next line when done
+          process.stdout.write('\n')
+
+          console.log(
+            `${c('green', '✓')} Updated alternate part IDs for ${c('bright', totalUpdated.toLocaleString())} parts (${c('cyan', partsWithAlts.toLocaleString())} parts have alternates)`
+          )
           resolve()
         } catch (error) {
           reject(error)
@@ -209,7 +296,7 @@ class ComputedFieldsUpdater {
                 reject(err)
               } else {
                 console.log(
-                  `✓ Example design IDs updated: ${stats.parts_with_design_id}/${stats.total_parts} parts have design IDs`
+                  `${c('green', '✓')} Example design IDs updated: ${c('bright', stats.parts_with_design_id.toLocaleString())}/${c('bright', stats.total_parts.toLocaleString())} parts have design IDs`
                 )
                 resolve()
               }
@@ -222,24 +309,39 @@ class ComputedFieldsUpdater {
 
   async forceUpdateAllExampleDesignIds() {
     console.log('Force updating ALL example design IDs...')
+    const startTime = Date.now()
+
     return new Promise((resolve, reject) => {
-      // Force update all example_design_ids (useful if color preference logic changes)
+      // Force update all example_design_ids using optimized JOIN-based query
+      // This completely avoids correlated subqueries and should be much faster with indexes
       this.db.run(
         `
         UPDATE parts
         SET example_design_id = (
-            SELECT design_id
-            FROM elements
-            WHERE elements.part_num = parts.part_num
-            ORDER BY
-                CASE color_id
+          SELECT design_id
+          FROM (
+            SELECT
+              part_num,
+              design_id,
+              ROW_NUMBER() OVER (
+                PARTITION BY part_num
+                ORDER BY
+                  CASE color_id
                     WHEN 15 THEN 1   -- White
                     WHEN 71 THEN 2   -- Light Bluish Gray
                     WHEN 72 THEN 3   -- Dark Bluish Gray
                     WHEN 0  THEN 4   -- Black
                     ELSE 5           -- Others
-                END
-            LIMIT 1
+                  END,
+                  design_id
+              ) as rn
+            FROM elements
+          ) ranked_elements
+          WHERE ranked_elements.part_num = parts.part_num
+            AND ranked_elements.rn = 1
+        )
+        WHERE EXISTS (
+          SELECT 1 FROM elements WHERE elements.part_num = parts.part_num
         )
       `,
         (err) => {
@@ -261,8 +363,9 @@ class ComputedFieldsUpdater {
               if (err) {
                 reject(err)
               } else {
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1)
                 console.log(
-                  `✓ All example design IDs updated: ${stats.parts_with_design_id}/${stats.total_parts} parts have design IDs`
+                  `${c('green', '✓')} All example design IDs updated: ${c('bright', stats.parts_with_design_id.toLocaleString())}/${c('bright', stats.total_parts.toLocaleString())} parts have design IDs in ${c('cyan', duration + 's')}`
                 )
                 resolve()
               }
@@ -307,13 +410,13 @@ class ComputedFieldsUpdater {
 
       // Update image availability using the more sophisticated script
       if (options.imageAvailability !== false) {
-        console.log('Delegating image availability update to update_image_availability.js...')
+        console.log()
         await updateImageAvailabilityScript.main()
       }
 
-      console.log('✅ Computed fields updated successfully!')
+      console.log(c('green', '✓ Computed fields updated successfully!'))
     } catch (error) {
-      console.error('❌ Update failed:', error)
+      console.error(c('red', '❌ Update failed:'), error)
       process.exit(1)
     } finally {
       this.db.close()

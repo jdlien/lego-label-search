@@ -76,27 +76,3 @@ The seed script (`scripts/migrations/seed_data.js`) automatically calls this mai
 - **Image availability**: Slowest, requires filesystem scanning
 
 For faster updates during development, you can skip the image availability update which is the most time-consuming operation. You can also skip category sort order if the category hierarchy hasn't changed.
-
-### Replaced Scripts
-
-This consolidated script replaces the functionality of:
-
-- `scripts/update_category_counts.js`
-- `scripts/update_alt_part_ids.js`
-- `scripts/add_example_design_id.sql`
-- `scripts/update_example_design_ids.sql`
-- `scripts/update_image_availability.js`
-
-These individual scripts are kept for reference but should not be used directly. Use this maintenance script instead.
-
-### Related Scripts
-
-- `scripts/update_category_sort_order.js` - Updates hierarchical sort order for categories (separate from computed fields)
-
-## When to Run
-
-- **After data import**: Automatically run by the seed script
-- **After adding new images**: Run with image availability update
-- **After changing color preferences**: Run with `--force-example-design-ids`
-- **After modifying part relationships**: Run to update alternate part IDs
-- **Periodic maintenance**: Run periodically to ensure data consistency

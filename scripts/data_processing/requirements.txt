@@ -1,5 +1,0 @@
-# No external packages needed
-# Tkinter comes with Python installation
-# SQLite3 comes with Python installation
-requests
-beautifulsoup4

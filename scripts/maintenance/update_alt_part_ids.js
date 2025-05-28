@@ -86,6 +86,7 @@ async function updateAltPartIds(db, partNum) {
 }
 
 async function updateAllAltPartIds(db) {
+  console.log()
   console.log('Updating alternate part IDs for all parts...')
   const partNumbers = await getAllPartNumbers(db)
 
