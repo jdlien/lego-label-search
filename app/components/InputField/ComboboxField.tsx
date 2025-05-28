@@ -226,22 +226,35 @@ const groupOptions = (
 ): { grouped: GroupedOption[]; ungrouped: NormalizedOptionType[] } => {
   const grouped: GroupedOption[] = []
   const ungrouped: NormalizedOptionType[] = []
-  const groupMap = new Map<string, NormalizedOptionType[]>()
+  const groupMap = new Map<string, { name: string | React.ReactNode; items: NormalizedOptionType[] }>()
 
   options.forEach((option) => {
     if (option.group) {
-      if (!groupMap.has(option.group)) {
-        groupMap.set(option.group, [])
+      let groupKey: string
+      let groupDisplay: string | React.ReactNode
+      
+      if (typeof option.group === 'string') {
+        // Simple string group
+        groupKey = option.group
+        groupDisplay = option.group
+      } else {
+        // Object with key and display
+        groupKey = option.group.key
+        groupDisplay = option.group.display
       }
-      groupMap.get(option.group)!.push(option)
+      
+      if (!groupMap.has(groupKey)) {
+        groupMap.set(groupKey, { name: groupDisplay, items: [] })
+      }
+      groupMap.get(groupKey)!.items.push(option)
     } else {
       ungrouped.push(option)
     }
   })
 
   // Convert map to array of GroupedOption
-  groupMap.forEach((items, name) => {
-    grouped.push({ name, items })
+  groupMap.forEach((group, key) => {
+    grouped.push({ name: group.name, items: group.items, key })
   })
 
   return { grouped, ungrouped }
@@ -446,8 +459,11 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
             )}
 
             {/* Render grouped options */}
-            {grouped.map((group) => (
-              <Command.Group key={group.name} className={styles.comboboxGroup()}>
+            {grouped.map((group, index) => (
+              <Command.Group
+                key={group.key || (typeof group.name === 'string' ? group.name : `group-${index}`)}
+                className={styles.comboboxGroup()}
+              >
                 <div className={styles.comboboxGroupHeading()}>{group.name}</div>
                 {group.items.map((option) => (
                   <Command.Item

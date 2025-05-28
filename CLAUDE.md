@@ -35,7 +35,6 @@ LEGO Part Label Search is a Next.js web application that allows users to search 
 ### Maintenance Scripts
 
 - `node scripts/maintenance/update_computed_fields.js` - Update all computed fields
-- `node scripts/update_category_sort_order.js` - Update category ordering
 - `node scripts/update_image_availability.js` - Update image availability flags
 
 ## Architecture

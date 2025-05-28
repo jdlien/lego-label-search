@@ -20,12 +20,16 @@ interface Category {
 // No need for placeholders here if you have a global layout.
 
 // Move this function outside the component to avoid dependency issues
-const transformCategoriesToAccordionItems = (categories: Category[]): AccordionItemDef[] => {
+const transformCategoriesToAccordionItems = (
+  categories: Category[],
+  isRootLevel: boolean = false
+): AccordionItemDef[] => {
   return categories.map((cat) => ({
     id: cat.id,
     title: (
       <div className="flex w-full items-center justify-start space-x-4">
         <span className="min-w-[240px]">
+          {isRootLevel && cat.sort_order !== undefined && <strong className="mr-1">{cat.sort_order}.</strong>}
           {cat.name}
           <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(ID: {cat.id})</span>
         </span>
@@ -44,7 +48,7 @@ const transformCategoriesToAccordionItems = (categories: Category[]): AccordionI
       <div className="mb-3 text-sm text-gray-600 dark:text-gray-400">{cat.description}</div>
     ) : undefined,
     childrenItems:
-      cat.children && cat.children.length > 0 ? transformCategoriesToAccordionItems(cat.children) : undefined,
+      cat.children && cat.children.length > 0 ? transformCategoriesToAccordionItems(cat.children, false) : undefined,
   }))
 }
 
@@ -132,7 +136,7 @@ function CategoriesPageContent() {
 
   const accordionItems = useMemo(() => {
     if (isLoading || error || categoryId) return [] // Only show top-level accordion if no category selected
-    return transformCategoriesToAccordionItems(topLevelCategories)
+    return transformCategoriesToAccordionItems(topLevelCategories, true)
   }, [isLoading, error, categoryId, topLevelCategories])
 
   return (

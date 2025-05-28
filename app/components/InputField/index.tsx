@@ -474,7 +474,15 @@ const normalizeOptions = (options?: OptionType[]): NormalizedOptionType[] => {
       if (optObj.selected !== undefined && typeof optObj.selected === 'boolean') normalized.selected = optObj.selected // Keep for initial state if needed
       if (optObj.disabled !== undefined && typeof optObj.disabled === 'boolean' && optObj.disabled !== false)
         normalized.disabled = optObj.disabled
-      if (optObj.group !== undefined && typeof optObj.group === 'string') normalized.group = optObj.group
+      if (optObj.group !== undefined) {
+        // Accept both string and object formats for group
+        if (
+          typeof optObj.group === 'string' ||
+          (typeof optObj.group === 'object' && optObj.group !== null && 'key' in optObj.group)
+        ) {
+          normalized.group = optObj.group as string | { key: string; display: string | React.ReactNode }
+        }
+      }
 
       return normalized
     })

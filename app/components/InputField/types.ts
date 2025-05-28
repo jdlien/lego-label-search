@@ -18,12 +18,14 @@ export type NormalizedOptionType = {
   description?: string
   selected?: boolean // Retained for data structure, but 'checked' or 'value' prop will manage state
   disabled?: boolean
-  group?: string // Group identifier for organizing options
+  group?: string | { key: string; display: string | ReactNode } // Group identifier - string for simple cases, object for JSX display
 }
 
 export type GroupedOption = {
-  name: string
+  name: string | ReactNode
   items: NormalizedOptionType[]
+  // Optional key for when name is ReactNode
+  key?: string
 }
 
 export interface BaseInputProps {

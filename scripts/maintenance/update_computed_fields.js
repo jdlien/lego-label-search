@@ -274,42 +274,15 @@ class ComputedFieldsUpdater {
   }
 
   // ===== CATEGORY SORT ORDER =====
-  async updateCategorySortOrder() {
-    console.log('Updating category sort order...')
-    return new Promise((resolve, reject) => {
-      const scriptPath = path.join(__dirname, '../update_category_sort_order.js')
-      const child = spawn('node', [scriptPath], {
-        stdio: 'inherit', // This will show the script's output in real-time
-        cwd: path.dirname(scriptPath),
-      })
-
-      child.on('close', (code) => {
-        if (code === 0) {
-          console.log('✓ Category sort order updated successfully')
-          resolve()
-        } else {
-          reject(new Error(`Category sort order script exited with code ${code}`))
-        }
-      })
-
-      child.on('error', (error) => {
-        reject(new Error(`Failed to run category sort order script: ${error.message}`))
-      })
-    })
-  }
-
-  // ===== IMAGE AVAILABILITY =====
-  // Image availability logic is now delegated to scripts/update_image_availability.js
+  // Sort order is now generated directly from BrickArchitect data during fetch_ba_data.js
+  // No longer needs to be updated as a computed field
 
   // ===== MAIN EXECUTION =====
   async run(options = {}) {
     try {
       console.log('Starting computed fields update...')
 
-      // Update category sort order first (affects category display)
-      if (options.categorySortOrder !== false) {
-        await this.updateCategorySortOrder()
-      }
+      // Category sort order is now set directly from BrickArchitect data during import
 
       // Handle specific category updates
       if (options.modifiedCategories && options.modifiedCategories.length > 0) {
@@ -361,10 +334,6 @@ if (require.main === module) {
     if (categoryIndex !== -1 && args[categoryIndex + 1]) {
       options.modifiedCategories = args[categoryIndex + 1].split(',').map((id) => parseInt(id.trim()))
     }
-  }
-
-  if (args.includes('--skip-category-sort-order')) {
-    options.categorySortOrder = false
   }
 
   if (args.includes('--skip-category-counts')) {
@@ -456,18 +425,5 @@ module.exports.updateImageAvailability = async function () {
   } catch (error) {
     console.error('❌ Image availability update failed:', error)
     throw error
-  }
-}
-
-module.exports.updateCategorySortOrder = async function () {
-  const updater = new ComputedFieldsUpdater()
-  try {
-    await updater.updateCategorySortOrder()
-    console.log('✅ Category sort order updated successfully!')
-  } catch (error) {
-    console.error('❌ Category sort order update failed:', error)
-    throw error
-  } finally {
-    updater.db.close()
   }
 }

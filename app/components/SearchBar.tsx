@@ -19,7 +19,7 @@ interface CategoryForDropdown {
   value: string
   label: string
   disabled?: boolean
-  group?: string
+  group?: string | { key: string; display: string | React.ReactNode }
   description?: string
 }
 
@@ -109,7 +109,14 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
             const categoryOption: CategoryForDropdown = {
               value: cat.id,
               label: cat.name,
-              group: rootCat.name,
+              group: {
+                key: rootCat.name,
+                display: (
+                  <>
+                    <span className="text-gray-800 dark:text-gray-200">{rootCat.sort_order}.</span> {rootCat.name}
+                  </>
+                ),
+              },
             }
 
             // Add indentation for level 2+ categories

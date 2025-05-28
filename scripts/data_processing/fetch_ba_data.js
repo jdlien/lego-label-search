@@ -131,6 +131,11 @@ async function processUrl(url, rootCategoryInfo = null) {
   const mainCategoryId = parseInt(urlMatch[1])
   const categories = []
   const partsData = []
+  
+  // Initialize counters for hierarchical sort_order
+  const rootSortOrder = rootCategoryInfo?.sort_order ? rootCategoryInfo.sort_order * 10000 : null
+  let level1Counter = 1  // Counter for level 1 subcategories (will be multiplied by 100)
+  const level2Counters = new Map()  // Track level 2 counters per parent category
 
   try {
     // Fetch the page content with retry logic
@@ -159,7 +164,7 @@ async function processUrl(url, rootCategoryInfo = null) {
       name: mainCategoryName,
       parent_id: '',
       level: 0,
-      sort_order: rootCategoryInfo?.sort_order || null,
+      sort_order: rootSortOrder,
       description: rootCategoryInfo?.description || ''
     })
 
@@ -241,13 +246,35 @@ async function processUrl(url, rootCategoryInfo = null) {
         }
       }
       
-      // Add category to categories list
+      // Calculate sort_order based on hierarchy level
+      let sortOrder = null
+      if (rootSortOrder) {
+        if (level === 1) {
+          // Level 1: rootSortOrder + (counter * 100)
+          sortOrder = rootSortOrder + (level1Counter * 100)
+          level1Counter++
+        } else if (level === 2) {
+          // Level 2: Find parent's sort_order and increment from parent's base
+          const parentCategory = categories.find(cat => cat.id === parentId)
+          if (parentCategory && parentCategory.sort_order) {
+            // Get or initialize counter for this parent
+            if (!level2Counters.has(parentId)) {
+              level2Counters.set(parentId, 1)
+            }
+            const counter = level2Counters.get(parentId)
+            sortOrder = parentCategory.sort_order + counter
+            level2Counters.set(parentId, counter + 1)
+          }
+        }
+      }
+      
+      // Add category to categories list with hierarchical sort_order
       categories.push({
         id: categoryId,
         name: categoryName,
         parent_id: parentId,
         level: level,
-        sort_order: null, // Only root categories have sort_order
+        sort_order: sortOrder,
         description: ''
       })
       
@@ -375,10 +402,8 @@ async function main() {
       if (cat.level === undefined || cat.level === '') {
         cat.level = cat.parent_id ? 1 : 0  // Default based on whether it has a parent
       }
-      // For sort_order, only root categories should have values
-      if (cat.parent_id) {
-        cat.sort_order = ''  // Empty string for non-root categories
-      } else if (cat.sort_order === undefined || cat.sort_order === null) {
+      // Ensure sort_order is properly set (all categories should have sort_order now)
+      if (cat.sort_order === undefined || cat.sort_order === null) {
         cat.sort_order = ''  // Empty string if not set
       }
       // Ensure other fields
