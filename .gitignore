@@ -95,6 +95,11 @@ public/*.zip
 data/lego.sqlite
 data/lego.sqlite-journal
 data/lego.sqlite.backup
+data/lego.backup.sqlite
+data/*.backup
+data/*.backup.*
+*.sqlite.backup
+*.backup.sqlite
 
 # Added by Claude Task Master
 logs
