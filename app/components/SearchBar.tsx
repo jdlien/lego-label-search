@@ -154,7 +154,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
 
         router.replace(`/?${params.toString()}`)
       })
-    }, 500)
+    }, 300)
   }
 
   // Clean up on unmount
