@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 interface PaginationProps {
@@ -11,18 +11,31 @@ interface PaginationProps {
   className?: string
 }
 
-export default function Pagination({ currentPage, totalPages, hasNext, hasPrev, className = '' }: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, className = '' }: PaginationProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [optimisticPage, setOptimisticPage] = useState(currentPage)
+  const [, startTransition] = useTransition()
+
+  // Sync optimistic state with actual current page when it changes
+  useEffect(() => {
+    setOptimisticPage(currentPage)
+  }, [currentPage])
 
   const navigateToPage = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString())
-    if (page === 1) {
-      params.delete('page')
-    } else {
-      params.set('page', page.toString())
-    }
-    router.push(`/?${params.toString()}`)
+    // Immediately update the optimistic state
+    setOptimisticPage(page)
+    
+    // Then navigate in a transition
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (page === 1) {
+        params.delete('page')
+      } else {
+        params.set('page', page.toString())
+      }
+      router.push(`/?${params.toString()}`)
+    })
   }
 
   // Generate page numbers to show for desktop
@@ -39,14 +52,14 @@ export default function Pagination({ currentPage, totalPages, hasNext, hasPrev, 
       // Always show first page
       pages.push(1)
 
-      if (currentPage <= 4) {
+      if (optimisticPage <= 4) {
         // Near the beginning
         for (let i = 2; i <= 5; i++) {
           pages.push(i)
         }
         pages.push('...')
         pages.push(totalPages)
-      } else if (currentPage >= totalPages - 3) {
+      } else if (optimisticPage >= totalPages - 3) {
         // Near the end
         pages.push('...')
         for (let i = totalPages - 4; i <= totalPages; i++) {
@@ -55,7 +68,7 @@ export default function Pagination({ currentPage, totalPages, hasNext, hasPrev, 
       } else {
         // In the middle
         pages.push('...')
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+        for (let i = optimisticPage - 1; i <= optimisticPage + 1; i++) {
           pages.push(i)
         }
         pages.push('...')
@@ -77,25 +90,25 @@ export default function Pagination({ currentPage, totalPages, hasNext, hasPrev, 
       }
     } else {
       // Always show first page (unless it's the current page)
-      if (currentPage !== 1) {
+      if (optimisticPage !== 1) {
         pages.push(1)
 
         // Add ellipsis if there's a gap between first page and current
-        if (currentPage > 2) {
+        if (optimisticPage > 2) {
           pages.push('...')
         }
       }
 
       // Always show current page
-      pages.push(currentPage)
+      pages.push(optimisticPage)
 
       // Add ellipsis if there's a gap between current and last page
-      if (currentPage < totalPages - 1) {
+      if (optimisticPage < totalPages - 1) {
         pages.push('...')
       }
 
       // Always show last page (unless it's the current page)
-      if (currentPage !== totalPages) {
+      if (optimisticPage !== totalPages) {
         pages.push(totalPages)
       }
     }
@@ -125,12 +138,13 @@ export default function Pagination({ currentPage, totalPages, hasNext, hasPrev, 
         }
 
         const pageNum = page as number
-        const isCurrentPage = pageNum === currentPage
+        const isCurrentPage = pageNum === optimisticPage
 
         return (
           <button
             key={pageNum}
             onClick={() => navigateToPage(pageNum)}
+            disabled={pageNum === optimisticPage}
             className={`min-w-8 rounded-md px-1 py-1 text-sm font-medium sm:text-base ${
               isCurrentPage
                 ? 'border border-sky-500 bg-sky-500 text-white dark:border-sky-600 dark:bg-sky-600'
@@ -150,10 +164,10 @@ export default function Pagination({ currentPage, totalPages, hasNext, hasPrev, 
     <nav className={`flex items-center justify-center space-x-1 ${className}`} aria-label="Pagination">
       {/* Previous button */}
       <button
-        onClick={() => navigateToPage(currentPage - 1)}
-        disabled={!hasPrev}
+        onClick={() => navigateToPage(optimisticPage - 1)}
+        disabled={optimisticPage <= 1}
         className={`flex items-center justify-center rounded-md py-1 pr-2 pl-1 text-sm font-medium sm:text-base ${
-          hasPrev
+          optimisticPage > 1
             ? 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
             : 'cursor-not-allowed border border-gray-200 bg-gray-100 text-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-500'
         } `}
@@ -173,10 +187,10 @@ export default function Pagination({ currentPage, totalPages, hasNext, hasPrev, 
 
       {/* Next button */}
       <button
-        onClick={() => navigateToPage(currentPage + 1)}
-        disabled={!hasNext}
+        onClick={() => navigateToPage(optimisticPage + 1)}
+        disabled={optimisticPage >= totalPages}
         className={`flex items-center justify-center rounded-md py-1 pr-1 pl-2 text-sm font-medium sm:text-base ${
-          hasNext
+          optimisticPage < totalPages
             ? 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
             : 'cursor-not-allowed border border-gray-200 bg-gray-100 text-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-500'
         } `}

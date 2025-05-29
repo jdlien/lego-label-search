@@ -55,6 +55,11 @@ function HomeContent() {
   const [isImageSearchModalOpen, setIsImageSearchModalOpen] = useState(false)
   const [directPartId, setDirectPartId] = useState<string | null>(null)
 
+  // Keep track of the last known pagination state to prevent flickering
+  const [stablePagination, setStablePagination] = useState<ApiSearchResponse['pagination'] | null>(null)
+  // Track the last query/category to detect when search params change (not just page)
+  const [lastSearchKey, setLastSearchKey] = useState('')
+
   // Load search results when query parameters change
   useEffect(() => {
     const q = searchParams.get('q')
@@ -79,8 +84,22 @@ function HomeContent() {
       setResults([])
       setTotalResultCount(0)
       setPagination(null)
+      setStablePagination(null)
       setDirectPartId(null)
       return
+    }
+
+    // Check if this is a new search (not just a page change)
+    const currentSearchKey = `${q || ''}-${category || ''}`
+    const isNewSearch = currentSearchKey !== lastSearchKey
+
+    if (isNewSearch) {
+      setLastSearchKey(currentSearchKey)
+      // Reset stable pagination for new searches
+      setStablePagination(null)
+      // Clear results immediately for new searches
+      setResults([])
+      setTotalResultCount(0)
     }
 
     setIsLoading(true)
@@ -111,6 +130,11 @@ function HomeContent() {
         setTotalResultCount(data.total || 0)
         setPagination(data.pagination || null)
 
+        // Update stable pagination if we have valid pagination data
+        if (data.pagination && data.pagination.totalPages > 1) {
+          setStablePagination(data.pagination)
+        }
+
         // Clear directPartId after results are loaded
         if (directPartId) {
           setTimeout(() => setDirectPartId(null), 100)
@@ -126,7 +150,7 @@ function HomeContent() {
     }
 
     fetchResults()
-  }, [searchParams, directPartId, router])
+  }, [searchParams, directPartId, router, lastSearchKey])
 
   // Handler functions
   const handleImageSearchModalOpen = () => {
@@ -175,8 +199,8 @@ function HomeContent() {
             <SearchBar onImageSearch={handleImageSearchModalOpen} />
           </div>
 
-          {/* Loading state */}
-          {showSpinner && (
+          {/* Loading state - only show spinner if we don't have existing results to show */}
+          {showSpinner && results.length === 0 && (
             <div className="flex items-center justify-center py-6">
               <div className="h-12 w-12 animate-spin rounded-full border-t-2 border-b-2 border-sky-500"></div>
             </div>
@@ -202,48 +226,67 @@ function HomeContent() {
             </div>
           )}
 
-          {/* Results */}
-          {!isLoading && !error && hasSearched && (
-            <>
-              {/* Top pagination and page size selector */}
-              {pagination && (
-                <div className="mb-2 flex flex-col items-center gap-4 space-y-1 sm:space-y-0">
-                  {pagination.totalPages > 1 && (
-                    <Pagination
-                      currentPage={pagination.page}
-                      totalPages={pagination.totalPages}
-                      hasNext={pagination.hasNext}
-                      hasPrev={pagination.hasPrev}
-                    />
-                  )}
-                  {/* <PageSizeSelector className="" /> */}
-                </div>
-              )}
-
-              <SearchResults
-                results={results}
-                totalResults={totalResultCount}
-                subcategoryCount={results.length > 0 ? 0 : 0}
-                onPartSearch={handlePartSearch}
-                pagination={pagination}
-                autoOpenPartId={directPartId}
+          {/* Top pagination - show if we have stable pagination state */}
+          {hasSearched && stablePagination && stablePagination.totalPages > 1 && (
+            <div className="mb-2 flex flex-col items-center gap-4 space-y-1 sm:space-y-0">
+              <Pagination
+                currentPage={pagination?.page || stablePagination.page}
+                totalPages={stablePagination.totalPages}
+                hasNext={pagination?.hasNext || stablePagination.hasNext}
+                hasPrev={pagination?.hasPrev || stablePagination.hasPrev}
               />
+            </div>
+          )}
 
-              {/* Bottom pagination */}
-              {pagination && (
-                <div className="mt-6 mb-2 flex flex-col items-center gap-4 space-y-1 sm:space-y-0">
-                  {pagination.totalPages > 1 && (
-                    <Pagination
-                      currentPage={pagination.page}
-                      totalPages={pagination.totalPages}
-                      hasNext={pagination.hasNext}
-                      hasPrev={pagination.hasPrev}
-                    />
-                  )}
-                  <PageSizeSelector className="" />
+          {/* Results - Keep visible during loading for smooth transitions */}
+          {hasSearched && results.length > 0 && (
+            <div className="relative">
+              {/* Subtle loading overlay for pagination changes */}
+              {isLoading && !showSpinner && (
+                <div className="absolute inset-0 z-10 flex items-start justify-center pt-20">
+                  <div className="rounded-full bg-white/90 p-3 shadow-lg dark:bg-gray-800/90">
+                    <div className="h-8 w-8 animate-spin rounded-full border-t-2 border-b-2 border-sky-500"></div>
+                  </div>
                 </div>
               )}
-            </>
+              <div className={isLoading ? 'opacity-60 transition-opacity duration-200' : 'transition-opacity duration-200'}>
+                <SearchResults
+                  results={results}
+                  totalResults={totalResultCount}
+                  subcategoryCount={results.length > 0 ? 0 : 0}
+                  onPartSearch={handlePartSearch}
+                  pagination={pagination}
+                  autoOpenPartId={directPartId}
+                  data-testid="search-results"
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* Show empty state only when not loading and no results */}
+          {!isLoading && hasSearched && results.length === 0 && !error && (
+            <SearchResults
+              results={[]}
+              totalResults={0}
+              subcategoryCount={0}
+              onPartSearch={handlePartSearch}
+              pagination={null}
+              autoOpenPartId={null}
+              data-testid="search-results-empty"
+            />
+          )}
+
+          {/* Bottom pagination - show if we have stable pagination state */}
+          {hasSearched && stablePagination && stablePagination.totalPages > 1 && (
+            <div className="mt-6 mb-2 flex flex-col items-center gap-4 space-y-1 sm:space-y-0">
+              <Pagination
+                currentPage={pagination?.page || stablePagination.page}
+                totalPages={stablePagination.totalPages}
+                hasNext={pagination?.hasNext || stablePagination.hasNext}
+                hasPrev={pagination?.hasPrev || stablePagination.hasPrev}
+              />
+              <PageSizeSelector className="" />
+            </div>
           )}
 
           {/* Initial state - welcome message */}
