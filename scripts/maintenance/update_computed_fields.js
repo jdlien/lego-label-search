@@ -5,7 +5,7 @@ const path = require('path')
 const fs = require('fs').promises
 const fsSync = require('fs')
 const { spawn } = require('child_process')
-const updateImageAvailabilityScript = require('../update_image_availability.js')
+const updateImageAvailabilityScript = require('./update_image_availability.js')
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../data/lego.sqlite')
 const IMAGES_DIR = path.join(__dirname, '../../public/data/images')
@@ -523,7 +523,7 @@ module.exports.updateAltPartIds = async function () {
 
 module.exports.updateImageAvailability = async function () {
   try {
-    await require('../update_image_availability.js').main()
+    await require('./update_image_availability.js').main()
     console.log('✅ Image availability updated successfully!')
   } catch (error) {
     console.error('❌ Image availability update failed:', error)

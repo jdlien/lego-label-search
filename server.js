@@ -2,7 +2,6 @@
 const { createServer } = require('http')
 const { parse } = require('url')
 const next = require('next')
-const cron = require('node-cron')
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({
@@ -11,14 +10,8 @@ const app = next({
 })
 const handle = app.getRequestHandler()
 
-// These now only run in production
-const { updateCategoryCounts } = require('./scripts/maintenance/update_computed_fields')
-// const { updateAltPartIds } = require('./scripts/maintenance/update_computed_fields')
-
-// Define how often to update the category counts (by default, once per day at 2 AM)
-const CRON_SCHEDULE = process.env.CATEGORY_COUNT_CRON || '0 2 * * *'
-// Define how often to update alt part IDs (by default, once per day at 3 AM)
-// const ALT_PARTS_CRON_SCHEDULE = process.env.ALT_PARTS_CRON || '0 3 * * *'
+// Removed startup database updates - these can be run manually when needed
+// using the maintenance scripts
 
 app.prepare().then(() => {
   const server = createServer(async (req, res) => {
@@ -36,50 +29,9 @@ app.prepare().then(() => {
     await handle(req, res, parsedUrl)
   })
 
-  // Schedule the category counts update job only in production
-  if (process.env.NODE_ENV === 'production') {
-    console.log(`Scheduling category counts update with cron schedule: ${CRON_SCHEDULE}`)
-    cron.schedule(CRON_SCHEDULE, async () => {
-      console.log('Running scheduled category counts update...')
-      try {
-        await updateCategoryCounts()
-        console.log('Scheduled category counts update completed successfully')
-      } catch (error) {
-        console.error('Error in scheduled category counts update:', error)
-      }
-    })
-  }
-
-  // Schedule the alt part IDs update job only in production
-  // if (process.env.NODE_ENV === 'production') {
-  //   console.log(`Scheduling alt part IDs update with cron schedule: ${ALT_PARTS_CRON_SCHEDULE}`)
-  //   cron.schedule(ALT_PARTS_CRON_SCHEDULE, async () => {
-  //     console.log('Running scheduled alt part IDs update...')
-  //     try {
-  //       const db = await openDb()
-  //       await updateAllAltPartIds(db)
-  //       console.log('Scheduled alt part IDs update completed successfully')
-  //     } catch (error) {
-  //       console.error('Error in scheduled alt part IDs update:', error)
-  //     }
-  //   })
-  // }
-
-  // Also update counts and alt part IDs on startup only in production
-  if (process.env.NODE_ENV === 'production' && process.env.UPDATE_COUNTS_ON_STARTUP !== 'false') {
-    console.log('Running initial category counts update...')
-    updateCategoryCounts()
-      .then(() => console.log('Initial category counts update completed successfully'))
-      .catch((error) => console.error('Error in initial category counts update:', error))
-  }
-
-  // if (process.env.NODE_ENV === 'production' && process.env.UPDATE_ALT_PARTS_ON_STARTUP !== 'false') {
-  //   console.log('Running initial alt part IDs update...')
-  //   openDb()
-  //     .then((db) => updateAllAltPartIds(db))
-  //     .then(() => console.log('Initial alt part IDs update completed successfully'))
-  //     .catch((error) => console.error('Error in initial alt part IDs update:', error))
-  // }
+  // Cron jobs and startup database updates removed for simplicity
+  // Database maintenance can be run manually or via separate cron service
+  // Use: npm run db:update to update computed fields manually
 
   const PORT = process.env.PORT || 3000
   server.listen(PORT, (err) => {
