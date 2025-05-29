@@ -42,32 +42,32 @@ async function seedSearchTestData(db) {
 
   // Insert parts with various search patterns
   await db.exec(`
-    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, sort_order) VALUES
+    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id) VALUES
     -- Parts with dimensions
-    ('3001', 'Brick 2 x 4', 1, 10, 1),
-    ('3020', 'Plate 2 x 4', 2, 20, 2),
-    ('3021', 'Plate 2 x 3', 2, 20, 3),
-    ('3022', 'Plate 2 x 2', 2, 20, 4),
-    ('3034', 'Plate 2 x 8', 2, 20, 5),
-    ('3035', 'Plate 4 x 8', 2, 20, 6),
-    ('3032', 'Plate 4 x 6', 2, 20, 7),
+    ('3001', 'Brick 2 x 4', 1, 10),
+    ('3020', 'Plate 2 x 4', 2, 20),
+    ('3021', 'Plate 2 x 3', 2, 20),
+    ('3022', 'Plate 2 x 2', 2, 20),
+    ('3034', 'Plate 2 x 8', 2, 20),
+    ('3035', 'Plate 4 x 8', 2, 20),
+    ('3032', 'Plate 4 x 6', 2, 20),
     
     -- Different dimension formats
-    ('TEST01', 'Part 2x4 No Spaces', 1, 10, 10),
-    ('TEST02', 'Part 2 x 4 With Spaces', 1, 10, 11),
-    ('TEST03', 'Part 2×4 Unicode', 1, 10, 12),
-    ('TEST04', 'Part 2 × 4 Unicode Spaces', 1, 10, 13),
+    ('TEST01', 'Part 2x4 No Spaces', 1, 10),
+    ('TEST02', 'Part 2 x 4 With Spaces', 1, 10),
+    ('TEST03', 'Part 2×4 Unicode', 1, 10),
+    ('TEST04', 'Part 2 × 4 Unicode Spaces', 1, 10),
     
     -- Multi-word search
-    ('TEST10', 'Red Brick with Studs', 1, 10, 20),
-    ('TEST11', 'Blue Brick with Studs', 1, 10, 21),
-    ('TEST12', 'Red Plate with Clips', 2, 20, 22),
-    ('TEST13', 'Blue Plate with Rails', 2, 20, 23),
+    ('TEST10', 'Red Brick with Studs', 1, 10),
+    ('TEST11', 'Blue Brick with Studs', 1, 10),
+    ('TEST12', 'Red Plate with Clips', 2, 20),
+    ('TEST13', 'Blue Plate with Rails', 2, 20),
     
     -- Special characters
-    ('SPEC01', 'Part with "Quotes"', 1, 10, 30),
-    ('SPEC02', "Part with 'Apostrophe'", 1, 10, 31),
-    ('SPEC03', 'Part with & Ampersand', 1, 10, 32);
+    ('SPEC01', 'Part with "Quotes"', 1, 10),
+    ('SPEC02', "Part with 'Apostrophe'", 1, 10),
+    ('SPEC03', 'Part with & Ampersand', 1, 10);
   `)
 }
 
@@ -115,22 +115,22 @@ async function seedCategoryTestData(db) {
 
   // Insert parts in various categories
   await db.exec(`
-    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, sort_order) VALUES
+    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id) VALUES
     -- Parts in root categories
-    ('P001', 'Part in A', 1, 1, 1),
-    ('P002', 'Part in B', 1, 2, 2),
-    ('P003', 'Part in C', 1, 3, 3),
+    ('P001', 'Part in A', 1, 1),
+    ('P002', 'Part in B', 1, 2),
+    ('P003', 'Part in C', 1, 3),
     
     -- Parts in subcategories
-    ('P010', 'Part in A.1', 1, 10, 10),
-    ('P011', 'Part in A.2', 1, 11, 11),
-    ('P020', 'Part in B.1', 1, 20, 20),
+    ('P010', 'Part in A.1', 1, 10),
+    ('P011', 'Part in A.2', 1, 11),
+    ('P020', 'Part in B.1', 1, 20),
     
     -- Parts in deep subcategories
-    ('P100', 'Part in A.1.1', 1, 100, 100),
-    ('P101', 'Part in A.1.2', 1, 101, 101),
-    ('P1000', 'Part in A.1.1.1', 1, 1000, 1000),
-    ('P1001', 'Part in A.1.1.2', 1, 1001, 1001);
+    ('P100', 'Part in A.1.1', 1, 100),
+    ('P101', 'Part in A.1.2', 1, 101),
+    ('P1000', 'Part in A.1.1.1', 1, 1000),
+    ('P1001', 'Part in A.1.1.2', 1, 1001);
   `)
 }
 
@@ -153,24 +153,24 @@ async function seedRelationshipTestData(db) {
 
   // Insert parts with complex relationships
   await db.exec(`
-    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, sort_order) VALUES
+    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id) VALUES
     -- Main parts
-    ('A001', 'Part A', 1, 1, 1),
-    ('B001', 'Part B', 1, 1, 2),
-    ('C001', 'Part C', 1, 1, 3),
-    ('D001', 'Part D', 1, 1, 4),
-    ('E001', 'Part E', 1, 1, 5),
+    ('A001', 'Part A', 1, 1),
+    ('B001', 'Part B', 1, 1),
+    ('C001', 'Part C', 1, 1),
+    ('D001', 'Part D', 1, 1),
+    ('E001', 'Part E', 1, 1),
     
     -- Parts for chain relationships
-    ('CHAIN1', 'Chain Part 1', 1, 1, 10),
-    ('CHAIN2', 'Chain Part 2', 1, 1, 11),
-    ('CHAIN3', 'Chain Part 3', 1, 1, 12),
-    ('CHAIN4', 'Chain Part 4', 1, 1, 13),
+    ('CHAIN1', 'Chain Part 1', 1, 1),
+    ('CHAIN2', 'Chain Part 2', 1, 1),
+    ('CHAIN3', 'Chain Part 3', 1, 1),
+    ('CHAIN4', 'Chain Part 4', 1, 1),
     
     -- Parts for circular relationships
-    ('CIRC1', 'Circular Part 1', 1, 1, 20),
-    ('CIRC2', 'Circular Part 2', 1, 1, 21),
-    ('CIRC3', 'Circular Part 3', 1, 1, 22);
+    ('CIRC1', 'Circular Part 1', 1, 1),
+    ('CIRC2', 'Circular Part 2', 1, 1),
+    ('CIRC3', 'Circular Part 3', 1, 1);
   `)
 
   // Insert relationships
@@ -223,7 +223,7 @@ async function seedPaginationTestData(db, partCount = 100) {
   for (let i = 1; i <= partCount; i++) {
     const partNum = `TEST${i.toString().padStart(4, '0')}`
     const name = `Test Part ${i}`
-    partInserts.push(`('${partNum}', '${name}', 1, 1, ${i})`)
+    partInserts.push(`('${partNum}', '${name}', 1, 1)`)
   }
 
   // Insert in batches to avoid SQL length limits
@@ -231,7 +231,7 @@ async function seedPaginationTestData(db, partCount = 100) {
   for (let i = 0; i < partInserts.length; i += batchSize) {
     const batch = partInserts.slice(i, i + batchSize)
     await db.exec(`
-      INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, sort_order) VALUES
+      INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id) VALUES
       ${batch.join(',\n')}
     `)
   }
@@ -280,15 +280,15 @@ async function seedStatsTestData(db) {
 
   // Insert parts with specific image distribution for stats testing
   await db.exec(`
-    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, img_file, sort_order) VALUES
+    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, img_file) VALUES
     -- Parts with unique images (3 total)
-    ('P001', 'Part with Image 1', 1, 1, 'p001.webp', 1),
-    ('P002', 'Part with Image 2', 1, 2, 'p002.webp', 2),
-    ('P003', 'Part with Image 3', 1, 3, 'p003.webp', 3),
+    ('P001', 'Part with Image 1', 1, 1, 'p001.webp'),
+    ('P002', 'Part with Image 2', 1, 2, 'p002.webp'),
+    ('P003', 'Part with Image 3', 1, 3, 'p003.webp'),
     
     -- Parts without images
-    ('P004', 'Part without Image 1', 1, 10, NULL, 4),
-    ('P005', 'Part without Image 2', 1, 11, NULL, 5);
+    ('P004', 'Part without Image 1', 1, 10, NULL),
+    ('P005', 'Part without Image 2', 1, 11, NULL);
   `)
 }
 

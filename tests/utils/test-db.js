@@ -202,40 +202,40 @@ async function seedMinimalTestData(db) {
 
   // Insert test parts with various scenarios
   await db.exec(`
-    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, alt_part_ids, ba_name, sort_order) VALUES
+    INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, alt_part_ids, ba_name) VALUES
     -- Basic bricks for testing
-    ('3001', 'Brick 2 x 4', 10, NULL, 'Brick 2 x 4', 1),
-    ('3002', 'Brick 2 x 3', 10, NULL, 'Brick 2 x 3', 2),
-    ('3003', 'Brick 2 x 2', 10, NULL, 'Brick 2 x 2', 3),
-    ('3004', 'Brick 1 x 2', 10, '3004b', 'Brick 1 x 2', 4),
-    ('3004b', 'Brick 1 x 2 with Embossed Line', 11, '3004', 'Brick 1 x 2 with Line', 5),
-    ('3005', 'Brick 1 x 1', 10, NULL, 'Brick 1 x 1', 6),
+    ('3001', 'Brick 2 x 4', 1, 10, NULL, 'Brick 2 x 4'),
+    ('3002', 'Brick 2 x 3', 1, 10, NULL, 'Brick 2 x 3'),
+    ('3003', 'Brick 2 x 2', 1, 10, NULL, 'Brick 2 x 2'),
+    ('3004', 'Brick 1 x 2', 1, 10, '3004b', 'Brick 1 x 2'),
+    ('3004b', 'Brick 1 x 2 with Embossed Line', 1, 11, '3004', 'Brick 1 x 2 with Line'),
+    ('3005', 'Brick 1 x 1', 1, 10, NULL, 'Brick 1 x 1'),
     
     -- Modified bricks for testing categories
-    ('3622', 'Brick 1 x 3', 10, NULL, 'Brick 1 x 3', 7),
-    ('87087', 'Brick 1 x 1 with Stud on Side', 12, NULL, 'Brick 1 x 1 with Stud on Side', 8),
+    ('3622', 'Brick 1 x 3', 1, 10, NULL, 'Brick 1 x 3'),
+    ('87087', 'Brick 1 x 1 with Stud on Side', 1, 12, NULL, 'Brick 1 x 1 with Stud on Side'),
     
     -- Plates for testing
-    ('3020', 'Plate 2 x 4', 2, 20, NULL, 'Plate 2 x 4', 10),
-    ('3021', 'Plate 2 x 3', 2, 20, NULL, 'Plate 2 x 3', 11),
-    ('3022', 'Plate 2 x 2', 2, 20, NULL, 'Plate 2 x 2', 12),
-    ('3023', 'Plate 1 x 2', 2, 20, NULL, 'Plate 1 x 2', 13),
-    ('3024', 'Plate 1 x 1', 2, 20, '3024b', 'Plate 1 x 1', 14),
-    ('3024b', 'Plate 1 x 1 Round', 2, 21, '3024', 'Plate 1 x 1 Round', 15),
+    ('3020', 'Plate 2 x 4', 2, 20, NULL, 'Plate 2 x 4'),
+    ('3021', 'Plate 2 x 3', 2, 20, NULL, 'Plate 2 x 3'),
+    ('3022', 'Plate 2 x 2', 2, 20, NULL, 'Plate 2 x 2'),
+    ('3023', 'Plate 1 x 2', 2, 20, NULL, 'Plate 1 x 2'),
+    ('3024', 'Plate 1 x 1', 2, 20, '3024b', 'Plate 1 x 1'),
+    ('3024b', 'Plate 1 x 1 Round', 2, 21, '3024', 'Plate 1 x 1 Round'),
     
     -- Plates with dimensions in name for search testing
-    ('2420', 'Plate 2 x 2 Corner', 2, 21, NULL, 'Plate 2 x 2 Corner', 16),
-    ('3032', 'Plate 4 x 6', 2, 20, NULL, 'Plate 4 x 6', 17),
-    ('3035', 'Plate 4 x 8', 2, 20, NULL, 'Plate 4 x 8', 18),
+    ('2420', 'Plate 2 x 2 Corner', 2, 21, NULL, 'Plate 2 x 2 Corner'),
+    ('3032', 'Plate 4 x 6', 2, 20, NULL, 'Plate 4 x 6'),
+    ('3035', 'Plate 4 x 8', 2, 20, NULL, 'Plate 4 x 8'),
     
     -- Technic parts for testing
-    ('3700', 'Technic Brick 1 x 2 with Hole', 4, 40, NULL, 'Technic Brick 1 x 2 with Hole', 20),
-    ('3701', 'Technic Brick 1 x 4 with Holes', 4, 40, NULL, 'Technic Brick 1 x 4 with Holes', 21),
-    ('2780', 'Technic Pin with Friction', 4, 41, NULL, 'Technic Pin with Friction', 22),
+    ('3700', 'Technic Brick 1 x 2 with Hole', 4, 40, NULL, 'Technic Brick 1 x 2 with Hole'),
+    ('3701', 'Technic Brick 1 x 4 with Holes', 4, 40, NULL, 'Technic Brick 1 x 4 with Holes'),
+    ('2780', 'Technic Pin with Friction', 4, 41, NULL, 'Technic Pin with Friction'),
     
     -- Parts with no images for testing
-    ('99999', 'Test Part No Image', 10, NULL, 'Test Part No Image', 100),
-    ('88888', 'Another Test No Image', 2, 20, NULL, 'Another Test No Image', 101);
+    ('99999', 'Test Part No Image', 1, 10, NULL, 'Test Part No Image'),
+    ('88888', 'Another Test No Image', 2, 20, NULL, 'Another Test No Image');
   `)
 
   // Insert test part relationships
@@ -251,22 +251,22 @@ async function seedMinimalTestData(db) {
   await db.exec(`
     INSERT INTO elements (element_id, part_num, color_id, design_id) VALUES
     -- Bricks in various colors
-    ('300101', '3001', '3001'),
+    ('300101', '3001', 0, '3001'),
     ('300115', '3001', 15, '3001'),
     ('300104', '3001', 4, '3001'),
-    ('300401', '3004', '3004'),
+    ('300401', '3004', 0, '3004'),
     ('300415', '3004', 15, '3004'),
     
     -- Plates in various colors
-    ('302001', '3020', '3020'),
+    ('302001', '3020', 0, '3020'),
     ('302015', '3020', 15, '3020'),
-    ('302101', '3021', '3021'),
+    ('302101', '3021', 0, '3021'),
     ('302171', '3021', 71, '3021'),
     
     -- Technic parts
-    ('370001', '3700', '3700'),
+    ('370001', '3700', 0, '3700'),
     ('370071', '3700', 71, '3700'),
-    ('278001', '2780', '2780');
+    ('278001', '2780', 0, '2780');
   `)
 
   // Update computed fields for the test data
@@ -364,10 +364,10 @@ async function seedScenarioData(db, scenario) {
       // Add many parts for pagination testing
       const partInserts = []
       for (let i = 1; i <= 100; i++) {
-        partInserts.push(`('TEST${i.toString().padStart(4, '0')}', 'Test Part ${i}', 10, NULL, 'Test Part ${i}', ${100 + i})`)
+        partInserts.push(`('TEST${i.toString().padStart(4, '0')}', 'Test Part ${i}', 1, 10, NULL, 'Test Part ${i}')`)
       }
       await db.exec(`
-        INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, alt_part_ids, ba_name, sort_order) VALUES
+        INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, alt_part_ids, ba_name) VALUES
         ${partInserts.join(',\n')}
       `)
       break
@@ -375,10 +375,10 @@ async function seedScenarioData(db, scenario) {
     case 'complex-relationships':
       // Add parts with complex relationship chains
       await db.exec(`
-        INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, alt_part_ids, ba_name, sort_order) VALUES
-        ('REL001', 'Relationship Test 1', 10, NULL, 'Relationship Test 1', 200),
-        ('REL002', 'Relationship Test 2', 10, NULL, 'Relationship Test 2', 201),
-        ('REL003', 'Relationship Test 3', 10, NULL, 'Relationship Test 3', 202);
+        INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, alt_part_ids, ba_name) VALUES
+        ('REL001', 'Relationship Test 1', 1, 10, NULL, 'Relationship Test 1'),
+        ('REL002', 'Relationship Test 2', 1, 10, NULL, 'Relationship Test 2'),
+        ('REL003', 'Relationship Test 3', 1, 10, NULL, 'Relationship Test 3');
         
         INSERT INTO part_relationships (rel_type, child_part_num, parent_part_num) VALUES
         ('M', 'REL001', 'REL002'),
@@ -390,11 +390,11 @@ async function seedScenarioData(db, scenario) {
     case 'special-characters':
       // Add parts with special characters in names
       await db.exec(`
-        INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, alt_part_ids, ba_name, sort_order) VALUES
-        ('SPEC001', 'Part with "Quotes"', 10, NULL, 'Part with "Quotes"', 300),
-        ('SPEC002', "Part with 'Apostrophe'", 10, NULL, "Part with 'Apostrophe'", 301),
-        ('SPEC003', 'Part with & Ampersand', 10, NULL, 'Part with & Ampersand', 302),
-        ('SPEC004', 'Part with < > Brackets', 10, NULL, 'Part with < > Brackets', 303);
+        INSERT INTO parts (part_num, name, part_cat_id, ba_cat_id, alt_part_ids, ba_name) VALUES
+        ('SPEC001', 'Part with "Quotes"', 1, 10, NULL, 'Part with "Quotes"'),
+        ('SPEC002', "Part with 'Apostrophe'", 1, 10, NULL, "Part with 'Apostrophe'"),
+        ('SPEC003', 'Part with & Ampersand', 1, 10, NULL, 'Part with & Ampersand'),
+        ('SPEC004', 'Part with < > Brackets', 1, 10, NULL, 'Part with < > Brackets');
       `)
       break
   }
