@@ -56,10 +56,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Part ID is required' }, { status: 400 })
   }
 
-  console.log(`Looking up part ID: ${partId}`)
 
   try {
-    console.log(`Opening database connection for part ${partId}`)
     const db = await openDb()
 
     // Find the part in the database with the same query structure as search API
@@ -78,15 +76,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       WHERE p.part_num = ?
     `
 
-    console.log(`Executing query for part ${partId}`)
     const part: Part | undefined = await db.get(query, partId)
 
     if (!part) {
-      console.log(`Part ${partId} not found in database`)
       return NextResponse.json({ error: 'Part not found' }, { status: 404 })
     }
 
-    console.log(`Found part ${partId}: ${part.name}`)
 
     // Enhance the part data for the modal
     part.description = part.ba_category_name || part.category_name

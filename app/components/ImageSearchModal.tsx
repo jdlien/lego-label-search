@@ -162,7 +162,6 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
 
         // Check if it's a HEIC file and convert it
         if (isHeicFile(file)) {
-          console.log('HEIC file detected, converting to JPEG for preview and submission...')
           const convertedFile = await convertHeicToJpeg(file)
           fileForPreview = convertedFile
           fileForSubmission = convertedFile // Use converted file for submission too

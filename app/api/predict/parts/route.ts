@@ -14,7 +14,6 @@ const HEIC_MIME_TYPES = ['image/heic', 'image/heif']
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log('Processing image prediction request')
 
     const formData = await request.formData()
     const imageFile = formData.get('query_image') as File
@@ -31,7 +30,6 @@ export async function POST(request: NextRequest) {
     // Step 1: Convert HEIC/HEIF to JPEG using heic-convert
     // Note: Frontend now handles HEIC conversion to JPEG, so this is a fallback
     if (HEIC_MIME_TYPES.includes(targetMimeType)) {
-      console.log(`Attempting to convert ${targetFilename} from ${targetMimeType} to JPEG using heic-convert.`)
       try {
         const convertedBuffer = await heicConvert({
           buffer: imageBuffer,
@@ -41,7 +39,6 @@ export async function POST(request: NextRequest) {
         targetFileBuffer = Buffer.from(convertedBuffer)
         targetMimeType = 'image/jpeg'
         targetFilename = `${targetFilename.substring(0, targetFilename.lastIndexOf('.') || targetFilename.length)}.jpg`
-        console.log(`Successfully converted ${targetFilename} to JPEG using heic-convert.`)
       } catch (heicConversionError) {
         const errorMessage = heicConversionError instanceof Error ? heicConversionError.message : 'Unknown error'
         console.error(`Failed to convert ${targetFilename} from HEIC/HEIF to JPEG:`, heicConversionError)
@@ -66,12 +63,10 @@ export async function POST(request: NextRequest) {
       const convertToWebpLogName = HEIC_MIME_TYPES.includes(imageFile.type)
         ? `${imageFile.name} (originally HEIC)`
         : targetFilename
-      console.log(`Attempting to convert ${convertToWebpLogName} from ${targetMimeType} to WEBP using sharp.`)
       try {
         targetFileBuffer = await sharp(targetFileBuffer).webp({ quality: 75 }).toBuffer()
         targetMimeType = 'image/webp'
         targetFilename = `${targetFilename.substring(0, targetFilename.lastIndexOf('.') || targetFilename.length)}.webp`
-        console.log(`Successfully converted ${convertToWebpLogName} to WEBP using sharp.`)
       } catch (sharpConversionError) {
         const errorMessage = sharpConversionError instanceof Error ? sharpConversionError.message : 'Unknown error'
         console.error(`Failed to convert ${convertToWebpLogName} to WEBP using sharp:`, sharpConversionError)
@@ -85,8 +80,6 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         )
       }
-    } else if (isAlreadyConverted) {
-      console.log(`Skipping backend conversion for ${targetFilename} - already converted by frontend`)
     }
 
     // Create form data for the API request
@@ -94,7 +87,6 @@ export async function POST(request: NextRequest) {
     const blob = new Blob([targetFileBuffer], { type: targetMimeType })
     apiFormData.append('query_image', blob, targetFilename)
 
-    console.log('Sending request to Brickognize API...')
 
     const response = await fetch(`${BRICKOGNIZE_BASE_URL}/predict/parts/`, {
       method: 'POST',
@@ -117,7 +109,6 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json()
-    console.log('Successfully proxied image prediction.')
     return NextResponse.json(data)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'

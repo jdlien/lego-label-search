@@ -21,12 +21,9 @@ async function openDb() {
 
 export async function GET() {
   try {
-    console.log('Opening database connection...')
     const db = await openDb()
-    console.log('Database connection opened')
 
     // Get all categories from the ba_categories table
-    console.log('Fetching categories from ba_categories table...')
     const categories = await db.all(`
       SELECT
         id,
@@ -42,7 +39,6 @@ export async function GET() {
       FROM ba_categories
       ORDER BY sort_order, name
     `)
-    console.log(`Fetched ${categories.length} categories`)
 
     // Return all categories
     return NextResponse.json({

@@ -10,8 +10,7 @@ LEGO Part Label Search is a Next.js web application that allows users to search 
 
 ### Development
 
-- `npm run dev` - Start development server (using Turbopack)
-- `npm run dev:no-turbo` - Start without Turbopack
+- `npm run dev` - Start development server (using Turbopack, usually already running)
 
 ### Production & Deployment
 
@@ -86,6 +85,7 @@ You can view the entire database schema in the scripts/migrations/000\*.js files
 - When updating the database schema, usually it's safe to update 0001_create_initial_tables.js and rebuild the database with `npm run db:rebuild`, as all the data in the database is easily recreated (for now).
 - For significant new features, write tests first then we can iterate on the feature.
 - When writing tests, ensure that logs and error output are not shown on the console unless running in verbose mode.
+- After making significant changes (especially to multiple files at once) run the tests and fix any errors.
 
 ## Environment Variables
 

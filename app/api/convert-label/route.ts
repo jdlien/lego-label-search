@@ -57,15 +57,12 @@ export async function GET(request: NextRequest) {
         if (stats.size === 0) {
           // Empty file, delete it and retry
           fs.unlinkSync(outputFile)
-          console.log(`Deleted empty output file: ${outputFile}`)
         } else {
           // Validate that it's a proper LBX file
           const fileBuffer = fs.readFileSync(outputFile)
           if (!isValidLbxFile(fileBuffer)) {
             fs.unlinkSync(outputFile)
-            console.log(`Deleted invalid output LBX file: ${outputFile}`)
           } else {
-            console.log(`Output file ${outputFile} already exists and is valid. Skipping conversion.`)
             return NextResponse.json({ success: true, message: 'Converted file already exists.' })
           }
         }
@@ -77,7 +74,6 @@ export async function GET(request: NextRequest) {
 
     // Check if the original label exists
     if (!fs.existsSync(inputFile)) {
-      console.error(`Original label not found at ${inputFile}`)
       return NextResponse.json({ success: false, message: 'Original label not found' }, { status: 404 })
     }
 
@@ -85,7 +81,6 @@ export async function GET(request: NextRequest) {
     try {
       const stats = fs.statSync(inputFile)
       if (stats.size === 0) {
-        console.error(`Original label file is empty: ${inputFile}`)
         return NextResponse.json(
           {
             success: false,
@@ -98,7 +93,6 @@ export async function GET(request: NextRequest) {
       // Check if it's a valid LBX file
       const fileBuffer = fs.readFileSync(inputFile)
       if (!isValidLbxFile(fileBuffer)) {
-        console.error(`Input file is not a valid LBX/ZIP file: ${inputFile}`)
         return NextResponse.json(
           {
             success: false,
@@ -107,8 +101,7 @@ export async function GET(request: NextRequest) {
           { status: 500 }
         )
       }
-    } catch (statError) {
-      console.error(`Error checking file stats for ${inputFile}: ${statError}`)
+    } catch {
       return NextResponse.json(
         {
           success: false,
@@ -123,9 +116,6 @@ export async function GET(request: NextRequest) {
 
     // Check if the assumed 'src' directory for PYTHONPATH exists
     if (!fs.existsSync(pythonPathForModule)) {
-      console.error(
-        `PYTHONPATH directory not found: ${pythonPathForModule}. Check LBX_UTILS_PATH and project structure.`
-      )
       return NextResponse.json(
         {
           success: false,
@@ -138,7 +128,6 @@ export async function GET(request: NextRequest) {
     // Run the conversion script as a module
     // Make sure to properly escape any paths with spaces
     const command = `cd "${LBX_UTILS_PATH}" && PYTHONPATH="${pythonPathForModule}" "${LBX_PYTHON_ENV}" -W ignore -m lbx_utils.lbx_change "${inputFile}" "${outputFile}" -f 16 -b 20 -l 24 -c -s 1.5 -m 1 -t`
-    console.log(`Executing conversion command: ${command}`)
 
     try {
       const { stdout, stderr } = await execAsync(command)
@@ -159,7 +148,6 @@ export async function GET(request: NextRequest) {
           // Validate the output file
           const fileBuffer = fs.readFileSync(outputFile)
           if (!isValidLbxFile(fileBuffer)) {
-            console.error(`Generated output file is not a valid LBX/ZIP file: ${outputFile}`)
             fs.unlinkSync(outputFile) // Delete invalid output
             return NextResponse.json(
               {
@@ -170,15 +158,12 @@ export async function GET(request: NextRequest) {
             )
           }
 
-          console.log(`Conversion successful. Output file: ${outputFile} (${stats.size} bytes)`)
           return NextResponse.json({ success: true, warnings: stderr && stderr.trim() ? stderr.trim() : null })
         } else {
-          console.error(`Output file ${outputFile} was created but is empty.`)
           // Clean up empty file
           try {
             fs.unlinkSync(outputFile)
-          } catch (unlinkError) {
-            console.error(`Error deleting empty output file: ${unlinkError}`)
+          } catch {
           }
           return NextResponse.json(
             {
@@ -190,7 +175,6 @@ export async function GET(request: NextRequest) {
         }
       } else {
         // If output file does not exist, it's a failure. stderr should have the error.
-        console.error('Output file not created by the script.')
         return NextResponse.json(
           {
             success: false,
@@ -220,10 +204,8 @@ export async function GET(request: NextRequest) {
       try {
         if (fs.existsSync(outputFile)) {
           fs.unlinkSync(outputFile)
-          console.log(`Deleted partial/failed output file: ${outputFile}`)
         }
-      } catch (unlinkError) {
-        console.error(`Error cleaning up failed output file: ${unlinkError}`)
+      } catch {
       }
 
       return NextResponse.json(

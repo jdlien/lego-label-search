@@ -36,7 +36,6 @@ export async function GET(request: NextRequest) {
         if (stats.size === 0) {
           // If file exists but is empty, delete it and re-download
           fs.unlinkSync(labelPath)
-          console.log(`Deleted empty label file: ${labelPath}`)
         } else {
           // Check if the file contains an error message
           const fileBuffer = fs.readFileSync(labelPath)
@@ -48,11 +47,9 @@ export async function GET(request: NextRequest) {
             if (fileContent.startsWith('ERROR:') || fileContent.includes('Part image not found')) {
               // Delete file with error message and re-download
               fs.unlinkSync(labelPath)
-              console.log(`Deleted label file with error message: ${labelPath}`)
             } else if (!isValidLbxFile(fileBuffer)) {
               // Not a valid LBX/ZIP file
               fs.unlinkSync(labelPath)
-              console.log(`Deleted invalid LBX file: ${labelPath}`)
             } else {
               // File exists and has valid content
               return NextResponse.json({ success: true })
@@ -60,21 +57,18 @@ export async function GET(request: NextRequest) {
           } else if (!isValidLbxFile(fileBuffer)) {
             // Not a valid LBX/ZIP file
             fs.unlinkSync(labelPath)
-            console.log(`Deleted invalid LBX file: ${labelPath}`)
           } else {
             // File exists and has valid content
             return NextResponse.json({ success: true })
           }
         }
-      } catch (statError) {
-        console.error(`Error checking existing file: ${statError}`)
+      } catch {
         // Continue with download attempt
       }
     }
 
     // Try to download the label from Brick Architect
     const url = `https://brickarchitect.com/label/${part_num}.lbx`
-    console.log(`Downloading label from: ${url}`)
 
     // Download the entire response content first to check its validity
     const responseBuffer = await new Promise<Buffer>((resolve, reject) => {
@@ -109,7 +103,6 @@ export async function GET(request: NextRequest) {
       responseStartText.includes('<html') ||
       responseStartText.includes('<!DOCTYPE')
     ) {
-      console.log(`Invalid label response for part ${part_num}: "${responseStartText.substring(0, 100)}..."`)
       return NextResponse.json({
         success: false,
         message: 'Label not found',
@@ -118,7 +111,6 @@ export async function GET(request: NextRequest) {
 
     // Check if the file appears to be a valid LBX file (ZIP format)
     if (!isValidLbxFile(responseBuffer)) {
-      console.log(`Downloaded file for part ${part_num} is not a valid LBX/ZIP file`)
       return NextResponse.json({
         success: false,
         message: 'Downloaded file is not a valid LBX file',
@@ -135,7 +127,6 @@ export async function GET(request: NextRequest) {
       throw new Error('Written file is empty')
     }
 
-    console.log(`Successfully downloaded label: ${labelPath} (${stats.size} bytes)`)
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error(String(error))
@@ -146,7 +137,6 @@ export async function GET(request: NextRequest) {
       const labelPath = path.join(process.cwd(), 'public', 'data', 'labels', `${part_num}.lbx`)
       if (fs.existsSync(labelPath)) {
         fs.unlinkSync(labelPath)
-        console.log(`Removed invalid label file: ${labelPath}`)
       }
     } catch (cleanupError) {
       console.error('Error during cleanup:', cleanupError)

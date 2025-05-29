@@ -8,7 +8,6 @@ const BRICKOGNIZE_BASE_URL = 'https://api.brickognize.com'
  */
 export async function GET() {
   try {
-    console.log('Proxying health check request to Brickognize API')
     const response = await fetch(`${BRICKOGNIZE_BASE_URL}/health/`, {
       method: 'GET',
       headers: {

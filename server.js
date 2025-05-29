@@ -19,7 +19,6 @@ app.prepare().then(() => {
 
     // Explicitly handle API routes
     if (parsedUrl.pathname && parsedUrl.pathname.startsWith('/api/')) {
-      console.log(`Handling API route: ${parsedUrl.pathname}`)
       // Set proper headers for API routes
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
       res.setHeader('Pragma', 'no-cache')
