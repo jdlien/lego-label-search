@@ -46,6 +46,7 @@ function HomeContent() {
 
   // State management
   const [isLoading, setIsLoading] = useState(false)
+  const [showSpinner, setShowSpinner] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<Part[]>([])
   const [totalResultCount, setTotalResultCount] = useState(0)
@@ -86,6 +87,11 @@ function HomeContent() {
     setHasSearched(true)
     setError(null)
 
+    // Delay showing spinner by a few ms to prevent flashing on quick searches
+    const spinnerTimeout = setTimeout(() => {
+      setShowSpinner(true)
+    }, 200)
+
     const fetchResults = async () => {
       try {
         const queryParams = new URLSearchParams()
@@ -104,7 +110,7 @@ function HomeContent() {
         setResults(data.results || [])
         setTotalResultCount(data.total || 0)
         setPagination(data.pagination || null)
-        
+
         // Clear directPartId after results are loaded
         if (directPartId) {
           setTimeout(() => setDirectPartId(null), 100)
@@ -113,7 +119,9 @@ function HomeContent() {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch results'
         setError(errorMessage)
       } finally {
+        clearTimeout(spinnerTimeout)
         setIsLoading(false)
+        setShowSpinner(false)
       }
     }
 
@@ -168,7 +176,7 @@ function HomeContent() {
           </div>
 
           {/* Loading state */}
-          {isLoading && (
+          {showSpinner && (
             <div className="flex items-center justify-center py-6">
               <div className="h-12 w-12 animate-spin rounded-full border-t-2 border-b-2 border-sky-500"></div>
             </div>

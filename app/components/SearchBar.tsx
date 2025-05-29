@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import InputField from './InputField'
 import { IconMagnifyingGlass } from './InputField/InputIcons'
@@ -37,15 +37,10 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
   const [category, setCategory] = useState(initialCategory)
   const [categoriesForDropdown, setCategoriesForDropdown] = useState<CategoryForDropdown[]>([])
   const searchTimeout = useRef<NodeJS.Timeout | null>(null)
+  const [, startTransition] = useTransition()
 
-  // Update state when URL parameters change
-  useEffect(() => {
-    const urlQuery = searchParams.get('q') || ''
-    const urlCategory = searchParams.get('category') || ''
-
-    setQuery(urlQuery)
-    setCategory(urlCategory)
-  }, [searchParams])
+  // Only sync from URL on initial mount to avoid feedback loops
+  // The local state is the source of truth while typing
 
   // Fetch categories when component mounts
   useEffect(() => {
@@ -152,11 +147,13 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
 
     // Set a new timeout
     searchTimeout.current = setTimeout(() => {
-      const params = new URLSearchParams()
-      if (newQuery) params.append('q', newQuery)
-      if (category) params.append('category', category)
+      startTransition(() => {
+        const params = new URLSearchParams()
+        if (newQuery) params.append('q', newQuery)
+        if (category) params.append('category', category)
 
-      router.push(`/?${params.toString()}`)
+        router.replace(`/?${params.toString()}`)
+      })
     }, 500)
   }
 
@@ -190,30 +187,34 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
     }
 
     // Automatically trigger search when category changes
-    const params = new URLSearchParams()
-    if (query) params.append('q', query)
-    if (newCategory) params.append('category', newCategory)
+    startTransition(() => {
+      const params = new URLSearchParams()
+      if (query) params.append('q', query)
+      if (newCategory) params.append('category', newCategory)
 
-    router.push(`/?${params.toString()}`)
+      router.replace(`/?${params.toString()}`)
+    })
   }
 
   // Perform search
   const handleSearch = () => {
-    // If both query and category are empty, reset to default state
-    if (!query && !category) {
-      router.push('/')
-      return
-    }
+    startTransition(() => {
+      // If both query and category are empty, reset to default state
+      if (!query && !category) {
+        router.push('/')
+        return
+      }
 
-    const params = new URLSearchParams()
-    if (query) params.append('q', query)
-    if (category) params.append('category', category)
+      const params = new URLSearchParams()
+      if (query) params.append('q', query)
+      if (category) params.append('category', category)
 
-    router.push(`/?${params.toString()}`)
+      router.push(`/?${params.toString()}`)
+    })
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full" data-testid="search-bar">
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col flex-wrap items-end gap-3 md:flex-row">
           <div className="w-full min-w-0 md:flex-1">
