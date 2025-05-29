@@ -19,7 +19,7 @@ The application has 9 API routes that need comprehensive testing:
 ### File/Image Management Routes
 7. **GET /api/convert-label** - Label file conversion utilities
 8. **GET /api/download-label** - Label download functionality
-9. **GET /api/predict/parts** - AI part prediction endpoint
+9. **POST /api/predict/parts** - AI part prediction endpoint
 
 ## Goals
 

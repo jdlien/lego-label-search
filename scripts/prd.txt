@@ -20,6 +20,7 @@ This is helpful for people with large collections of LEGO parts to help organize
 # Technical Architecture
 - This app uses a SQLite database in data/lego.sqlite
 - The framework is modern Next.js
-- It uses custom UI components
+- It uses custom UI components in app/components/
+
 
 </PRD>
