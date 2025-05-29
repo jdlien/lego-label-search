@@ -51,7 +51,7 @@ const CONFIG = {
   dbPath: path.join(process.cwd(), 'data', 'lego.sqlite'),
   imagesDir: path.join(process.cwd(), 'public', 'data', 'images'),
   baseUrl: 'https://brickarchitect.com/content/parts-large/',
-  delay: 200, // .2 second delay between requests
+  delay: 100, // ms delay between requests
   limit: null, // No limit by default
   dryRun: false,
   verbose: false,
