@@ -39,8 +39,13 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
   const searchTimeout = useRef<NodeJS.Timeout | null>(null)
   const [, startTransition] = useTransition()
 
-  // Only sync from URL on initial mount to avoid feedback loops
-  // The local state is the source of truth while typing
+  // Sync category state when URL changes (e.g., from "Search All Categories" link)
+  useEffect(() => {
+    const urlCategory = searchParams.get('category') || ''
+    if (urlCategory !== category) {
+      setCategory(urlCategory)
+    }
+  }, [searchParams])
 
   // Fetch categories when component mounts
   useEffect(() => {
