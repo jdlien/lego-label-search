@@ -538,7 +538,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
         ) : showCamera ? (
           <div className="flex flex-col items-center">
             <div className="relative mb-6 w-full">
-              <video ref={videoRef} autoPlay playsInline muted className="h-full w-full rounded-lg object-contain" />
+              <video ref={videoRef} autoPlay playsInline muted className="mx-auto max-h-[50vh] rounded-lg" />
             </div>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
             <div className="flex w-full flex-col items-center justify-center space-y-6">

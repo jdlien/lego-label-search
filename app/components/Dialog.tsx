@@ -129,7 +129,7 @@ export default function Dialog({
         </div>
       )}
 
-      <div className="max-h-[calc(90vh-6rem)] overflow-y-auto p-4 md:p-6">{children}</div>
+      <div className="max-h-[calc(94vh-6rem)] overflow-y-auto p-4 md:p-6">{children}</div>
 
       {actions && (
         <div className="flex justify-end gap-2 border-t border-gray-200 p-4 pt-2 dark:border-gray-600">{actions}</div>

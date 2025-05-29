@@ -21,7 +21,6 @@ type SearchResultsProps = {
   subcategoryCount?: number
   onPartClick?: (partId: string) => void
   onPartSearch?: (partId: string) => void
-  autoOpenPartId?: string | null
   pagination?: {
     page: number
     limit: number
@@ -37,7 +36,6 @@ export default function SearchResults({
   subcategoryCount = 0,
   onPartClick,
   onPartSearch,
-  autoOpenPartId,
   pagination,
 }: SearchResultsProps) {
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null)
@@ -46,26 +44,40 @@ export default function SearchResults({
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Auto-open modal if autoOpenPartId is provided and matches a result
+  // Sync modal state with URL parameter - this is the elegant approach
   useEffect(() => {
-    if (autoOpenPartId && results.length > 0) {
-      const matchingPart = results.find(part => part.id === autoOpenPartId)
-      if (matchingPart) {
-        setSelectedPartId(autoOpenPartId)
-        setIsModalOpen(true)
-      }
+    const partParam = searchParams.get('part')
+    
+    // If URL has part param but modal isn't open for that part, open it
+    if (partParam && partParam !== selectedPartId && results.some(part => part.id === partParam)) {
+      setSelectedPartId(partParam)
+      setIsModalOpen(true)
     }
-  }, [autoOpenPartId, results])
+    // If URL doesn't have part param but modal is open, close it
+    else if (!partParam && isModalOpen) {
+      setIsModalOpen(false)
+      setSelectedPartId(null)
+    }
+  }, [searchParams, selectedPartId, isModalOpen, results])
 
   const handlePartClick = (partId: string) => {
     // If parent provided a click handler, use that
     if (onPartClick) {
       onPartClick(partId)
     } else {
-      // Otherwise use local state
-      setSelectedPartId(partId)
-      setIsModalOpen(true)
+      // Add part parameter to URL - the useEffect will handle opening the modal
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('part', partId)
+      router.replace(`/?${params.toString()}`, { scroll: false })
     }
+  }
+
+  const handleModalClose = () => {
+    // Remove part parameter from URL - the useEffect will handle closing the modal
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('part')
+    const newUrl = params.toString() ? `/?${params.toString()}` : '/'
+    router.replace(newUrl, { scroll: false })
   }
 
   // If no results, show a message and a reset button if applicable
@@ -138,7 +150,7 @@ export default function SearchResults({
       {!onPartClick && (
         <PartDetailModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={handleModalClose}
           partId={selectedPartId}
           onPartSearch={onPartSearch}
         />

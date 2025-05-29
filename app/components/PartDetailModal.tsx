@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Dialog from './Dialog'
@@ -72,6 +72,11 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
   const [navigatingToPartId, setNavigatingToPartId] = useState<string | null>(null)
   const { error: showError, warning } = useToastHelpers()
+  
+  // Simple close handler - URL management is handled by parent component
+  const handleClose = useCallback(() => {
+    onClose()
+  }, [onClose])
 
   useEffect(() => {
     if (!isOpen || !partId) {
@@ -142,7 +147,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
     e.stopPropagation()
 
     // Close the modal first to ensure navigation works in iOS PWA mode
-    onClose()
+    handleClose()
 
     // Use different navigation strategies based on PWA mode
     if (isPWA) {
@@ -268,7 +273,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
     setNavigatingToPartId(altId)
 
     // Close the modal first to ensure navigation works in iOS PWA mode
-    onClose()
+    handleClose()
 
     // Use different navigation strategies based on PWA mode
     if (isPWA) {
@@ -294,7 +299,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
     }
   }
 
-  let content
+  let content: React.ReactNode
 
   if (isLoading) {
     content = (
@@ -500,7 +505,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
   }
 
   return (
-    <Dialog open={isOpen} onClose={onClose} title={part ? `Part ${part.id} Details` : 'Part Details'} size="4xl">
+    <Dialog open={isOpen} onClose={handleClose} title={part ? `Part ${part.id} Details` : 'Part Details'} size="4xl">
       {content}
     </Dialog>
   )

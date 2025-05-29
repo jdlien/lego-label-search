@@ -53,7 +53,6 @@ function HomeContent() {
   const [pagination, setPagination] = useState<ApiSearchResponse['pagination'] | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
   const [isImageSearchModalOpen, setIsImageSearchModalOpen] = useState(false)
-  const [directPartId, setDirectPartId] = useState<string | null>(null)
 
   // Keep track of the last known pagination state to prevent flickering
   const [stablePagination, setStablePagination] = useState<ApiSearchResponse['pagination'] | null>(null)
@@ -68,14 +67,12 @@ function HomeContent() {
     const limit = searchParams.get('limit')
     const part = searchParams.get('part')
 
-    // If we have a part parameter, search for that specific part
-    if (part && !q) {
-      setDirectPartId(part)
-      // Convert to a search query
+    // If we have a part parameter but no search query, convert part to search
+    if (part && !q && !category) {
       const params = new URLSearchParams(searchParams.toString())
-      params.delete('part')
       params.set('q', part)
-      router.replace(`/?${params.toString()}`)
+      // Keep the part parameter so modal opens
+      router.replace(`/?${params.toString()}`, { scroll: false })
       return
     }
 
@@ -85,7 +82,6 @@ function HomeContent() {
       setTotalResultCount(0)
       setPagination(null)
       setStablePagination(null)
-      setDirectPartId(null)
       return
     }
 
@@ -135,10 +131,6 @@ function HomeContent() {
           setStablePagination(data.pagination)
         }
 
-        // Clear directPartId after results are loaded
-        if (directPartId) {
-          setTimeout(() => setDirectPartId(null), 100)
-        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch results'
         setError(errorMessage)
@@ -150,7 +142,7 @@ function HomeContent() {
     }
 
     fetchResults()
-  }, [searchParams, directPartId, router, lastSearchKey])
+  }, [searchParams, router, lastSearchKey])
 
   // Handler functions
   const handleImageSearchModalOpen = () => {
@@ -256,7 +248,6 @@ function HomeContent() {
                   subcategoryCount={results.length > 0 ? 0 : 0}
                   onPartSearch={handlePartSearch}
                   pagination={pagination}
-                  autoOpenPartId={directPartId}
                   data-testid="search-results"
                 />
               </div>
@@ -271,7 +262,6 @@ function HomeContent() {
               subcategoryCount={0}
               onPartSearch={handlePartSearch}
               pagination={null}
-              autoOpenPartId={null}
               data-testid="search-results-empty"
             />
           )}

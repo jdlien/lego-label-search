@@ -23,11 +23,11 @@ jest.mock('../../app/components/SearchBar', () => {
 })
 
 jest.mock('../../app/components/SearchResults', () => {
-  return function MockSearchResults({ autoOpenPartId }) {
+  return function MockSearchResults({ results }) {
     return (
       <div data-testid="search-results">
         Search Results
-        {autoOpenPartId && <div data-testid="auto-open-part">{autoOpenPartId}</div>}
+        {results && results.length > 0 && <div data-testid="results-count">{results.length}</div>}
       </div>
     )
   }
@@ -79,16 +79,16 @@ describe('Home Page - Part Parameter Handling', () => {
     })
   })
 
-  test('should convert ?part= parameter to search query', async () => {
+  test('should convert ?part= parameter to ?q=&part= parameters', async () => {
     // Set up search params with part parameter
     mockSearchParams = new URLSearchParams('part=3001')
     useSearchParams.mockReturnValue(mockSearchParams)
     
     render(<Home />)
     
-    // Should replace URL with q parameter
+    // Should replace URL with both q and part parameters
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith('/?q=3001')
+      expect(mockReplace).toHaveBeenCalledWith('/?part=3001&q=3001', { scroll: false })
     })
   })
 
@@ -104,38 +104,27 @@ describe('Home Page - Part Parameter Handling', () => {
     expect(mockReplace).not.toHaveBeenCalled()
   })
 
-  test('should preserve other query parameters when converting', async () => {
-    // Set up search params with part and other parameters
-    mockSearchParams = new URLSearchParams('part=3001&category=cat1&page=2')
+  test('should preserve all query parameters when converting part to search', async () => {
+    // Set up search params with part and other parameters (but no category or q)
+    mockSearchParams = new URLSearchParams('part=3001&page=2&limit=50')
     useSearchParams.mockReturnValue(mockSearchParams)
     
     render(<Home />)
     
-    // Should preserve other parameters
+    // Should preserve other parameters while adding q
     await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalled()
       const call = mockReplace.mock.calls[0][0]
       expect(call).toContain('q=3001')
-      expect(call).toContain('category=cat1')
+      expect(call).toContain('part=3001')
       expect(call).toContain('page=2')
-      expect(call).not.toContain('part=')
+      expect(call).toContain('limit=50')
     })
   })
 
-  test('should pass directPartId to SearchResults when part parameter exists', async () => {
-    // First, simulate the URL being changed from ?part=3001 to ?q=3001
-    // Initial render with part parameter
-    mockSearchParams = new URLSearchParams('part=3001')
-    useSearchParams.mockReturnValue(mockSearchParams)
-    
-    const { rerender } = render(<Home />)
-    
-    // Wait for the replace to happen
-    await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith('/?q=3001')
-    })
-    
-    // Now simulate the URL change and API response
-    mockSearchParams = new URLSearchParams('q=3001')
+  test('should not redirect when both part and query parameters exist', async () => {
+    // Set up with both part and q parameters
+    mockSearchParams = new URLSearchParams('q=3001&part=3001')
     useSearchParams.mockReturnValue(mockSearchParams)
     
     // Mock successful API response
@@ -156,17 +145,15 @@ describe('Home Page - Part Parameter Handling', () => {
       }),
     })
     
-    // Force a re-render with the new search params
-    rerender(<Home />)
+    render(<Home />)
     
-    // Wait for API call and rendering
+    // Wait for API call
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith('/api/search?q=3001')
     })
     
-    // The directPartId should be set and passed to SearchResults
-    // Note: This is testing the component integration, not the actual modal opening
-    // The actual modal opening would be tested in SearchResults component tests
+    // Should not replace URL since both q and part exist
+    expect(mockReplace).not.toHaveBeenCalled()
   })
 
   test('should handle part search and update URL correctly', async () => {
@@ -209,9 +196,9 @@ describe('Home Page - Part Parameter Handling', () => {
     
     render(<Home />)
     
-    // Should decode and use the part ID
+    // Should preserve encoding in the URL replacement
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith('/?q=3001%2B')
+      expect(mockReplace).toHaveBeenCalledWith('/?part=3001%2B&q=3001%2B', { scroll: false })
     })
   })
 })
