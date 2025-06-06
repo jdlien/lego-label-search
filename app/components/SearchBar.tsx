@@ -47,6 +47,20 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
     }
   }, [searchParams, category])
 
+  // Sync query from URL only on initial mount and when navigating to category-only URLs
+  // This prevents feedback loops while typing but allows clearing when clicking category pills
+  useEffect(() => {
+    const urlQuery = searchParams.get('q') || ''
+    const urlCategory = searchParams.get('category') || ''
+    
+    // Only update query if:
+    // 1. URL has no query but we have a local query (category pill clicked), OR
+    // 2. URL has a query but we have no local query (fresh page load or bookmark)
+    if ((!urlQuery && query) || (urlQuery && !query)) {
+      setQuery(urlQuery)
+    }
+  }, [searchParams]) // Only depend on searchParams, not query to avoid loops
+
   // Fetch categories when component mounts
   useEffect(() => {
     const fetchCategories = async () => {

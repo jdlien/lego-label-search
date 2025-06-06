@@ -176,7 +176,7 @@ export default function PartCard({ part, onPartClick, priority = false }: PartCa
     e.stopPropagation()
 
     // Navigate to homepage with only the category parameter
-    // This will clear any existing search query
+    // This will clear any existing search query by not including 'q' parameter
     router.push(`/?category=${categoryId}`)
   }
 
