@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Dialog from './Dialog'
 import { useToastHelpers } from './ToastPop'
 import { usePWA } from './PWAHandler'
+import ExternalLinks from './ExternalLinks'
 
 type PartData = {
   id: string
@@ -72,7 +73,7 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
   const [labelExists, setLabelExists] = useState<boolean | null>(null)
   const [navigatingToPartId, setNavigatingToPartId] = useState<string | null>(null)
   const { error: showError, warning } = useToastHelpers()
-  
+
   // Simple close handler - URL management is handled by parent component
   const handleClose = useCallback(() => {
     onClose()
@@ -421,15 +422,15 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
             </div>
           )}
 
-          {/* Material */}
-          {part.part_material && (
+          {/* Material (this data has proven to be unreliable and useless so I'm not displaying it)*/}
+          {/* {part.part_material && (
             <div>
               <h4 className="mb-1 text-lg font-semibold text-gray-700 dark:text-gray-300">Material</h4>
               <span className="rounded-sm bg-green-300/80 px-2 py-0.5 text-green-950 dark:bg-green-800/80 dark:text-green-200">
                 {part.part_material}
               </span>
             </div>
-          )}
+          )} */}
 
           {/* Alternative part relationships */}
           {part.alternatesByType && Object.entries(part.alternatesByType).some(([, rel]) => rel.ids.length > 0) && (
@@ -463,9 +464,14 @@ export default function PartDetailModal({ isOpen, onClose, partId, onPartSearch 
             </div>
           )}
 
+          {/* External Links */}
+          <div className="border-t border-gray-200 pt-4 dark:border-gray-600">
+            <ExternalLinks partNum={part.id} />
+          </div>
+
           {/* Label download buttons */}
           <div className="border-t border-gray-200 pt-4 dark:border-gray-600">
-            <h4 className="mb-3 text-lg font-semibold text-gray-700 dark:text-gray-300">Download Labels</h4>
+            <h4 className="mb-3 text-lg font-semibold text-gray-700 dark:text-gray-300">Labels</h4>
             <div className="flex items-center justify-start">
               {labelExists === false ? (
                 <div className="text-sm text-gray-500 dark:text-gray-400">No label available</div>
