@@ -51,15 +51,30 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
   // This prevents feedback loops while typing but allows clearing when clicking category pills
   useEffect(() => {
     const urlQuery = searchParams.get('q') || ''
-    const urlCategory = searchParams.get('category') || ''
-    
+
     // Only update query if:
     // 1. URL has no query but we have a local query (category pill clicked), OR
     // 2. URL has a query but we have no local query (fresh page load or bookmark)
     if ((!urlQuery && query) || (urlQuery && !query)) {
       setQuery(urlQuery)
     }
-  }, [searchParams]) // Only depend on searchParams, not query to avoid loops
+
+    // CRITICAL: We deliberately DO NOT include 'query' in the dependency array.
+    // Here's why adding 'query' breaks the typing experience:
+    // 1. User types -> query state updates -> this effect runs -> setQuery() called
+    // 2. Even if setQuery() doesn't change the value, React may re-render components
+    // 3. This can cause the input field to lose focus or cursor position
+    // 4. The debounced search in handleInputChange updates the URL after 300ms
+    // 5. When URL updates -> searchParams changes -> this effect runs again
+    // 6. This creates a cycle that interferes with smooth typing
+    //
+    // By only depending on [searchParams], we ensure this effect only runs when:
+    // - Initial page load
+    // - Navigation (like clicking category pills)
+    // - URL changes from outside this component
+    // This preserves the principle: "local state is source of truth while typing"
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
   // Fetch categories when component mounts
   useEffect(() => {
