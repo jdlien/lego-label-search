@@ -45,7 +45,7 @@ export default function SearchBar({ onImageSearch }: SearchBarProps) {
     if (urlCategory !== category) {
       setCategory(urlCategory)
     }
-  }, [searchParams])
+  }, [searchParams, category])
 
   // Fetch categories when component mounts
   useEffect(() => {
