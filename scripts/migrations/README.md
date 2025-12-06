@@ -14,7 +14,7 @@ This directory contains a custom migration system for the LEGO database, since N
 ### Rebuild entire database from scratch
 
 ```bash
-npm run db:rebuild
+pnpm db:rebuild
 ```
 
 This will:
@@ -26,13 +26,13 @@ This will:
 ### Run only migrations (create/update schema)
 
 ```bash
-npm run db:migrate
+pnpm db:migrate
 ```
 
 ### Run only data seeding (import CSV data)
 
 ```bash
-npm run db:seed
+pnpm db:seed
 ```
 
 ## Database Schema
@@ -123,7 +123,7 @@ module.exports = {
 }
 ```
 
-3. Run `npm run db:migrate` to execute the new migration
+3. Run `pnpm db:migrate` to execute the new migration
 
 ## Data Sources
 

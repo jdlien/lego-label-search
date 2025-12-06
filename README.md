@@ -33,13 +33,13 @@ Some of the data and categories for this application comes from the Brick Archit
 2. Install dependencies:
 
    ```
-   npm install
+   pnpm install
    ```
 
 3. Start the development server:
 
    ```
-   npm run dev
+   pnpm dev
    ```
 
 4. Open your browser and navigate to `http://localhost:3000`
@@ -62,8 +62,8 @@ If you want to update the data from the source:
 ## Build for Production
 
 ```
-npm run build
-npm start
+pnpm build
+pnpm start
 ```
 
 ## Acknowledgments

@@ -52,14 +52,14 @@ fi
 # Install dependencies
 echo -e "${YELLOW}Installing dependencies...${NC}"
 # Since we build on the server, we need dev dependencies
-npm install # --omit=dev
+pnpm install
 
 # Clear build cache to ensure fresh CSS generation
 echo -e "${YELLOW}Clearing build cache...${NC}"
 rm -rf .next
 
 echo -e "${YELLOW}Building application...${NC}"
-npm run build
+pnpm build
 
 # Stop existing PM2 process
 echo -e "${YELLOW}Stopping existing PM2 process...${NC}"
@@ -76,7 +76,7 @@ fi
 
 # Start/reload the application with PM2
 echo -e "${YELLOW}Starting application with PM2...${NC}"
-pm2 reload search-brck-ca || pm2 start npm --name "search-brck-ca" -- run start
+pm2 reload search-brck-ca || pm2 start node --name "search-brck-ca" -- server.js
 
 # Update nginx configuration if needed
 if [ -f "nginx-production.conf" ]; then

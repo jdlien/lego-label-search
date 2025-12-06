@@ -153,8 +153,8 @@ This script updates the hierarchical sort order for categories in the `ba_catego
 # Update category sort orders
 node scripts/update_category_sort_order.js
 
-# Or use the npm script
-npm run update-category-sort
+# Or use the pnpm script
+pnpm update-category-sort
 ```
 
 **Database Changes:**

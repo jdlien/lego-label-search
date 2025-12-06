@@ -10,26 +10,26 @@ LEGO Part Label Search is a Next.js web application that allows users to search 
 
 ### Development
 
-- `npm run dev` - Start development server (using Turbopack, usually already running)
+- `pnpm dev` - Start development server (using Turbopack, usually already running)
 
 ### Production & Deployment
 
-- `npm run build` - Build for production with linting and type checking
-- `npm start` - Start production server
-- `npm run deploy` - Run deployment script (on jdlien.com server)
+- `pnpm build` - Build for production with linting and type checking
+- `pnpm start` - Start production server
+- `pnpm deploy` - Run deployment script (on jdlien.com server)
 
 ### Database Management
 
-- `npm run db:rebuild` - Rebuild entire database from source data
-- `npm run db:migrate` - Run database migrations
-- `npm run db:seed` - Seed database with initial data
-- `npm run db:update` - Update computed fields
+- `pnpm db:rebuild` - Rebuild entire database from source data
+- `pnpm db:migrate` - Run database migrations
+- `pnpm db:seed` - Seed database with initial data
+- `pnpm db:update` - Update computed fields
 
 ### Testing
 
-- `npm test` - Run all tests with clean output (console.log suppressed)
-- `npm test -- --verbose` - Run tests with full console output for debugging
-- `npm test -- <file>` - Run specific test file
+- `pnpm test` - Run all tests with clean output (console.log suppressed)
+- `pnpm test --verbose` - Run tests with full console output for debugging
+- `pnpm test <file>` - Run specific test file
 
 ### Maintenance Scripts
 
@@ -42,7 +42,7 @@ This application originally started as a loose collection of python scripts to s
 
 ### Tech Stack
 
-- **Next.js 15.3.2** with App Router and TypeScript
+- **Next.js 16** with App Router and TypeScript
 - **SQLite3** database
 - **Tailwind CSS 4.1.7** for styling
 - **React Context API** for state management
@@ -50,7 +50,7 @@ This application originally started as a loose collection of python scripts to s
 
 ### Database Structure
 
-The SQLite database is mostly read-only for users, as LEGO part data is not updated frequently here. Given that, data is often denormalized as the priority is to make searches as fast as possible. To this end, there are also some computed fields that can be updated with the `npm run db:update` command.
+The SQLite database is mostly read-only for users, as LEGO part data is not updated frequently here. Given that, data is often denormalized as the priority is to make searches as fast as possible. To this end, there are also some computed fields that can be updated with the `pnpm db:update` command.
 
 The SQLite database contains multiple tables:
 
@@ -82,7 +82,7 @@ You can view the entire database schema in the scripts/migrations/000\*.js files
 - Create atomic commits for each specific change to enable easy auditing/reverting
 - Database updates are cached - use maintenance scripts when schema changes
 - Image availability is tracked in database to avoid filesystem checks during searches
-- When updating the database schema, usually it's safe to update 0001_create_initial_tables.js and rebuild the database with `npm run db:rebuild`, as all the data in the database is easily recreated (for now).
+- When updating the database schema, usually it's safe to update 0001_create_initial_tables.js and rebuild the database with `pnpm db:rebuild`, as all the data in the database is easily recreated (for now).
 - For significant new features, write tests first then we can iterate on the feature.
 - When writing tests, ensure that logs and error output are not shown on the console unless running in verbose mode.
 - After making significant changes (especially to multiple files at once) run the tests and fix any errors.
