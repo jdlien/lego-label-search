@@ -1,6 +1,5 @@
 /** @format */
 const { createServer } = require('http')
-const { parse } = require('url')
 const next = require('next')
 
 const dev = process.env.NODE_ENV !== 'production'
@@ -13,17 +12,18 @@ const handle = app.getRequestHandler()
 
 app.prepare().then(() => {
   const server = createServer(async (req, res) => {
-    const parsedUrl = parse(req.url, true)
+    // Use WHATWG URL API instead of deprecated url.parse()
+    const url = new URL(req.url, `http://${req.headers.host}`)
 
     // Explicitly handle API routes
-    if (parsedUrl.pathname && parsedUrl.pathname.startsWith('/api/')) {
+    if (url.pathname.startsWith('/api/')) {
       // Set proper headers for API routes
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
       res.setHeader('Pragma', 'no-cache')
       res.setHeader('Expires', '0')
     }
 
-    await handle(req, res, parsedUrl)
+    await handle(req, res)
   })
 
   // Cron jobs and startup database updates removed for simplicity
