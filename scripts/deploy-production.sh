@@ -20,14 +20,24 @@ if [ ! -f "package.json" ]; then
   exit 1
 fi
 
-# Check sudo access upfront to avoid getting stuck later
-if ! sudo -n true 2>/dev/null; then
-  echo -e "${BLUE}This script requires sudo access for nginx configuration and optional systemd service setup.${NC}"
-  echo -e "${BLUE}Please enter your password when prompted:${NC}"
-  sudo -v
-  if [ $? -ne 0 ]; then
-    echo -e "${RED}Error: sudo access required. Exiting.${NC}"
-    exit 1
+# Only require sudo if we need it for nginx or systemd operations
+NEEDS_SUDO=false
+if [ "$1" = "--with-cron-service" ]; then
+  NEEDS_SUDO=true
+fi
+if [ -f "nginx-production.conf" ]; then
+  NEEDS_SUDO=true
+fi
+
+if [ "$NEEDS_SUDO" = true ]; then
+  if ! sudo -n true 2>/dev/null; then
+    echo -e "${BLUE}This deploy requires sudo for nginx/systemd configuration.${NC}"
+    echo -e "${BLUE}Please enter your password when prompted:${NC}"
+    sudo -v
+    if [ $? -ne 0 ]; then
+      echo -e "${RED}Error: sudo access required. Exiting.${NC}"
+      exit 1
+    fi
   fi
 fi
 
