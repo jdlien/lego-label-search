@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // Create form data for the API request
     const apiFormData = new FormData()
-    const blob = new Blob([targetFileBuffer], { type: targetMimeType })
+    const blob = new Blob([new Uint8Array(targetFileBuffer)], { type: targetMimeType })
     apiFormData.append('query_image', blob, targetFilename)
 
 
