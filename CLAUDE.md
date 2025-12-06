@@ -87,6 +87,26 @@ You can view the entire database schema in the scripts/migrations/000\*.js files
 - When writing tests, ensure that logs and error output are not shown on the console unless running in verbose mode.
 - After making significant changes (especially to multiple files at once) run the tests and fix any errors.
 
+### Critical Search Implementation Notes
+
+**⚠️ IMPORTANT: SearchBar.tsx Query State Management**
+
+The SearchBar component has a carefully crafted approach to syncing query state with the URL that **must not be modified** without extreme care. The key principle is: **"local state is source of truth while typing"**.
+
+**DO NOT** add `query` to the dependency array of the URL sync useEffect in SearchBar.tsx. This creates a feedback loop that breaks the typing experience:
+
+1. User types → query state updates → effect runs → setQuery() called
+2. React may re-render components, disrupting cursor position/focus
+3. Debounced search (300ms) updates URL → searchParams changes → effect runs again
+4. Creates a cycle that makes typing jerky and unresponsive
+
+The current implementation only depends on `[searchParams]` and uses an ESLint disable comment. This ensures the effect only runs on:
+- Initial page load
+- Navigation (like clicking category pills) 
+- URL changes from outside the component
+
+This maintains smooth typing while still allowing category pills to clear the search field when navigating.
+
 ## Environment Variables
 
 - `LBX_UTILS_PATH` - Path to label conversion utilities
