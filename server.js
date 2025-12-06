@@ -4,10 +4,8 @@ const { parse } = require('url')
 const next = require('next')
 
 const dev = process.env.NODE_ENV !== 'production'
-const app = next({
-  dev,
-  turbo: process.env.USE_TURBOPACK === 'true' || dev, // Enable Turbopack based on env var or dev mode
-})
+const app = next({ dev })
+// Note: turbo option removed - Turbopack is now default in Next.js 16
 const handle = app.getRequestHandler()
 
 // Removed startup database updates - these can be run manually when needed
