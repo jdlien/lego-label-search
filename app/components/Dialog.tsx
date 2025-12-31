@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useRef, useEffect, useState } from 'react'
+import { useDialogContextSafe } from '../context/DialogContext'
 
 interface DialogProps {
   open: boolean
@@ -24,6 +25,7 @@ export default function Dialog({
   const dialogRef = useRef<HTMLDialogElement>(null)
   const lastFocusedElement = useRef<HTMLElement | null>(null)
   const [shouldShow, setShouldShow] = useState(false)
+  const dialogContext = useDialogContextSafe()
 
   // Size mapping for the dialog
   const sizeClasses = {
@@ -48,12 +50,16 @@ export default function Dialog({
     if (open) {
       lastFocusedElement.current = document.activeElement as HTMLElement
       dialog.showModal()
+      // Register this dialog with the context so toasts can portal into it
+      dialogContext?.setActiveDialog(dialog)
       // Start the opening animation
       setShouldShow(true)
       // Allow animation to complete
       const timer = setTimeout(() => {}, 300)
       return () => clearTimeout(timer)
     } else if (dialog.open) {
+      // Unregister from context
+      dialogContext?.setActiveDialog(null)
       // Start the closing animation
       setShouldShow(false)
       // Close the dialog after animation completes
@@ -62,7 +68,7 @@ export default function Dialog({
       }, 300)
       return () => clearTimeout(timer)
     }
-  }, [open])
+  }, [open, dialogContext])
 
   // Handle ESC key and clicking outside the dialog
   useEffect(() => {
@@ -108,7 +114,7 @@ export default function Dialog({
   return (
     <dialog
       ref={dialogRef}
-      className={`w-[92vw] rounded-lg border p-0 text-gray-800 dark:text-white ${sizeClasses[size]} mx-auto mt-6 max-h-[90vh] border border-gray-200 bg-white shadow-3xl transition-all duration-300 ease-out backdrop:duration-400 lg:mt-28 dark:border-gray-700 dark:border-t-gray-600 dark:bg-gray-800 ${
+      className={`w-[92vw] rounded-lg border p-0 text-gray-800 dark:text-white ${sizeClasses[size]} mx-auto mt-6 max-h-[90vh] border border-gray-200 bg-white shadow-3xl transition-opacity duration-300 ease-out backdrop:transition-colors backdrop:duration-400 lg:mt-28 dark:border-gray-700 dark:border-t-gray-600 dark:bg-gray-800 ${
         shouldShow ? 'opacity-100 backdrop:bg-black/50' : 'opacity-0 backdrop:bg-transparent'
       }`}
     >

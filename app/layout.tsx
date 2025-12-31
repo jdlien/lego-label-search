@@ -4,6 +4,7 @@ import React from 'react'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
 import { ThemeProvider } from './context/ThemeContext'
+import { DialogProvider } from './context/DialogContext'
 import { ToastProvider } from './components/ToastPop'
 import { PWABottomNav, PWATopBar, PWAViewportAdjuster } from './components/PWAHandler'
 
@@ -55,11 +56,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PWATopBar />
         <PWAViewportAdjuster>
           <ThemeProvider defaultTheme="gray" defaultAccent="sky" defaultUISize="lg">
-            <ToastProvider>
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </ToastProvider>
+            <DialogProvider>
+              <ToastProvider>
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </ToastProvider>
+            </DialogProvider>
           </ThemeProvider>
         </PWAViewportAdjuster>
         <PWABottomNav />
