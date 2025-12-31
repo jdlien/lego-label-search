@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { IconXMark } from './InputField/InputIcons'
-import { useDialogContextSafe } from '../context/DialogContext'
+import { useDialogContext, useDialogContextSafe } from '../context/DialogContext'
 
 // Toast types
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
@@ -25,6 +25,8 @@ interface ToastContextValue {
   toasts: ToastData[]
   addToast: (toast: Omit<ToastData, 'id'>) => void
   removeToast: (id: string) => void
+  shownToasts: Set<string>
+  markToastShown: (id: string) => void
 }
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined)
@@ -45,7 +47,7 @@ export const useToast = () => {
   return context
 }
 
-// Toast Provider component using Popover API
+// Toast Provider component - manages state only
 interface ToastProviderProps {
   children: ReactNode
   swipeDirection?: 'right' | 'left' | 'up' | 'down'
@@ -53,19 +55,8 @@ interface ToastProviderProps {
 
 export function ToastProvider({ children, swipeDirection = 'right' }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastData[]>([])
-  const [isMounted, setIsMounted] = useState(false)
-  const dialogContext = useDialogContextSafe()
-  const activeDialog = dialogContext?.activeDialog
-  // Track which toasts have completed entrance animation to prevent re-animation on portal change
-  const enteredToastsRef = useRef<Set<string>>(new Set())
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  // Portal into active dialog if one is open, otherwise document.body
-  // This ensures toasts are interactive even when a dialog is open
-  const portalTarget = activeDialog || (isMounted ? document.body : null)
+  // Track which toasts have completed entrance animation (persists across host switches)
+  const shownToastsRef = useRef<Set<string>>(new Set())
 
   const addToast = useCallback((toast: Omit<ToastData, 'id'>) => {
     const id = generateToastId()
@@ -74,35 +65,80 @@ export function ToastProvider({ children, swipeDirection = 'right' }: ToastProvi
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id))
-    enteredToastsRef.current.delete(id)
+    shownToastsRef.current.delete(id)
   }, [])
 
-  const markToastEntered = useCallback((id: string) => {
-    enteredToastsRef.current.add(id)
+  const markToastShown = useCallback((id: string) => {
+    shownToastsRef.current.add(id)
   }, [])
 
-  const toastElements = toasts.length > 0 ? (
-    <div
-      className="pointer-events-none fixed right-0 bottom-0 z-[9999] flex max-h-screen w-full max-w-[420px] flex-col-reverse gap-2 p-4"
-    >
+  return (
+    <ToastContext.Provider value={{ toasts, addToast, removeToast, shownToasts: shownToastsRef.current, markToastShown }}>
+      {children}
+      <GlobalToastHost swipeDirection={swipeDirection} />
+    </ToastContext.Provider>
+  )
+}
+
+// GlobalToastHost - renders in body when NO dialog is open
+interface ToastHostProps {
+  swipeDirection?: 'right' | 'left' | 'up' | 'down'
+}
+
+function GlobalToastHost({ swipeDirection = 'right' }: ToastHostProps) {
+  const { toasts, removeToast, shownToasts, markToastShown } = useToast()
+  const dialogContext = useDialogContextSafe()
+  const isDialogOpen = dialogContext?.isDialogOpen ?? false
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // Don't render if not mounted, dialog is open, or no toasts
+  if (!isMounted || isDialogOpen || toasts.length === 0) return null
+
+  return createPortal(
+    <ToastStack toasts={toasts} onRemove={removeToast} swipeDirection={swipeDirection} shownToasts={shownToasts} markToastShown={markToastShown} />,
+    document.body
+  )
+}
+
+// DialogToastHost - rendered inside Dialog, shows when dialog IS open
+export function DialogToastHost({ swipeDirection = 'right' }: ToastHostProps) {
+  const { toasts, removeToast, shownToasts, markToastShown } = useToast()
+  const dialogContext = useDialogContextSafe()
+  const isDialogOpen = dialogContext?.isDialogOpen ?? false
+
+  // Only render when dialog is open and there are toasts
+  if (!isDialogOpen || toasts.length === 0) return null
+
+  return <ToastStack toasts={toasts} onRemove={removeToast} swipeDirection={swipeDirection} shownToasts={shownToasts} markToastShown={markToastShown} />
+}
+
+// ToastStack - shared rendering logic for toast container
+interface ToastStackProps {
+  toasts: ToastData[]
+  onRemove: (id: string) => void
+  swipeDirection: 'right' | 'left' | 'up' | 'down'
+  shownToasts: Set<string>
+  markToastShown: (id: string) => void
+}
+
+function ToastStack({ toasts, onRemove, swipeDirection, shownToasts, markToastShown }: ToastStackProps) {
+  return (
+    <div className="pointer-events-none fixed right-0 bottom-0 z-[9999] flex max-h-screen w-full max-w-[420px] flex-col-reverse gap-2 p-4">
       {toasts.map((toast) => (
         <Toast
           key={toast.id}
           toast={toast}
-          onRemove={removeToast}
+          onRemove={onRemove}
           swipeDirection={swipeDirection}
-          hasEntered={enteredToastsRef.current.has(toast.id)}
-          onEntered={markToastEntered}
+          hasShown={shownToasts.has(toast.id)}
+          onShown={() => markToastShown(toast.id)}
         />
       ))}
     </div>
-  ) : null
-
-  return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
-      {children}
-      {isMounted && portalTarget && toastElements && createPortal(toastElements, portalTarget)}
-    </ToastContext.Provider>
   )
 }
 
@@ -111,13 +147,13 @@ interface ToastProps {
   toast: ToastData
   onRemove: (id: string) => void
   swipeDirection: 'right' | 'left' | 'up' | 'down'
-  hasEntered: boolean
-  onEntered: (id: string) => void
+  hasShown: boolean
+  onShown: () => void
 }
 
-function Toast({ toast, onRemove, swipeDirection, hasEntered, onEntered }: ToastProps) {
-  // If toast has already entered (e.g., portal moved), start visible to prevent re-animation
-  const [isVisible, setIsVisible] = useState(hasEntered)
+function Toast({ toast, onRemove, swipeDirection, hasShown, onShown }: ToastProps) {
+  // Start visible if already shown (e.g., switching between hosts)
+  const [isVisible, setIsVisible] = useState(hasShown)
   const [isExiting, setIsExiting] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState(0)
@@ -125,18 +161,18 @@ function Toast({ toast, onRemove, swipeDirection, hasEntered, onEntered }: Toast
   const startPos = useRef({ x: 0, y: 0 })
   const currentPos = useRef({ x: 0, y: 0 })
 
-  // Entrance animation - skip if already entered
+  // Entrance animation - skip if already shown
   useEffect(() => {
-    if (hasEntered) {
+    if (hasShown) {
       setIsVisible(true)
       return
     }
     const timer = setTimeout(() => {
       setIsVisible(true)
-      onEntered(toast.id)
+      onShown()
     }, 50)
     return () => clearTimeout(timer)
-  }, [hasEntered, onEntered, toast.id])
+  }, [hasShown, onShown])
 
   const handleDismiss = useCallback(() => {
     setIsExiting(true)
@@ -157,7 +193,6 @@ function Toast({ toast, onRemove, swipeDirection, hasEntered, onEntered }: Toast
   // Touch/Mouse handlers for swipe-to-dismiss
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     // Don't capture pointer events on interactive elements (buttons)
-    // This allows click handlers to work properly
     const target = e.target as HTMLElement
     if (target.closest('button')) {
       return

@@ -3,8 +3,8 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
 
 interface DialogContextValue {
-  activeDialog: HTMLDialogElement | null
-  setActiveDialog: (dialog: HTMLDialogElement | null) => void
+  isDialogOpen: boolean
+  setDialogOpen: (open: boolean) => void
 }
 
 const DialogContext = createContext<DialogContextValue | undefined>(undefined)
@@ -27,14 +27,14 @@ interface DialogProviderProps {
 }
 
 export function DialogProvider({ children }: DialogProviderProps) {
-  const [activeDialog, setActiveDialogState] = useState<HTMLDialogElement | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const setActiveDialog = useCallback((dialog: HTMLDialogElement | null) => {
-    setActiveDialogState(dialog)
+  const setDialogOpen = useCallback((open: boolean) => {
+    setIsDialogOpen(open)
   }, [])
 
   return (
-    <DialogContext.Provider value={{ activeDialog, setActiveDialog }}>
+    <DialogContext.Provider value={{ isDialogOpen, setDialogOpen }}>
       {children}
     </DialogContext.Provider>
   )
