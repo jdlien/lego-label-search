@@ -59,13 +59,12 @@ export default function Dialog({
       const timer = setTimeout(() => {}, 300)
       return () => clearTimeout(timer)
     } else if (dialog.open) {
-      // Unregister from context
-      dialogContext?.setDialogOpen(false)
       // Start the closing animation
       setShouldShow(false)
-      // Close the dialog after animation completes
+      // Close the dialog and unregister from context after animation completes
       const timer = setTimeout(() => {
         dialog.close()
+        dialogContext?.setDialogOpen(false)
       }, 300)
       return () => clearTimeout(timer)
     }
