@@ -56,7 +56,7 @@ interface ToastProviderProps {
 export function ToastProvider({ children, swipeDirection = 'right' }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastData[]>([])
   // Track which toasts have completed entrance animation (persists across host switches)
-  const shownToastsRef = useRef<Set<string>>(new Set())
+  const [shownToasts, setShownToasts] = useState<Set<string>>(() => new Set())
 
   const addToast = useCallback((toast: Omit<ToastData, 'id'>) => {
     const id = generateToastId()
@@ -65,15 +65,23 @@ export function ToastProvider({ children, swipeDirection = 'right' }: ToastProvi
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id))
-    shownToastsRef.current.delete(id)
+    setShownToasts((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
   }, [])
 
   const markToastShown = useCallback((id: string) => {
-    shownToastsRef.current.add(id)
+    setShownToasts((prev) => {
+      const next = new Set(prev)
+      next.add(id)
+      return next
+    })
   }, [])
 
   return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast, shownToasts: shownToastsRef.current, markToastShown }}>
+    <ToastContext.Provider value={{ toasts, addToast, removeToast, shownToasts, markToastShown }}>
       {children}
       <GlobalToastHost swipeDirection={swipeDirection} />
     </ToastContext.Provider>
