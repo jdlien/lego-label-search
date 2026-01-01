@@ -61,12 +61,19 @@ export default function Dialog({
     } else if (dialog.open) {
       // Start the closing animation
       setShouldShow(false)
-      // Close the dialog and unregister from context after animation completes
-      const timer = setTimeout(() => {
-        dialog.close()
+      // Unregister from dialog context slightly before closing
+      // This allows GlobalToastHost to mount before DialogToastHost unmounts
+      const contextTimer = setTimeout(() => {
         dialogContext?.setDialogOpen(false)
+      }, 250)
+      // Close the dialog after animation completes
+      const closeTimer = setTimeout(() => {
+        dialog.close()
       }, 300)
-      return () => clearTimeout(timer)
+      return () => {
+        clearTimeout(contextTimer)
+        clearTimeout(closeTimer)
+      }
     }
   }, [open, dialogContext])
 
