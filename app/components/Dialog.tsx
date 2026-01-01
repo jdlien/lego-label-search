@@ -65,7 +65,7 @@ export default function Dialog({
       // This allows GlobalToastHost to mount before DialogToastHost unmounts
       const contextTimer = setTimeout(() => {
         dialogContext?.setDialogOpen(false)
-      }, 250)
+      }, 295)
       // Close the dialog after animation completes
       const closeTimer = setTimeout(() => {
         dialog.close()
