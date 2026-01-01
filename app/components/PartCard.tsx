@@ -4,28 +4,8 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import PillContainer from './PillContainer'
-import { useToastHelpers } from './ToastPop'
-
-// SVG icon for fallback when image fails to load
-const BrickPlaceholder = () => (
-  <svg viewBox="0 0 24 24" className="h-10 w-10 text-gray-400 dark:text-gray-500" fill="currentColor">
-    <circle cx="6" cy="12" r="2" />
-    <circle cx="12" cy="12" r="2" />
-    <circle cx="18" cy="12" r="2" />
-  </svg>
-)
-
-// Download icon for the download button
-const DownloadIcon = () => (
-  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-    />
-  </svg>
-)
+import { BrickPlaceholder, DownloadIcon } from './icons'
+import { useLabelDownload } from '../hooks/useLabelDownload'
 
 type Part = {
   id: string
@@ -55,119 +35,16 @@ export default function PartCard({ part, onPartClick, priority = false }: PartCa
   // Use the img_file field from database - much simpler!
   const imagePath = part.img_file ? `/data/images/${part.img_file}` : null
 
-  // Simple state management - no complex fallback logic needed
+  // State for image loading
   const [imageError, setImageError] = useState(!imagePath)
-  const [isDownloading, setIsDownloading] = useState(false)
-  const [isConverting, setIsConverting] = useState(false)
-  const [labelExists, setLabelExists] = useState<boolean | null>(null)
   const router = useRouter()
-  const { error, warning } = useToastHelpers()
+
+  // Use the shared download hook for label downloads
+  const { download12mm, download24mm, isDownloading, isConverting, labelExists } = useLabelDownload(part.id)
 
   // Handle image error - no fallback needed since we have the exact filename
   const handleImageError = () => {
     setImageError(true)
-  }
-
-  // Unified download trigger function
-  const triggerDownload = async (fileUrl: string, fileName: string) => {
-    try {
-      const response = await fetch(fileUrl)
-      if (!response.ok) {
-        throw new Error(`Failed to fetch file: ${response.statusText}`)
-      }
-      const blob = await response.blob()
-      const link = document.createElement('a')
-      link.href = URL.createObjectURL(blob)
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(link.href)
-    } catch (err) {
-      console.error('Error triggering download:', err)
-      error('Could not start the file download.')
-    }
-  }
-
-  // Handler for label download (12mm)
-  const handleLabelDownload = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (isDownloading) return
-
-    setIsDownloading(true)
-    try {
-      const response = await fetch(`/api/download-label?part_num=${part.id}`)
-      const data = await response.json()
-
-      if (data.success) {
-        // Start the download
-        await triggerDownload(`/data/labels/${part.id}.lbx`, `${part.id}.lbx`)
-        setLabelExists(true)
-      } else {
-        setLabelExists(false)
-        warning('This part does not have a label available.')
-      }
-    } catch (err) {
-      console.error('Error downloading label:', err)
-      error('There was an error downloading the label.')
-    } finally {
-      setIsDownloading(false)
-    }
-  }
-
-  // Handler for 24mm label download
-  const handle24mmLabelDownload = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (isConverting) return
-
-    setIsConverting(true)
-    try {
-      // First, ensure the original label exists
-      const downloadResponse = await fetch(`/api/download-label?part_num=${part.id}`)
-      const downloadData = await downloadResponse.json()
-
-      if (!downloadData.success) {
-        setLabelExists(false)
-        warning('The original label is not available for conversion.')
-        return
-      }
-
-      // Add a small delay to ensure the file is fully written to disk
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      // Now try to convert the label
-      const response = await fetch(`/api/convert-label?part_num=${part.id}`)
-      const data = await response.json()
-
-      if (data.success) {
-        // Add a small delay to allow the server to recognize the new file
-        await new Promise((resolve) => setTimeout(resolve, 300))
-        // Start the download
-        await triggerDownload(`/data/labels/${part.id}-24mm.lbx`, `${part.id}-24mm.lbx`)
-      } else {
-        // Check if the error message contains a SyntaxWarning about escape sequences
-        const isEscapeSequenceWarning = data.message && data.message.includes('SyntaxWarning: invalid escape sequence')
-
-        if (isEscapeSequenceWarning) {
-          // Add a small delay here as well if attempting retry on warning
-          await new Promise((resolve) => setTimeout(resolve, 300))
-          // Try one more time - the script might have executed properly despite the warning
-          await triggerDownload(`/data/labels/${part.id}-24mm.lbx`, `${part.id}-24mm.lbx`)
-          warning('There were some warnings during conversion, but your file should be ready.')
-        } else {
-          error(data.message || 'There was an error converting the label to 24mm format.')
-        }
-      }
-    } catch (err) {
-      console.error('Error converting label:', err)
-      error('There was an error converting the label.')
-    } finally {
-      setIsConverting(false)
-    }
   }
 
   // Handler for category badge clicks
@@ -279,7 +156,7 @@ export default function PartCard({ part, onPartClick, priority = false }: PartCa
             <div className="flex space-x-8">
               <button
                 className="link flex items-center space-x-1 text-sm"
-                onClick={handleLabelDownload}
+                onClick={download12mm}
                 disabled={isDownloading}
                 title="Download 12mm Label"
                 aria-label="Download 12mm Label"
@@ -289,7 +166,7 @@ export default function PartCard({ part, onPartClick, priority = false }: PartCa
               </button>
               <button
                 className="link flex items-center space-x-1 text-sm"
-                onClick={handle24mmLabelDownload}
+                onClick={download24mm}
                 disabled={isConverting}
                 title="Download 24mm Label"
                 aria-label="Download 24mm Label"

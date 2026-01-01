@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import Dialog from './Dialog'
-
-// Import heic-convert for HEIC to JPEG conversion
-import convert from 'heic-convert'
+import LoadingSpinner from './LoadingSpinner'
+import { useCamera } from '../hooks/useCamera'
+import { useHeicConverter } from '../hooks/useHeicConverter'
 
 type ImageSearchModalProps = {
   isOpen: boolean
@@ -31,65 +31,35 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [cameraError, setCameraError] = useState<string | null>(null)
   const [showCamera, setShowCamera] = useState(false)
-  const [isStreamActive, setIsStreamActive] = useState(false)
   const [apiStatus, setApiStatus] = useState({ isChecking: false, isAvailable: true })
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null)
-  const [isConverting, setIsConverting] = useState(false)
 
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (isOpen) {
-      checkApiHealth()
-      setSelectedImage(null)
-      setSearchResults(null)
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-        setPreviewUrl(null)
-      }
-      setError(null)
-      setCameraError(null)
-      setIsLoading(false)
-      setShowCamera(true)
-    } else {
-      stopCameraStream()
-      setShowCamera(false)
-      setSelectedImage(null)
-      setSearchResults(null)
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-        setPreviewUrl(null)
-      }
-      setError(null)
-      setCameraError(null)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen])
+  // Use extracted hooks
+  const {
+    videoRef,
+    canvasRef,
+    isStreamActive,
+    cameraError,
+    startCamera,
+    stopCamera,
+    takePicture,
+    clearError: clearCameraError,
+  } = useCamera({ facingMode: 'environment' })
 
-  useEffect(() => {
-    if (isOpen && showCamera) {
-      startCamera()
-    } else if (isOpen && !showCamera) {
-      stopCameraStream()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, showCamera])
+  const { isConverting, processFile } = useHeicConverter({
+    onError: (errorMessage) => setError(errorMessage),
+  })
 
-  const checkApiHealth = async () => {
+  // Check API health
+  const checkApiHealth = useCallback(async () => {
     setApiStatus({ isChecking: true, isAvailable: false })
     try {
       const healthResponse = await fetch('/api/health', {
         method: 'GET',
-        headers: {
-          accept: 'application/json',
-        },
+        headers: { accept: 'application/json' },
       })
 
       if (!healthResponse.ok) {
@@ -107,175 +77,104 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
       console.error('API Health check failed:', errorMessage)
       setApiStatus({ isChecking: false, isAvailable: false })
     }
-  }
+  }, [])
 
-  // Helper function to check if a file is HEIC
-  const isHeicFile = (file: File): boolean => {
-    const heicExtensions = ['.heic', '.heif', '.HEIC', '.HEIF']
-    return heicExtensions.some((ext) => file.name.toLowerCase().endsWith(ext.toLowerCase()))
-  }
-
-  // Function to convert HEIC to JPEG
-  const convertHeicToJpeg = async (file: File): Promise<File> => {
-    try {
-      setIsConverting(true)
-
-      // Convert file to buffer
-      const buffer = await file.arrayBuffer()
-      const inputBuffer = new Uint8Array(buffer)
-
-      // Convert HEIC to JPEG for smaller file size
-      const outputBuffer = await convert({
-        buffer: inputBuffer,
-        format: 'JPEG',
-        quality: 0.85, // Good balance between quality and file size
-      })
-
-      // Create a new File object with the converted data
-      const jpegBlob = new Blob([outputBuffer], { type: 'image/jpeg' })
-      const originalNameWithoutExt = file.name.replace(/\.(heic|heif)$/i, '')
-      const convertedFile = new File([jpegBlob], `${originalNameWithoutExt}_converted.jpg`, {
-        type: 'image/jpeg',
-        lastModified: Date.now(),
-      })
-
-      return convertedFile
-    } catch (err) {
-      console.error('Error converting HEIC to JPEG:', err)
-      throw new Error('Failed to convert HEIC image. Please try a different image format.')
-    } finally {
-      setIsConverting(false)
-    }
-  }
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Only stop camera and change view state if a file was actually selected
-      stopCameraStream()
-      setShowCamera(false)
+  // Handle modal open/close
+  useEffect(() => {
+    if (isOpen) {
+      checkApiHealth()
+      setSelectedImage(null)
+      setSearchResults(null)
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(null)
+      }
       setError(null)
-
-      try {
-        let fileForPreview = file
-        let fileForSubmission = file
-
-        // Check if it's a HEIC file and convert it
-        if (isHeicFile(file)) {
-          const convertedFile = await convertHeicToJpeg(file)
-          fileForPreview = convertedFile
-          fileForSubmission = convertedFile // Use converted file for submission too
-        }
-
-        setSelectedImage(fileForSubmission)
-        if (previewUrl) URL.revokeObjectURL(previewUrl)
-        setPreviewUrl(URL.createObjectURL(fileForPreview))
-      } catch (err) {
-        console.error('Error processing file:', err)
-        setError(err instanceof Error ? err.message : 'Failed to process the selected image.')
-      }
-    }
-    // Reset the input value to allow selecting the same file again
-    // and to ensure clean state after cancel
-    event.target.value = ''
-  }
-
-  const startCamera = async () => {
-    // Stop any existing stream first
-    stopCameraStream()
-
-    setSelectedImage(null)
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl)
-      setPreviewUrl(null)
-    }
-    setShowCamera(true)
-    setError(null)
-    setCameraError(null)
-    setIsStreamActive(false)
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
-      })
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        await videoRef.current.play()
-        setIsStreamActive(true)
-      } else {
-        stream.getTracks().forEach((track) => track.stop())
-        throw new Error('Video element not available.')
-      }
-    } catch (err) {
-      console.error('Error accessing camera:', err)
-      setCameraError('Could not access camera. Please ensure permissions are granted and a camera is available.')
-      setShowCamera(false)
-      setIsStreamActive(false)
-    }
-  }
-
-  const stopCameraStream = () => {
-    if (videoRef.current?.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream
-      stream.getTracks().forEach((track) => track.stop())
-      videoRef.current.srcObject = null
-    }
-    setIsStreamActive(false)
-  }
-
-  const takePicture = () => {
-    if (videoRef.current && canvasRef.current && isStreamActive) {
-      const video = videoRef.current
-      const canvas = canvasRef.current
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-      const context = canvas.getContext('2d')
-      if (context) {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height)
-        stopCameraStream()
-        setShowCamera(false)
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const file = new File([blob], `captured_image_${Date.now()}.jpg`, { type: 'image/jpeg' })
-            setSelectedImage(file)
-            if (previewUrl) URL.revokeObjectURL(previewUrl)
-            setPreviewUrl(URL.createObjectURL(file))
-          }
-        }, 'image/jpeg')
-      }
+      clearCameraError()
+      setIsLoading(false)
+      setShowCamera(true)
     } else {
-      console.warn('Take picture called but stream not active or refs not set')
-      setCameraError('Could not take picture. Camera not ready.')
+      stopCamera()
+      setShowCamera(false)
+      setSelectedImage(null)
+      setSearchResults(null)
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(null)
+      }
+      setError(null)
+      clearCameraError()
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
-  const switchToUpload = (e?: React.MouseEvent) => {
-    // Prevent any event bubbling that might interfere with modal
+  // Start/stop camera based on showCamera state
+  useEffect(() => {
+    if (isOpen && showCamera) {
+      startCamera()
+    } else if (isOpen && !showCamera) {
+      stopCamera()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, showCamera])
+
+  // Handle file selection
+  const handleFileChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0]
+      if (file) {
+        stopCamera()
+        setShowCamera(false)
+        setError(null)
+
+        try {
+          const processedFile = await processFile(file)
+          setSelectedImage(processedFile)
+          if (previewUrl) URL.revokeObjectURL(previewUrl)
+          setPreviewUrl(URL.createObjectURL(processedFile))
+        } catch (err) {
+          console.error('Error processing file:', err)
+          setError(err instanceof Error ? err.message : 'Failed to process the selected image.')
+        }
+      }
+      event.target.value = ''
+    },
+    [stopCamera, processFile, previewUrl]
+  )
+
+  // Handle taking a picture from camera
+  const handleTakePicture = useCallback(() => {
+    const file = takePicture()
+    if (file) {
+      stopCamera()
+      setShowCamera(false)
+      setSelectedImage(file)
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(URL.createObjectURL(file))
+    }
+  }, [takePicture, stopCamera, previewUrl])
+
+  // Switch to file upload
+  const switchToUpload = useCallback((e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault()
       e.stopPropagation()
     }
 
-    // Clear any existing value first to ensure clean state
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
-      // Add a small delay to ensure the input is ready
       setTimeout(() => {
         fileInputRef.current?.click()
       }, 10)
     }
-  }
+  }, [])
 
-  const handleUploadClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    switchToUpload(e)
-  }
-
-  const clearSelectionAndRestartCamera = () => {
-    // First stop the current camera stream
-    stopCameraStream()
-
-    // Reset all state
+  // Clear selection and restart camera
+  const clearSelectionAndRestartCamera = useCallback(() => {
+    stopCamera()
     setSelectedImage(null)
     setSearchResults(null)
     if (previewUrl) {
@@ -284,15 +183,15 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
     }
     if (fileInputRef.current) fileInputRef.current.value = ''
     setError(null)
-    setCameraError(null)
+    clearCameraError()
 
-    // Use setTimeout to ensure cleanup is complete before restarting
     setTimeout(() => {
-      setShowCamera(true) // This will trigger the useEffect to call startCamera()
+      setShowCamera(true)
     }, 100)
-  }
+  }, [stopCamera, previewUrl, clearCameraError])
 
-  const handleImageSubmit = async () => {
+  // Submit image for search
+  const handleImageSubmit = useCallback(async () => {
     if (!selectedImage) {
       setError('Please select or capture an image first.')
       return
@@ -342,8 +241,9 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [selectedImage, onImageSubmit])
 
+  // Search icon component
   const SearchIcon = () => (
     <svg
       fill="none"
@@ -357,6 +257,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
     </svg>
   )
 
+  // Render search results view
   const renderResultsView = () => {
     if (!searchResults || !searchResults.items || searchResults.items.length === 0) {
       return (
@@ -371,10 +272,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             </svg>
             <span className="text-yellow-800 dark:text-yellow-200">No matching items found</span>
           </div>
-          <button
-            onClick={clearSelectionAndRestartCamera}
-            className="btn mx-auto mt-3 w-full max-w-sm py-2 font-medium"
-          >
+          <button onClick={clearSelectionAndRestartCamera} className="btn mx-auto mt-3 w-full max-w-sm py-2 font-medium">
             Try Again
           </button>
         </div>
@@ -454,10 +352,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
           </div>
         ))}
         <div className="flex justify-center">
-          <button
-            onClick={clearSelectionAndRestartCamera}
-            className="btn mx-auto mt-4 w-full max-w-sm py-2 font-medium"
-          >
+          <button onClick={clearSelectionAndRestartCamera} className="btn mx-auto mt-4 w-full max-w-sm py-2 font-medium">
             Search New Image
           </button>
         </div>
@@ -470,6 +365,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
   return (
     <Dialog open={isOpen} onClose={onClose} title={modalTitle} size="3xl">
       <div className="">
+        {/* API unavailable alert */}
         {!apiStatus.isAvailable && !apiStatus.isChecking && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <div className="text-center">
@@ -486,6 +382,7 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
           </div>
         )}
 
+        {/* General error alert */}
         {error && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <div className="flex items-center">
@@ -501,14 +398,11 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
           </div>
         )}
 
+        {/* Camera error alert */}
         {cameraError && (
           <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-900/20">
             <div className="flex items-center">
-              <svg
-                className="mr-2 h-5 w-5 text-orange-600 dark:text-orange-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
+              <svg className="mr-2 h-5 w-5 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
@@ -523,16 +417,11 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
           </div>
         )}
 
+        {/* Main content */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-6">
-            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-sky-600"></div>
-            <span className="ml-3 font-medium">Processing image...</span>
-          </div>
+          <LoadingSpinner size="sm" text="Processing image..." variant="blue" />
         ) : isConverting ? (
-          <div className="flex items-center justify-center py-6">
-            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-orange-600"></div>
-            <span className="ml-3 font-medium">Converting HEIC image to JPEG...</span>
-          </div>
+          <LoadingSpinner size="sm" text="Converting HEIC image to JPEG..." variant="gray" />
         ) : searchResults ? (
           renderResultsView()
         ) : showCamera ? (
@@ -543,13 +432,13 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             <canvas ref={canvasRef} style={{ display: 'none' }} />
             <div className="flex w-full flex-col items-center justify-center space-y-6">
               <button
-                onClick={takePicture}
+                onClick={handleTakePicture}
                 disabled={!isStreamActive || isConverting}
                 className="btn btn-primary mx-auto w-full max-w-sm py-2"
               >
                 Take Picture
               </button>
-              <button onClick={handleUploadClick} disabled={isConverting} className="btn w-full max-w-sm py-2">
+              <button onClick={switchToUpload} disabled={isConverting} className="btn w-full max-w-sm py-2">
                 Upload Image
               </button>
             </div>
@@ -582,20 +471,18 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
         ) : (
           <div className="space-y-6 py-4 text-center">
             {!cameraError && (
-              <div className="flex items-center justify-center">
-                <div className="mr-3 h-6 w-6 animate-spin rounded-full border-b-2 border-blue-600"></div>
-                <span className="text-gray-600 dark:text-gray-400">Starting camera...</span>
-              </div>
+              <LoadingSpinner size="sm" text="Starting camera..." variant="blue" className="py-0" />
             )}
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {cameraError ? 'Camera unavailable.' : 'If you prefer to upload an image:'}
             </p>
-            <button onClick={handleUploadClick} disabled={isConverting} className="btn w-full py-2">
+            <button onClick={switchToUpload} disabled={isConverting} className="btn w-full py-2">
               Upload Image
             </button>
           </div>
         )}
 
+        {/* Hidden file input */}
         <div
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
@@ -609,18 +496,9 @@ export default function ImageSearchModal({ isOpen, onClose, onImageSubmit }: Ima
             accept="image/*"
             ref={fileInputRef}
             onChange={handleFileChange}
-            onBlur={(e) => {
-              // Prevent blur events from interfering with dialog
-              e.stopPropagation()
-            }}
-            onFocus={(e) => {
-              // Prevent focus events from interfering with dialog
-              e.stopPropagation()
-            }}
-            onClick={(e) => {
-              // Prevent click events from bubbling to dialog
-              e.stopPropagation()
-            }}
+            onBlur={(e) => e.stopPropagation()}
+            onFocus={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
             style={{ display: 'none', position: 'absolute', left: '-9999px' }}
           />
         </div>
