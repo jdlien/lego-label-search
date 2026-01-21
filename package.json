@@ -87,6 +87,10 @@
     "onlyBuiltDependencies": [
       "sharp",
       "sqlite3"
-    ]
+    ],
+    "overrides": {
+      "tar": "^7.5.6",
+      "undici": "^7.18.2"
+    }
   }
 }
