@@ -4,7 +4,11 @@
   "packageManager": "pnpm@10.27.0",
   "description": "Search for LEGO parts and download printable labels",
   "main": "index.js",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "dev": "node server.js",
     "dev:turbo": "USE_TURBOPACK=true node server.js",
     "dev:no-turbo": "USE_TURBOPACK=false node server.js",
@@ -69,7 +73,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.10.9",
+    "@types/node": "^25.0.10",
     "@types/react": "^19.2.9",
     "@types/supertest": "^6.0.3",
     "babel-jest": "^30.2.0",
