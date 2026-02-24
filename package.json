@@ -1,7 +1,7 @@
 {
   "name": "lego-label-search",
   "version": "2.0.0",
-  "packageManager": "pnpm@10.30.0+sha512.2b5753de015d480eeb88f5b5b61e0051f05b4301808a82ec8b840c9d2adf7748eb352c83f5c1593ca703ff1017295bc3fdd3119abb9686efc96b9fcb18200937",
+  "packageManager": "pnpm@10.30.2+sha512.36cdc707e7b7940a988c9c1ecf88d084f8514b5c3f085f53a2e244c2921d3b2545bc20dd4ebe1fc245feec463bb298aecea7a63ed1f7680b877dc6379d8d0cb4",
   "description": "Search for LEGO parts and download printable labels",
   "main": "index.js",
   "engines": {
@@ -47,7 +47,7 @@
   "homepage": "https://search.brck.ca/",
   "dependencies": {
     "@radix-ui/react-popover": "^1.1.15",
-    "@tailwindcss/postcss": "^4.2.0",
+    "@tailwindcss/postcss": "^4.2.1",
     "cheerio": "^1.2.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -84,15 +84,17 @@
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "supertest": "^7.2.2",
-    "tailwindcss": "^4.2.0",
+    "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "sharp",
-      "sqlite3"
+      "sqlite3",
+      "unrs-resolver"
     ],
     "overrides": {
+      "ajv": "~6.14.0",
       "tar": "^7.5.9",
       "undici": "^7.22.0"
     }
