@@ -49,6 +49,10 @@ else
   echo -e "${RED}⚠️  WARNING: Failed to pull from git repository${NC}"
 fi
 
+# Stop existing PM2 process before clearing build cache
+echo -e "${YELLOW}Stopping existing PM2 process...${NC}"
+pm2 stop search-brck-ca || true
+
 # Install dependencies
 echo -e "${YELLOW}Installing dependencies...${NC}"
 # Since we build on the server, we need dev dependencies
@@ -61,10 +65,6 @@ rm -rf .next
 echo -e "${YELLOW}Building application...${NC}"
 pnpm build
 
-# Stop existing PM2 process
-echo -e "${YELLOW}Stopping existing PM2 process...${NC}"
-pm2 stop search-brck-ca || true
-
 # Install/update cron service (optional - only if you want the separate cron service)
 if [ "$1" = "--with-cron-service" ]; then
   echo -e "${YELLOW}Installing systemd cron service...${NC}"
@@ -76,7 +76,8 @@ fi
 
 # Start/reload the application with PM2
 echo -e "${YELLOW}Starting application with PM2...${NC}"
-pm2 reload search-brck-ca || pm2 start node --name "search-brck-ca" -- server.js
+pm2 delete search-brck-ca 2>/dev/null || true
+pm2 start ecosystem.config.js
 
 # Update nginx configuration if needed
 if [ -f "nginx-production.conf" ]; then
