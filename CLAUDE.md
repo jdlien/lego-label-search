@@ -25,12 +25,6 @@ LEGO Part Label Search is a Next.js web application that allows users to search 
 - `pnpm db:seed` - Seed database with initial data
 - `pnpm db:update` - Update computed fields
 
-### Testing
-
-- `pnpm test` - Run all tests with clean output (console.log suppressed)
-- `pnpm test --verbose` - Run tests with full console output for debugging
-- `pnpm test <file>` - Run specific test file
-
 ### Maintenance Scripts
 
 - `node scripts/maintenance/update_computed_fields.js` - Update all computed fields
@@ -83,10 +77,6 @@ You can view the entire database schema in the scripts/migrations/000\*.js files
 - Database updates are cached - use maintenance scripts when schema changes
 - Image availability is tracked in database to avoid filesystem checks during searches
 - When updating the database schema, usually it's safe to update 0001_create_initial_tables.js and rebuild the database with `pnpm db:rebuild`, as all the data in the database is easily recreated (for now).
-- For significant new features, write tests first then we can iterate on the feature.
-- When writing tests, ensure that logs and error output are not shown on the console unless running in verbose mode.
-- After making significant changes (especially to multiple files at once) run the tests and fix any errors.
-
 ### Critical Search Implementation Notes
 
 **⚠️ IMPORTANT: SearchBar.tsx Query State Management**
