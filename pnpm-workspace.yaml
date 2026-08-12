@@ -1,0 +1,9 @@
+# Moved from .npmrc: pnpm 11 reads .npmrc for auth/registry settings only.
+engineStrict: true
+
+# pnpm 11 errors on an unapproved dependency build script instead of skipping it.
+# Both compile or fetch native binaries.
+allowBuilds:
+  sharp: true
+  sqlite3: true
+  unrs-resolver: set this to true or false
