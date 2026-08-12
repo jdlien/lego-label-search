@@ -2,8 +2,12 @@
 engineStrict: true
 
 # pnpm 11 errors on an unapproved dependency build script instead of skipping it.
-# Both compile or fetch native binaries.
+# All three compile or fetch native binaries.
+#
+# unrs-resolver must stay listed even though it never appears as a top-level
+# node_modules entry — it resolves under .pnpm, and removing it makes a
+# from-scratch `pnpm install` fail with ERR_PNPM_IGNORED_BUILDS.
 allowBuilds:
   sharp: true
   sqlite3: true
-  unrs-resolver: set this to true or false
+  unrs-resolver: true
